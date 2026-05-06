@@ -1,0 +1,30 @@
+{
+  "expo": {
+    "name": "GymPass",
+    "slug": "gympass-member",
+    "version": "1.0.0",
+    "scheme": "gympass",
+    "platforms": ["ios", "android"],
+    "icon": "./assets/icon.png",
+    "splash": {
+      "backgroundColor": "#0A0002"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-secure-store",
+        { "faceIDPermission": "Allow GymPass to use Face ID for secure login." }
+      ]
+    ],
+    "android": {
+      "config": {
+        "googleMaps": {
+          "apiKey": "YOUR_GOOGLE_MAPS_API_KEY"
+        }
+      }
+    },
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
