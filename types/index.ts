@@ -1,5 +1,3 @@
-// app/types/index.ts
-
 export interface User {
   _id: string;
   name: string;
@@ -39,7 +37,6 @@ export interface Transaction {
   createdAt: string;
 }
 
-// Expo Router tab param list
 export type TabParamList = {
   index: undefined;
   explore: undefined;

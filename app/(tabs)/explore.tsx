@@ -21,7 +21,7 @@ import {
 } from "react-native";
 import MapView, { Marker, Region } from "react-native-maps";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Gym } from "../types";
+import { Gym } from "@/types";
 
 // ── Placeholder data until gymService is wired up ──────────────────────────
 const MOCK_GYMS: (Gym & {
