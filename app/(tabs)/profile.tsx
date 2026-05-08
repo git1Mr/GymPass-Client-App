@@ -94,7 +94,7 @@ function ProfileSection({ section }: { section: Section }) {
           <Text style={styles.sectionTitle}>{section.title}</Text>
         </View>
         <Ionicons
-          name={open ? "chevron-up" : "chevron-down"}
+          name={open ? "chevron-down" : "chevron-up"}
           size={16}
           color={COLORS.textMuted}
         />
@@ -191,7 +191,7 @@ export default function ProfileScreen() {
       icon: "help-circle-outline",
       rows: [
         {
-          label: "About (À Propos)",
+          label: "About ",
           icon: "information-outline",
           onPress: () => {},
         },

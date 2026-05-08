@@ -16,6 +16,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
+
 import {
     Animated,
     Easing,
@@ -255,7 +256,7 @@ export default function HomeScreen() {
           <View style={styles.logoMark}>
             <Text style={styles.logoLetter}>G</Text>
           </View>
-          <Text style={styles.logoWord}>GYMPASS</Text>
+          <Text style={styles.logoWord}>UNITYFITNESS</Text>
         </View>
         <TouchableOpacity
           style={styles.profileBtn}
@@ -296,7 +297,7 @@ export default function HomeScreen() {
             onPress={() => router.push("/(tabs)/explore")}
             activeOpacity={0.85}
           >
-            <Text style={styles.heroBtnText}>Explore Gyms</Text>
+            <Text style={styles.heroBtnText}>Explore Clubs Near You</Text>
             <Ionicons name="arrow-forward" size={16} color={COLORS.white} />
           </TouchableOpacity>
         </View>
@@ -334,7 +335,7 @@ export default function HomeScreen() {
         <View style={styles.nearbyCard}>
           <Ionicons name="location" size={20} color={COLORS.primary} />
           <View style={styles.nearbyText}>
-            <Text style={styles.nearbyTitle}>Find gyms near you</Text>
+            <Text style={styles.nearbyTitle}>Find clubs near you</Text>
             <Text style={styles.nearbySubtitle}>
               12 partner clubs within 10 km
             </Text>

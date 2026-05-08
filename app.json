@@ -5,10 +5,7 @@
     "version": "1.0.0",
     "scheme": "gympass",
     "platforms": ["ios", "android"],
-    "icon": "./assets/icon.png",
-    "splash": {
-      "backgroundColor": "#0A0002"
-    },
+    "newArchEnabled": true,
     "plugins": [
       "expo-router",
       [
@@ -16,6 +13,9 @@
         { "faceIDPermission": "Allow GymPass to use Face ID for secure login." }
       ]
     ],
+    "experiments": {
+      "typedRoutes": true
+    },
     "android": {
       "config": {
         "googleMaps": {
@@ -23,8 +23,8 @@
         }
       }
     },
-    "experiments": {
-      "typedRoutes": true
+    "ios": {
+      "supportsTablet": true
     }
   }
 }

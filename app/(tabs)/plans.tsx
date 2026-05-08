@@ -43,7 +43,7 @@ const PLANS: Plan[] = [
     perPoint: 9.9,
     color: COLORS.primary,
     popular: false,
-    description: "Perfect for occasional visits to standard gyms.",
+    description: "Perfect for occasional visits to standard clubs.",
     perks: [
       "10 points included",
       "Tier 1 gyms (1 pt / session)",
