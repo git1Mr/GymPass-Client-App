@@ -1,6 +1,3 @@
-// app/constants/theme.ts
-// Updated palette: #9f99c7 primary (lavender) + #3C0008 accent (deep burgundy)
-
 export const COLORS = {
   // Brand
   primary: "#9f99c7", // soft lavender
@@ -28,6 +25,7 @@ export const COLORS = {
 
   // Semantic
   error: "#D93025",
+  errorBg: "#FFE9E8",
   success: "#1E8A4C",
   warning: "#F59E0B",
 
@@ -36,10 +34,19 @@ export const COLORS = {
   tabInactive: "#9f99c7",
   tabBar: "#FFFFFF",
 
+  // Auth screens — change these two to restyle every auth screen at once
+  authHeader: "#3C0008", // top brand panel background
+  authPanel: "#F7F6FB",  // bottom form panel background (off-white so inputs stand out)
+
+  // Wordmark
+  wordmarkHighlight: "#E8723F",
+
   white: "#FFFFFF",
   black: "#000000",
   transparent: "transparent",
 };
+
+export type ColorKey = keyof typeof COLORS;
 
 export const FONTS = {
   display: "System",
@@ -98,97 +105,11 @@ export const SHADOWS = {
     shadowRadius: 8,
     elevation: 3,
   },
+  pop: {
+    shadowColor: "#3C0008",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.18,
+    shadowRadius: 24,
+    elevation: 10,
+  },
 } as const;
-
-// // app/constants/theme.ts
-
-// import { TextStyle } from "react-native";
-
-// export const COLORS = {
-//   primary: "#3C0008",
-//   primaryLight: "#6B0010",
-//   primaryDark: "#1E0004",
-//   accent: "#FF2D55",
-//   accentMuted: "#C0162E",
-
-//   background: "#0A0002",
-//   surface: "#160005",
-//   surfaceElevated: "#220008",
-//   border: "#3C0018",
-//   borderFocus: "#FF2D55",
-
-//   text: "#F5E6E8",
-//   textSecondary: "#A07880",
-//   textMuted: "#5C3840",
-//   textOnPrimary: "#FFFFFF",
-
-//   error: "#FF453A",
-//   success: "#32D74B",
-//   warning: "#FFD60A",
-
-//   white: "#FFFFFF",
-//   black: "#000000",
-//   transparent: "transparent",
-// } as const;
-
-// export type ColorKey = keyof typeof COLORS;
-
-// export const FONTS = {
-//   display: "serif",
-//   body: "System",
-//   mono: "monospace",
-// } as const;
-
-// export const FONT_SIZES = {
-//   xs: 11,
-//   sm: 13,
-//   base: 15,
-//   md: 17,
-//   lg: 20,
-//   xl: 24,
-//   xxl: 32,
-//   hero: 48,
-// } as const;
-
-// // Typed as TextStyle['fontWeight'] so StyleSheet accepts them without casting
-// export const FONT_WEIGHTS: Record<string, TextStyle["fontWeight"]> = {
-//   regular: "400",
-//   medium: "500",
-//   semibold: "600",
-//   bold: "700",
-//   black: "900",
-// };
-
-// export const SPACING = {
-//   xs: 4,
-//   sm: 8,
-//   md: 16,
-//   lg: 24,
-//   xl: 32,
-//   xxl: 48,
-//   xxxl: 64,
-// } as const;
-
-// export const RADIUS = {
-//   sm: 6,
-//   md: 12,
-//   lg: 20,
-//   full: 999,
-// } as const;
-
-// export const SHADOWS = {
-//   glow: {
-//     shadowColor: "#FF2D55",
-//     shadowOffset: { width: 0, height: 0 } as const,
-//     shadowOpacity: 0.35,
-//     shadowRadius: 20,
-//     elevation: 12,
-//   },
-//   card: {
-//     shadowColor: "#000",
-//     shadowOffset: { width: 0, height: 4 } as const,
-//     shadowOpacity: 0.4,
-//     shadowRadius: 12,
-//     elevation: 8,
-//   },
-// } as const;

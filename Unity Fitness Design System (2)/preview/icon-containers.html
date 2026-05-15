@@ -1,0 +1,18 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_card.css"><link rel="stylesheet" href="../colors_and_type.css"></head><body class="card">
+<style>
+  .row { display:flex;gap:14px;flex-wrap:wrap;align-items:center; }
+  .ic { width:34px;height:34px;border-radius:8px;background:#3C000820;display:flex;align-items:center;justify-content:center;color:#3C0008;font:700 16px Inter; }
+  .ic.circle { border-radius:999px; }
+  .ic.danger { background:#FFE9E8;color:#D93025; }
+  .ic.muted  { background:#9f99c726;color:#3C0008; border-radius:999px; }
+  .lbl { font:400 11px Inter;color:#A09CC0; text-align:center; }
+  .col { display:flex;flex-direction:column;align-items:center;gap:4px; }
+</style>
+<div class="row">
+  <div class="col"><div class="ic">⌂</div><div class="lbl">Profile row<br>34 / r-8</div></div>
+  <div class="col"><div class="ic circle">✦</div><div class="lbl">Stat card<br>36 / circle</div></div>
+  <div class="col"><div class="ic muted">🛡</div><div class="lbl">Security<br>primaryMuted</div></div>
+  <div class="col"><div class="ic danger">!</div><div class="lbl">Danger<br>error-bg</div></div>
+</div>
+<div style="font:400 12px Inter;color:#5C567A;margin-top:14px">Brand pattern: every icon meeting text sits in a tinted square or circle. Glyph color = container's "loud" color; bg = same color at 12–15%.</div>
+</body></html>

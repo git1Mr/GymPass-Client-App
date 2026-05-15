@@ -1,0 +1,19 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_card.css"><link rel="stylesheet" href="../colors_and_type.css"></head><body class="card">
+<style>
+  .swatches { display:grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .sw { aspect-ratio: 1.4/1; border-radius: 14px; padding: 10px; display:flex; flex-direction:column; justify-content:flex-end; box-shadow: 0 2px 8px rgba(0,0,0,.08); border: 1px solid var(--uf-border); }
+  .sw .name { font-family: var(--uf-font-body); font-size: 11px; font-weight: 600; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.25); }
+  .sw .hex  { font-family: var(--uf-font-body); font-size: 10px; color: rgba(255,255,255,.85); }
+  .sw.dark .name, .sw.dark .hex { color: #1A1728; text-shadow: none; }
+</style>
+<div class="swatches">
+  <div class="sw" style="background:#9f99c7"><div class="name">Primary</div><div class="hex">#9F99C7</div></div>
+  <div class="sw" style="background:#bfbbdc"><div class="name">Primary Light</div><div class="hex">#BFBBDC</div></div>
+  <div class="sw" style="background:#7a73a8"><div class="name">Primary Dark</div><div class="hex">#7A73A8</div></div>
+  <div class="sw dark" style="background:#9f99c726"><div class="name">Primary Muted 15%</div><div class="hex">rgba lavender</div></div>
+  <div class="sw" style="background:#3C0008"><div class="name">Accent</div><div class="hex">#3C0008</div></div>
+  <div class="sw" style="background:#6B0010"><div class="name">Accent Light</div><div class="hex">#6B0010</div></div>
+  <div class="sw dark" style="background:#3C000820"><div class="name">Accent Muted 12%</div><div class="hex">rgba burgundy</div></div>
+  <div class="sw dark" style="background:#1A1728;color:#fff"><div class="name" style="color:#fff">Ink</div><div class="hex" style="color:rgba(255,255,255,.85)">#1A1728</div></div>
+</div>
+</body></html>

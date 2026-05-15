@@ -1,0 +1,168 @@
+/* Unity Fitness — colors_and_type.css
+ * Source of truth: gympass-client/constants/theme.ts
+ * Both raw tokens and semantic vars are exposed.
+ */
+
+/* ── Webfont (Inter — substituted for System; flag to user) ── */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
+
+:root {
+  /* ── Brand colors ───────────────────────────────────────────── */
+  --uf-primary:        #9f99c7;   /* soft lavender */
+  --uf-primary-light:  #bfbbdc;
+  --uf-primary-dark:   #7a73a8;
+  --uf-primary-muted:  rgba(159, 153, 199, 0.15);
+
+  --uf-accent:         #3C0008;   /* deep burgundy */
+  --uf-accent-light:   #6B0010;
+  --uf-accent-muted:   rgba(60, 0, 8, 0.125);
+
+  /* ── Surfaces ───────────────────────────────────────────────── */
+  --uf-bg:             #F7F6FB;   /* near-white lavender tint */
+  --uf-surface:        #FFFFFF;
+  --uf-surface-elev:   #EEEDF7;
+  --uf-border:         #D8D6EE;
+  --uf-border-focus:   #9f99c7;
+
+  /* ── Text ───────────────────────────────────────────────────── */
+  --uf-text:           #1A1728;   /* deep purple-black */
+  --uf-text-2:         #5C567A;   /* secondary */
+  --uf-text-muted:     #A09CC0;
+  --uf-text-on-primary:#FFFFFF;
+  --uf-text-on-accent: #FFFFFF;
+
+  /* ── Semantic state ─────────────────────────────────────────── */
+  --uf-error:          #D93025;
+  --uf-error-bg:       #FFE9E8;
+  --uf-success:        #1E8A4C;
+  --uf-warning:        #F59E0B;
+
+  /* ── Tier (gym tiers) ──────────────────────────────────────── */
+  --uf-tier-1:         #9f99c7;   /* Standard */
+  --uf-tier-2:         #F59E0B;   /* Mobility */
+  --uf-tier-3:         #3C0008;   /* Elite */
+
+  /* ── Auth screen split ─────────────────────────────────────── */
+  --uf-auth-header:    #3C0008;
+  --uf-auth-panel:     #F7F6FB;
+
+  /* ── Type ──────────────────────────────────────────────────── */
+  --uf-font-display:   "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif;
+  --uf-font-body:      "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+
+  --uf-fs-xs:    11px;
+  --uf-fs-sm:    13px;
+  --uf-fs-base:  15px;
+  --uf-fs-md:    17px;
+  --uf-fs-lg:    20px;
+  --uf-fs-xl:    24px;
+  --uf-fs-xxl:   30px;
+  --uf-fs-hero:  40px;
+
+  --uf-fw-regular:  400;
+  --uf-fw-medium:   500;
+  --uf-fw-semibold: 600;
+  --uf-fw-bold:     700;
+  --uf-fw-black:    900;
+
+  /* ── Spacing (matches RN SPACING) ──────────────────────────── */
+  --uf-sp-xs:    4px;
+  --uf-sp-sm:    8px;
+  --uf-sp-md:    16px;
+  --uf-sp-lg:    24px;
+  --uf-sp-xl:    32px;
+  --uf-sp-xxl:   48px;
+  --uf-sp-xxxl:  64px;
+
+  /* ── Radius ────────────────────────────────────────────────── */
+  --uf-r-sm:    8px;
+  --uf-r-md:    14px;
+  --uf-r-lg:    22px;
+  --uf-r-xl:    32px;
+  --uf-r-full:  999px;
+
+  /* ── Shadows (lavender-tinted card; soft black) ────────────── */
+  --uf-shadow-card: 0 4px 12px rgba(159, 153, 199, 0.18);
+  --uf-shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --uf-shadow-pop:  0 8px 24px rgba(60, 0, 8, 0.18);
+
+  /* ── Tracking (for wordmark / labels) ──────────────────────── */
+  --uf-track-wordmark: 3px;   /* "UNITYFITNESS" header */
+  --uf-track-label:    0.8px; /* uppercase section labels */
+}
+
+/* ── Semantic typography ──────────────────────────────────────── */
+.uf-display, h1.uf {
+  font-family: var(--uf-font-display);
+  font-size:   var(--uf-fs-hero);
+  font-weight: var(--uf-fw-black);
+  color:       var(--uf-text);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+.uf-h1, h2.uf {
+  font-family: var(--uf-font-display);
+  font-size:   var(--uf-fs-xxl);
+  font-weight: var(--uf-fw-black);
+  color:       var(--uf-text);
+  line-height: 1.15;
+}
+.uf-h2, h3.uf {
+  font-family: var(--uf-font-display);
+  font-size:   var(--uf-fs-xl);
+  font-weight: var(--uf-fw-black);
+  color:       var(--uf-text);
+}
+.uf-h3 {
+  font-family: var(--uf-font-display);
+  font-size:   var(--uf-fs-lg);
+  font-weight: var(--uf-fw-bold);
+  color:       var(--uf-text);
+}
+.uf-title {
+  font-family: var(--uf-font-body);
+  font-size:   var(--uf-fs-md);
+  font-weight: var(--uf-fw-bold);
+  color:       var(--uf-text);
+}
+.uf-body {
+  font-family: var(--uf-font-body);
+  font-size:   var(--uf-fs-base);
+  font-weight: var(--uf-fw-regular);
+  color:       var(--uf-text);
+  line-height: 1.45;
+}
+.uf-body-sm {
+  font-family: var(--uf-font-body);
+  font-size:   var(--uf-fs-sm);
+  color:       var(--uf-text-2);
+  line-height: 1.5;
+}
+.uf-caption {
+  font-family: var(--uf-font-body);
+  font-size:   var(--uf-fs-xs);
+  color:       var(--uf-text-muted);
+}
+.uf-label {                         /* uppercase form labels */
+  font-family: var(--uf-font-body);
+  font-size:   var(--uf-fs-sm);
+  font-weight: var(--uf-fw-medium);
+  color:       var(--uf-text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.uf-section-label {                 /* "GENERAL", "MY CLUB" headers */
+  font-family: var(--uf-font-body);
+  font-size:   var(--uf-fs-sm);
+  font-weight: var(--uf-fw-bold);
+  color:       var(--uf-text);
+  text-transform: uppercase;
+  letter-spacing: var(--uf-track-label);
+}
+.uf-wordmark {                      /* "UNITYFITNESS" */
+  font-family: var(--uf-font-display);
+  font-weight: var(--uf-fw-black);
+  letter-spacing: var(--uf-track-wordmark);
+  text-transform: uppercase;
+  color: var(--uf-text);
+}

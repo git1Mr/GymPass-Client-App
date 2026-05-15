@@ -1,0 +1,50 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_card.css"><link rel="stylesheet" href="../colors_and_type.css"></head><body class="card" style="background:#0d0610;padding:0">
+<style>
+  .stage { position:relative; padding: 30px 28px; overflow:hidden; isolation:isolate;
+    background:
+      radial-gradient(120% 80% at 10% 0%, #6B0010 0%, transparent 55%),
+      radial-gradient(140% 90% at 90% 100%, #9f99c7 0%, transparent 55%),
+      linear-gradient(135deg, #3C0008 0%, #1a0008 50%, #2a1238 100%);
+  }
+  .stage::before {
+    content:""; position:absolute; inset:-10%;
+    background:
+      conic-gradient(from 210deg at 60% 50%, rgba(255,220,200,.0), rgba(255,220,200,.18), rgba(159,153,199,.25), rgba(255,255,255,.0) 70%);
+    filter: blur(28px);
+    mix-blend-mode: screen;
+    z-index: 0;
+  }
+  .stage::after {
+    content:""; position:absolute; inset:0;
+    background:
+      repeating-linear-gradient( 28deg, rgba(255,255,255,.05) 0 1px, transparent 1px 6px),
+      repeating-linear-gradient(-28deg, rgba(0,0,0,.10)   0 1px, transparent 1px 9px);
+    mix-blend-mode: overlay;
+    pointer-events:none;
+    z-index: 0;
+  }
+  .stage > * { position:relative; z-index:1; }
+  .greet { font:400 13px Inter; color:rgba(255,235,220,.8); margin-bottom:6px; letter-spacing:.5px; }
+  .h { font:900 32px/1.05 Inter; color:#fff; letter-spacing:-0.6px; margin-bottom:10px;
+       background: linear-gradient(180deg,#fff 0%, #f3d6db 100%);
+       -webkit-background-clip: text; background-clip:text; -webkit-text-fill-color: transparent; }
+  .sub { font:400 13px/1.45 Inter; color:rgba(255,255,255,.72); margin-bottom:18px; max-width: 280px;}
+  .cta { background:#fff; color:#3C0008; border:none; border-radius:999px; padding:11px 18px;
+         font:700 13px Inter; display:inline-flex; align-items:center; gap:8px; cursor:pointer;
+         box-shadow: 0 8px 20px rgba(0,0,0,.35); }
+  .badge { position:absolute; top:18px; right:18px; display:inline-flex; align-items:center; gap:6px;
+           background: rgba(255,255,255,.10); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+           border:1px solid rgba(255,255,255,.18); padding: 5px 10px; border-radius:999px;
+           font:700 10px Inter; color:#fff; letter-spacing:1px; }
+  .dot { width:6px;height:6px;border-radius:3px; background: #f3d6db; box-shadow: 0 0 8px #f3d6db; }
+  .note { padding:14px 24px; font:400 12px Inter; color:#A09CC0; background:#fff;}
+</style>
+<div class="stage">
+  <div class="badge"><div class="dot"></div>UNITYFITNESS</div>
+  <div class="greet">Hey Sami 👋</div>
+  <div class="h">Get all-in-one<br>access.</div>
+  <div class="sub">Explore clubs, take classes, GymPass with one subscription.</div>
+  <button class="cta">Explore Clubs Near You →</button>
+</div>
+<div class="note">Hero v2 · Layered radial wash + conic light leak + crosshatch noise · gradient text · glass status badge.</div>
+</body></html>

@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Unity Fitness — Auth, Profile, Check-in</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #F6F4FA; font-family: Inter, system-ui, sans-serif; }
+  #root { display: contents; }
+  [data-lucide] { display: inline-block; vertical-align: middle; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<template id="__bundler_thumbnail" data-bg-color="#F6F4FA">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#F6F4FA"/>
+    <rect x="420" y="180" width="360" height="440" rx="60" fill="#9f99c7"/>
+    <g transform="translate(540 290) scale(1.6)">
+      <path d="M16 12 L16 38 C16 50 24 56 32 56 C40 56 48 50 48 38 L48 12 L40 12 L40 38 C40 44 38 47 32 47 C26 47 24 44 24 38 L24 12 Z" fill="#FFFFFF"/>
+    </g>
+  </svg>
+</template>
+
+<!-- React -->
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<!-- Lucide icons -->
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+
+<!-- Components -->
+<script type="text/babel" src="screens/android-frame.jsx"></script>
+<script type="text/babel" src="screens/design-canvas.jsx"></script>
+<script type="text/babel" src="screens/light-pillar.jsx"></script>
+<script type="text/babel" src="screens/login.jsx"></script>
+<script type="text/babel" src="screens/home.jsx"></script>
+<script type="text/babel" src="screens/profile.jsx"></script>
+<script type="text/babel" src="screens/qr.jsx"></script>
+<script type="text/babel" src="screens/splash.jsx"></script>
+
+<script type="text/babel" data-presets="env,react">
+  const W = 360, H = 740;
+
+  function Framed({ children, dark = false }) {
+    return (
+      <div style={{ filter: 'drop-shadow(0 20px 40px rgba(60,0,8,0.16))' }}>
+        <AndroidDevice width={W + 16} height={H + 56} dark={dark}>
+          {children}
+        </AndroidDevice>
+      </div>
+    );
+  }
+
+  function App() {
+    // Re-render lucide icons after canvas mounts/relays out
+    React.useEffect(() => {
+      const tick = () => window.lucide && window.lucide.createIcons();
+      tick();
+      const t = setInterval(tick, 600);
+      return () => clearInterval(t);
+    }, []);
+
+    return (
+      <DesignCanvas>
+        <DCSection
+          id="auth-profile-qr"
+          title="Unity Fitness — Light pillar refresh"
+          subtitle="Splash, Login, Profile (dark), and Check-in (QR) — lavender rendered as a vertical pillar of light"
+        >
+          <DCArtboard id="splash" label="Splash · Animated pillar entry" width={W + 16} height={H + 56}>
+            <Framed dark>
+              <SplashScreen width={W + 16} height={H} />
+            </Framed>
+          </DCArtboard>
+
+          <DCArtboard id="login" label="Login · Pillar hero + U logo" width={W + 16} height={H + 56}>
+            <Framed>
+              <LoginScreen width={W + 16} height={H} />
+            </Framed>
+          </DCArtboard>
+
+          <DCArtboard id="home" label="Home · Pillar hero + branded banner" width={W + 16} height={H + 56}>
+            <Framed>
+              <HomeScreen width={W + 16} height={H} />
+            </Framed>
+          </DCArtboard>
+
+          <DCArtboard id="profile" label="Profile · Dark with pillar hero" width={W + 16} height={H + 56}>
+            <Framed dark>
+              <ProfileScreen width={W + 16} height={H} />
+            </Framed>
+          </DCArtboard>
+
+          <DCArtboard id="qr" label="Check-in · Pillar background" width={W + 16} height={H + 56}>
+            <Framed dark>
+              <CheckedInScreen width={W + 16} height={H} />
+            </Framed>
+          </DCArtboard>
+        </DCSection>
+      </DesignCanvas>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

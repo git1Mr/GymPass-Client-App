@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" role="img" aria-label="Unity Fitness">
+  
+  <rect x="4" y="20" width="40" height="40" rx="8" fill="#3C0008"></rect>
+  <text x="24" y="50" text-anchor="middle" font-family="Inter, -apple-system, system-ui, sans-serif" font-weight="900" font-size="22" fill="#FFFFFF">G</text>
+
+  
+  <text x="60" y="48" font-family="Inter, -apple-system, system-ui, sans-serif" font-weight="900" font-size="22" letter-spacing="3" fill="#1A1728">UNITY</text>
+  <text x="170" y="48" font-family="Inter, -apple-system, system-ui, sans-serif" font-weight="900" font-size="22" letter-spacing="3" fill="#9f99c7">FITNESS</text>
+</svg>

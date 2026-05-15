@@ -16,7 +16,7 @@ import {
     FONT_WEIGHTS,
     RADIUS,
     SPACING,
-} from "../../constants/theme";
+} from "@/constants/theme";
 
 interface FormInputProps extends TextInputProps {
   label?: string;

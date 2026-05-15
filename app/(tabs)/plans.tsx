@@ -10,6 +10,7 @@ import {
     SPACING,
 } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
     ScrollView,
@@ -147,6 +148,7 @@ function PlanCard({
 }
 
 export default function PlansScreen() {
+  const router = useRouter();
   const [selected, setSelected] = useState<string>("mobility");
 
   const selectedPlan = PLANS.find((p) => p.id === selected)!;
@@ -156,7 +158,9 @@ export default function PlansScreen() {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Plans</Text>
-        <Text style={styles.headerSub}>Choose your mobility pack</Text>
+        <Text style={styles.headerSub}>
+          Buy points once · Use them everywhere
+        </Text>
       </View>
 
       <ScrollView
@@ -178,23 +182,6 @@ export default function PlansScreen() {
         ))}
 
         {/* Discover CTA */}
-        <View style={styles.ctaCard}>
-          <Ionicons
-            name="storefront-outline"
-            size={28}
-            color={COLORS.primary}
-            style={{ marginBottom: SPACING.sm }}
-          />
-          <Text style={styles.ctaTitle}>Discover our plans</Text>
-          <Text style={styles.ctaBody}>
-            Not sure which pack to pick? See all our offers and compare benefits
-            side by side.
-          </Text>
-          <TouchableOpacity style={styles.ctaBtn} activeOpacity={0.85}>
-            <Text style={styles.ctaBtnText}>See all plans</Text>
-            <Ionicons name="arrow-forward" size={16} color={COLORS.white} />
-          </TouchableOpacity>
-        </View>
       </ScrollView>
 
       {/* Sticky purchase bar */}
@@ -207,7 +194,16 @@ export default function PlansScreen() {
             {selectedPlan.price} MAD · {selectedPlan.points} pts
           </Text>
         </View>
-        <TouchableOpacity style={styles.purchaseBtn} activeOpacity={0.85}>
+        <TouchableOpacity
+          style={styles.purchaseBtn}
+          activeOpacity={0.85}
+          onPress={() =>
+            router.push({
+              pathname: "/checkout",
+              params: { planId: selectedPlan.id },
+            })
+          }
+        >
           <Text style={styles.purchaseBtnText}>Buy now</Text>
         </TouchableOpacity>
       </View>
@@ -251,7 +247,10 @@ const styles = StyleSheet.create({
     ...SHADOWS.soft,
     overflow: "visible",
   },
-  cardSelected: { ...SHADOWS.card },
+  cardSelected: {
+    backgroundColor: COLORS.surfaceElevated,
+    ...SHADOWS.card,
+  },
 
   popularBadge: {
     position: "absolute",

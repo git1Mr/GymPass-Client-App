@@ -15,7 +15,7 @@ import {
     FONT_WEIGHTS,
     RADIUS,
     SHADOWS,
-} from "../../constants/theme";
+} from "@/constants/theme";
 
 interface PrimaryButtonProps {
   title: string;
@@ -72,11 +72,11 @@ export default function PrimaryButton({
 const styles = StyleSheet.create({
   btn: {
     backgroundColor: COLORS.accent,
-    borderRadius: RADIUS.md,
+    borderRadius: RADIUS.full,
     height: 54,
     alignItems: "center",
     justifyContent: "center",
-    ...SHADOWS.glow,
+    ...SHADOWS.soft,
   },
   disabled: {
     opacity: 0.5,

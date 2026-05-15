@@ -1,0 +1,86 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_card.css"><link rel="stylesheet" href="../colors_and_type.css"></head><body class="card" style="background:#F7F6FB;padding:0;overflow:hidden">
+<style>
+  body { font-family: Inter; }
+  .stage {
+    position:relative;
+    padding: 28px 26px 24px;
+    background:
+      radial-gradient(120% 80% at 0% 0%, #f3d6db 0%, transparent 55%),
+      radial-gradient(140% 90% at 100% 120%, #cfc8e8 0%, transparent 60%),
+      linear-gradient(135deg, #fbeef1 0%, #efe8f5 100%);
+    overflow:hidden;
+  }
+  .stage::before {
+    content:""; position:absolute; inset:-15%;
+    background:
+      repeating-linear-gradient(20deg, rgba(60,0,8,.04) 0 1px, transparent 1px 8px);
+    mix-blend-mode: multiply;
+    pointer-events:none;
+  }
+
+  /* playful logo lockup */
+  .lockup { position:relative; z-index:1; display:flex; align-items:flex-end; gap:0;
+            padding-bottom:14px; border-bottom: 1.5px dashed rgba(60,0,8,.18); }
+  .mark {
+    width:78px; height:78px;
+    border-radius: 22px 22px 22px 6px;
+    background: linear-gradient(160deg, #3C0008 0%, #6B0010 60%, #9f99c7 130%);
+    color:#fff; font-weight: 900; font-size: 56px; letter-spacing:-3px;
+    display:flex; align-items:center; justify-content:center;
+    transform: rotate(-6deg);
+    box-shadow:
+      0 12px 24px rgba(60,0,8,.35),
+      inset 0 1px 0 rgba(255,255,255,.18);
+    position:relative;
+  }
+  .mark::after {
+    content:""; position:absolute; inset:8px 8px auto auto; width:10px;height:10px; border-radius:5px;
+    background:#f3d6db; box-shadow: 0 0 12px #f3d6db;
+  }
+  .mark span { display:inline-block; transform: translate(0,2px); }
+
+  .word-stack { margin-left: 14px; padding-bottom: 4px; }
+  .super { display:inline-block; font:700 9px Inter; letter-spacing:2.5px; color:#3C0008;
+           background:#fff; padding:3px 8px; border-radius:999px; margin-bottom:6px;
+           box-shadow: 0 2px 6px rgba(60,0,8,.12);}
+  .word { font-weight:900; font-size:26px; letter-spacing:5px; color:#1A1728; line-height:1;}
+  .word .u { color:#3C0008; }
+  .word .nity { background: linear-gradient(180deg,#1A1728,#3C0008); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  .word .fitness { font-style:italic; font-weight:800; letter-spacing: 4px; color:#9f99c7; margin-left:2px; }
+  .by { font:500 10px Inter; color:#5C567A; letter-spacing:1.5px; margin-top:6px;
+        display:inline-flex; align-items:center; gap:6px;}
+  .by::before { content:""; width:14px; height:1.5px; background:#9f99c7; display:inline-block; }
+
+  /* labels row */
+  .labels { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px; margin-top:14px; position:relative; z-index:1;}
+  .lbl-card { background:#fff; border-radius:14px; padding:10px 12px;
+              box-shadow: 0 2px 8px rgba(60,0,8,.06); border: 1px solid rgba(216,214,238,.7);
+              position:relative; overflow:hidden;}
+  .lbl-card .v { font-weight:700; font-size:13px; text-transform:uppercase; }
+  .lbl-card .m { font:400 10px Inter; color:#A09CC0; margin-top:3px; }
+  .one .v { letter-spacing:1px; color:#1A1728; }
+  .two .v { letter-spacing:.6px; color:#5C567A; font-weight:500; }
+  .three .v { letter-spacing:.6px; color:#fff; }
+  .three { background: #3C0008; border-color:#3C0008; }
+  .three .m { color: rgba(255,255,255,.7); }
+  .corner { position:absolute; top:6px; right:6px; font:700 8px Inter; color:#9f99c7; letter-spacing:1px; }
+  .three .corner { color: rgba(255,255,255,.5); }
+</style>
+
+<div class="stage">
+  <div class="lockup">
+    <div class="mark"><span>U</span></div>
+    <div class="word-stack">
+      <div class="super">★ EST. CASABLANCA</div>
+      <div class="word"><span class="u">U</span><span class="nity">NITY</span><span class="fitness">fitness</span></div>
+      <div class="by">one pass · every gym · since 2024</div>
+    </div>
+  </div>
+
+  <div class="labels">
+    <div class="lbl-card one"><div class="corner">A1</div><div class="v">GENERAL</div><div class="m">13 / 700 / +0.8px</div></div>
+    <div class="lbl-card two"><div class="corner">A2</div><div class="v">EMAIL</div><div class="m">13 / 500 / +0.5px · text-2</div></div>
+    <div class="lbl-card three"><div class="corner">A3</div><div class="v">MOST POPULAR</div><div class="m">11 / 700 / +0.6px · pill</div></div>
+  </div>
+</div>
+</body></html>

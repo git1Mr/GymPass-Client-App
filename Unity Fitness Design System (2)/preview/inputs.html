@@ -1,0 +1,19 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_card.css"><link rel="stylesheet" href="../colors_and_type.css"></head><body class="card">
+<style>
+  .lbl { font:500 13px Inter; color:#5C567A; text-transform: uppercase; letter-spacing:.5px; margin-bottom:6px; display:block; }
+  .wrap { display:flex; align-items:center; background:#fff; border:1.5px solid #D8D6EE; border-radius:14px; padding: 0 14px; margin-bottom:14px;}
+  .wrap.f { border-color:#9f99c7; }
+  .wrap.e { border-color:#D93025; }
+  input { flex:1; border:none; outline:none; height:48px; font: 400 15px Inter; color:#1A1728; background:transparent; }
+  input::placeholder { color:#A09CC0; }
+  .err { font:400 13px Inter; color:#D93025; margin: -8px 0 14px; }
+  .eye { font-size:18px; color:#5C567A; cursor:pointer; }
+</style>
+<label class="lbl">EMAIL</label>
+<div class="wrap"><input value="you@example.com"></div>
+<label class="lbl">PASSWORD</label>
+<div class="wrap f"><input type="password" value="secret123"><span class="eye">👁️</span></div>
+<label class="lbl">CONFIRM PASSWORD</label>
+<div class="wrap e"><input type="password" placeholder="Repeat your password"></div>
+<div class="err">Passwords don't match.</div>
+</body></html>
