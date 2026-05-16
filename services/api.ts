@@ -10,7 +10,7 @@ import axios, {
 import * as SecureStore from "expo-secure-store";
 
 const BASE_URL: string =
-  process.env.EXPO_PUBLIC_API_URL ?? "http://192.168.1.72:3000/api";
+  process.env.EXPO_PUBLIC_API_URL ?? "http://10.50.158.95:3000/api";
 
 export const TOKEN_KEY = "unityfitness_jwt" as const;
 export const REMEMBER_KEY = "unityfitness_remember_email" as const;

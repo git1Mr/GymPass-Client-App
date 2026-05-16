@@ -74,16 +74,22 @@ interface StatCardProps {
   label: string;
   value: string;
   icon: IoniconsName;
+  onPress?: () => void;
 }
-function StatCard({ label, value, icon }: StatCardProps) {
+function StatCard({ label, value, icon, onPress }: StatCardProps) {
+  const Wrapper: any = onPress ? TouchableOpacity : View;
   return (
-    <View style={styles.statCard}>
+    <Wrapper
+      style={styles.statCard}
+      onPress={onPress}
+      activeOpacity={onPress ? 0.85 : 1}
+    >
       <View style={styles.statIcon}>
         <Ionicons name={icon} size={20} color={COLORS.accent} />
       </View>
       <Text style={styles.statValue}>{value}</Text>
       <Text style={styles.statLabel}>{label}</Text>
-    </View>
+    </Wrapper>
   );
 }
 
@@ -299,9 +305,10 @@ export default function HomeScreen() {
         {/* ── Stats ── */}
         <View style={styles.statsRow}>
           <StatCard
-            label="Points"
+            label="Credits"
             value={String(user?.pointsBalance ?? 0)}
             icon="wallet-outline"
+            onPress={() => router.push("/credits")}
           />
           <StatCard
             label="Check-ins"
@@ -314,14 +321,11 @@ export default function HomeScreen() {
         {/* ── Quick actions ── */}
         <Text style={styles.sectionTitle}>Quick actions</Text>
         <View style={styles.pillsRow}>
-          {/* The AccessAnyGym pill keeps its own visual; the other two
-              use the gradient ActionPill. AccessAnyGym is the brand's
-              dedicated affordance so its trigger stays distinct. */}
           <AccessAnyGym variant="pill" />
           <ActionPill
-            label="Buy Points"
+            label="Top Up"
             icon="add-circle-outline"
-            onPress={() => router.push("/(tabs)/plans")}
+            onPress={() => router.push("/top-up")}
           />
           <ActionPill
             label="History"

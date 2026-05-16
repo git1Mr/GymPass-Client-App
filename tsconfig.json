@@ -6,9 +6,10 @@
     "moduleResolution": "bundler",
     "skipLibCheck": true,
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "expo-router/src/*": ["./node_modules/expo-router/build/*"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],
-  "exclude": ["node_modules", "Unity Fitness Design System (2)"]
+  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts", "types/**/*.d.ts"],
+  "exclude": ["node_modules", "Unity Fitness Design System (2)", "Unity Fitness Design System (3)"]
 }

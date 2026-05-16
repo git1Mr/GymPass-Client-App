@@ -1,0 +1,8 @@
+{
+  "name": "UnityAuthService",
+  "jwtPrivateKey": "",
+  "db": {
+    "uri": "mongodb://localhost/unityfitness"
+  },
+  "port": 3001
+}

@@ -14,13 +14,7 @@ import {
     View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Svg, {
-    Defs,
-    LinearGradient as SvgLinearGradient,
-    Rect,
-    Stop,
-} from "react-native-svg";
-
+import GradientSurface from "@/components/ui/GradientSurface";
 import {
     COLORS,
     FONT_SIZES,
@@ -112,39 +106,32 @@ export default function CheckoutScreen() {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        {/* ── Plan summary card (silk gradient) ── */}
-        <View style={styles.planCard}>
-          <Svg style={StyleSheet.absoluteFill} preserveAspectRatio="none">
-            <Defs>
-              <SvgLinearGradient id="checkoutGrad" x1="0" y1="0" x2="1" y2="1">
-                <Stop offset="0%" stopColor={COLORS.primary} stopOpacity="1" />
-                <Stop offset="50%" stopColor={COLORS.primaryDark} stopOpacity="1" />
-                <Stop offset="100%" stopColor={COLORS.accent} stopOpacity="1" />
-              </SvgLinearGradient>
-            </Defs>
-            <Rect x="0" y="0" width="100%" height="100%" fill="url(#checkoutGrad)" />
-          </Svg>
+        {/* ── Plan summary card (brand hero gradient) ── */}
+        <GradientSurface
+          radius={RADIUS.xl}
+          style={styles.planCard}
+          dimmer={0.08}
+        >
+          <View style={styles.planBody}>
+            <Text style={styles.planLabel}>YOUR PLAN</Text>
+            <Text style={styles.planName}>{plan.name}</Text>
 
-          <View style={styles.planBlob} />
-
-          <Text style={styles.planLabel}>YOUR PLAN</Text>
-          <Text style={styles.planName}>{plan.name}</Text>
-
-          <View style={styles.planRow}>
-            <View style={styles.planStat}>
-              <Ionicons name="flash" size={16} color="rgba(255,255,255,0.85)" />
-              <Text style={styles.planStatText}>{plan.points} points</Text>
+            <View style={styles.planRow}>
+              <View style={styles.planStat}>
+                <Ionicons name="flash" size={16} color="rgba(255,255,255,0.85)" />
+                <Text style={styles.planStatText}>{plan.points} points</Text>
+              </View>
+              <View style={styles.planStat}>
+                <Ionicons name="pricetag-outline" size={16} color="rgba(255,255,255,0.85)" />
+                <Text style={styles.planStatText}>
+                  {plan.perPoint.toFixed(2)} MAD/pt
+                </Text>
+              </View>
             </View>
-            <View style={styles.planStat}>
-              <Ionicons name="pricetag-outline" size={16} color="rgba(255,255,255,0.85)" />
-              <Text style={styles.planStatText}>
-                {plan.perPoint.toFixed(2)} MAD/pt
-              </Text>
-            </View>
+
+            <Text style={styles.planPrice}>{plan.price} MAD</Text>
           </View>
-
-          <Text style={styles.planPrice}>{plan.price} MAD</Text>
-        </View>
+        </GradientSurface>
 
         {/* ── Payment method ── */}
         <Text style={styles.sectionLabel}>PAYMENT METHOD</Text>
@@ -265,21 +252,11 @@ const styles = StyleSheet.create({
   scroll: { padding: SPACING.lg, paddingBottom: SPACING.xxxl },
 
   planCard: {
-    borderRadius: RADIUS.xl,
-    padding: SPACING.xl,
     marginBottom: SPACING.xl,
-    overflow: "hidden",
     ...SHADOWS.pop,
   },
-  planBlob: {
-    position: "absolute",
-    top: -40,
-    right: -40,
-    width: 160,
-    height: 160,
-    borderRadius: 80,
-    backgroundColor: COLORS.primaryLight,
-    opacity: 0.35,
+  planBody: {
+    padding: SPACING.xl,
   },
   planLabel: {
     fontSize: FONT_SIZES.xs,

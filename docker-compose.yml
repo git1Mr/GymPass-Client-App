@@ -1,0 +1,62 @@
+services:
+  mongo:
+    image: mongo:latest
+    container_name: unity-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - unity-net
+
+  auth-service:
+    build:
+      context: ./backend/auth-service
+      dockerfile: Dockerfile
+    image: ${DOCKERHUB_USER:-zakarialem}/unity-auth:v1
+    container_name: unity-auth
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      MONGO_URI: mongodb://mongo:27017/unityfitness
+      JWT_PRIVATE_KEY: ${JWT_PRIVATE_KEY}
+    ports:
+      - "3001:3001"
+    networks:
+      - unity-net
+
+  wallet-service:
+    build:
+      context: ./backend/wallet-service
+      dockerfile: Dockerfile
+    image: ${DOCKERHUB_USER:-zakarialem}/unity-wallet:v1
+    container_name: unity-wallet
+    restart: unless-stopped
+    depends_on:
+      - mongo
+      - auth-service
+    environment:
+      NODE_ENV: production
+      PORT: 3002
+      MONGO_URI: mongodb://mongo:27017/unityfitness
+      JWT_PRIVATE_KEY: ${JWT_PRIVATE_KEY}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+      STRIPE_CURRENCY: ${STRIPE_CURRENCY:-mad}
+      STRIPE_MERCHANT_NAME: ${STRIPE_MERCHANT_NAME:-UnityFitness}
+    ports:
+      - "3002:3002"
+    networks:
+      - unity-net
+
+networks:
+  unity-net:
+    driver: bridge
+
+volumes:
+  mongo-data:

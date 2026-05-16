@@ -1,6 +1,9 @@
 // app/(tabs)/plans.tsx
-// Clean plans screen showing the 3 tiers + a "Discover our plans" CTA.
+// Plans screen — each tier card now uses the brand hero treatment
+// (GradientSurface: burgundy → lavender diagonal gradient + crosshatch
+// texture), mirroring the home-screen hero card.
 
+import GradientSurface from "@/components/ui/GradientSurface";
 import {
     COLORS,
     FONT_SIZES,
@@ -28,7 +31,6 @@ interface Plan {
   price: number;
   points: number;
   perPoint: number;
-  color: string;
   description: string;
   perks: string[];
   popular: boolean;
@@ -42,7 +44,6 @@ const PLANS: Plan[] = [
     price: 99,
     points: 10,
     perPoint: 9.9,
-    color: COLORS.primary,
     popular: false,
     description: "Perfect for occasional visits to standard clubs.",
     perks: [
@@ -59,7 +60,6 @@ const PLANS: Plan[] = [
     price: 199,
     points: 25,
     perPoint: 7.96,
-    color: COLORS.accent,
     popular: true,
     description: "Our most popular pack for regular city-hoppers.",
     perks: [
@@ -76,7 +76,6 @@ const PLANS: Plan[] = [
     price: 349,
     points: 50,
     perPoint: 6.98,
-    color: "#1A1728",
     popular: false,
     description: "Unlimited access across our entire partner network.",
     perks: [
@@ -99,50 +98,57 @@ function PlanCard({
 }) {
   return (
     <TouchableOpacity
-      style={[
-        styles.card,
-        selected && styles.cardSelected,
-        { borderColor: selected ? plan.color : COLORS.border },
-      ]}
+      style={[styles.cardWrap, selected && styles.cardWrapSelected]}
       onPress={onSelect}
-      activeOpacity={0.85}
+      activeOpacity={0.92}
     >
-      {plan.popular && (
-        <View style={[styles.popularBadge, { backgroundColor: plan.color }]}>
-          <Text style={styles.popularText}>Most Popular</Text>
-        </View>
-      )}
-
-      <View style={styles.cardHeader}>
-        <View>
-          <Text style={styles.planName}>{plan.name}</Text>
-          <Text style={styles.planDesc}>{plan.description}</Text>
-        </View>
-        <View
-          style={[styles.priceWrap, { backgroundColor: plan.color + "18" }]}
-        >
-          <Text style={[styles.priceAmount, { color: plan.color }]}>
-            {plan.price}
-          </Text>
-          <Text style={[styles.priceCurrency, { color: plan.color }]}>MAD</Text>
-        </View>
-      </View>
-
-      <View style={styles.pointsRow}>
-        <Ionicons name="flash" size={14} color={plan.color} />
-        <Text style={styles.pointsText}>
-          {plan.points} pts · {plan.perPoint.toFixed(2)} MAD/pt
-        </Text>
-      </View>
-
-      <View style={styles.perksList}>
-        {plan.perks.map((p) => (
-          <View key={p} style={styles.perkRow}>
-            <Ionicons name="checkmark-circle" size={16} color={plan.color} />
-            <Text style={styles.perkText}>{p}</Text>
+      <GradientSurface radius={RADIUS.xl} dimmer={selected ? 0 : 0.08}>
+        {plan.popular && (
+          <View style={styles.popularBadge}>
+            <Text style={styles.popularText}>Most Popular</Text>
           </View>
-        ))}
-      </View>
+        )}
+
+        <View style={styles.cardBody}>
+          <View style={styles.cardHeader}>
+            <View style={{ flex: 1, paddingRight: SPACING.sm }}>
+              <Text style={styles.planName}>{plan.name}</Text>
+              <Text style={styles.planDesc}>{plan.description}</Text>
+            </View>
+            <View style={styles.priceChip}>
+              <Text style={styles.priceAmount}>{plan.price}</Text>
+              <Text style={styles.priceCurrency}>MAD</Text>
+            </View>
+          </View>
+
+          <View style={styles.pointsRow}>
+            <Ionicons name="flash" size={14} color="#F59E0B" />
+            <Text style={styles.pointsText}>
+              {plan.points} pts · {plan.perPoint.toFixed(2)} MAD/pt
+            </Text>
+          </View>
+
+          <View style={styles.perksList}>
+            {plan.perks.map((p) => (
+              <View key={p} style={styles.perkRow}>
+                <Ionicons
+                  name="checkmark"
+                  size={14}
+                  color="rgba(255,255,255,0.95)"
+                />
+                <Text style={styles.perkText}>{p}</Text>
+              </View>
+            ))}
+          </View>
+
+          {selected && (
+            <View style={styles.selectedPill}>
+              <Ionicons name="checkmark-circle" size={14} color={COLORS.text} />
+              <Text style={styles.selectedPillText}>Selected</Text>
+            </View>
+          )}
+        </View>
+      </GradientSurface>
     </TouchableOpacity>
   );
 }
@@ -158,9 +164,7 @@ export default function PlansScreen() {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Plans</Text>
-        <Text style={styles.headerSub}>
-          Buy points once · Use them everywhere
-        </Text>
+        <Text style={styles.headerSub}>Buy points once · Use them everywhere</Text>
       </View>
 
       <ScrollView
@@ -180,8 +184,6 @@ export default function PlansScreen() {
             onSelect={() => setSelected(plan.id)}
           />
         ))}
-
-        {/* Discover CTA */}
       </ScrollView>
 
       {/* Sticky purchase bar */}
@@ -237,33 +239,40 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.lg,
   },
 
-  card: {
-    backgroundColor: COLORS.surface,
-    borderRadius: RADIUS.lg,
-    padding: SPACING.lg,
+  cardWrap: {
     marginBottom: SPACING.md,
-    borderWidth: 2,
-    borderColor: COLORS.border,
-    ...SHADOWS.soft,
-    overflow: "visible",
+    borderRadius: RADIUS.xl,
+    shadowColor: "#3C0008",
+    shadowOpacity: 0.18,
+    shadowOffset: { width: 0, height: 12 },
+    shadowRadius: 28,
+    elevation: 6,
   },
-  cardSelected: {
-    backgroundColor: COLORS.surfaceElevated,
-    ...SHADOWS.card,
+  cardWrapSelected: {
+    shadowOpacity: 0.3,
+    shadowRadius: 32,
+    elevation: 10,
+  },
+
+  cardBody: {
+    padding: SPACING.lg,
   },
 
   popularBadge: {
     position: "absolute",
-    top: -12,
-    right: SPACING.lg,
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: 4,
-    borderRadius: RADIUS.full,
+    top: 0,
+    right: 0,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    backgroundColor: "#FFFFFF",
+    borderBottomLeftRadius: RADIUS.md,
+    zIndex: 2,
   },
   popularText: {
-    color: COLORS.white,
+    color: "#3C0008",
     fontSize: FONT_SIZES.xs,
-    fontWeight: FONT_WEIGHTS.bold,
+    fontWeight: FONT_WEIGHTS.black,
+    letterSpacing: 0.6,
   },
 
   cardHeader: {
@@ -273,73 +282,90 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.sm,
   },
   planName: {
-    fontSize: FONT_SIZES.lg,
+    fontSize: FONT_SIZES.xl,
     fontWeight: FONT_WEIGHTS.black,
-    color: COLORS.text,
+    color: COLORS.white,
+    letterSpacing: -0.4,
   },
   planDesc: {
     fontSize: FONT_SIZES.sm,
-    color: COLORS.textMuted,
-    marginTop: 2,
-    maxWidth: 180,
+    color: "rgba(255,255,255,0.75)",
+    marginTop: 4,
+    lineHeight: 18,
+    maxWidth: 220,
   },
 
-  priceWrap: {
+  priceChip: {
+    backgroundColor: "rgba(255,255,255,0.14)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.22)",
     borderRadius: RADIUS.md,
-    padding: SPACING.sm,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
     alignItems: "center",
-    minWidth: 64,
+    minWidth: 70,
   },
-  priceAmount: { fontSize: FONT_SIZES.xl, fontWeight: FONT_WEIGHTS.black },
-  priceCurrency: { fontSize: FONT_SIZES.xs, fontWeight: FONT_WEIGHTS.medium },
+  priceAmount: {
+    fontSize: FONT_SIZES.xl,
+    fontWeight: FONT_WEIGHTS.black,
+    color: COLORS.white,
+    lineHeight: FONT_SIZES.xl,
+  },
+  priceCurrency: {
+    fontSize: FONT_SIZES.xs,
+    fontWeight: FONT_WEIGHTS.medium,
+    color: "rgba(255,255,255,0.85)",
+    marginTop: 3,
+    letterSpacing: 1,
+  },
 
   pointsRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: SPACING.xs,
+    gap: 6,
     marginBottom: SPACING.md,
-  },
-  pointsText: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary },
-
-  perksList: { gap: SPACING.xs },
-  perkRow: { flexDirection: "row", alignItems: "center", gap: SPACING.xs },
-  perkText: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary },
-
-  ctaCard: {
-    backgroundColor: COLORS.primaryMuted,
-    borderRadius: RADIUS.lg,
-    padding: SPACING.xl,
-    alignItems: "center",
-    marginTop: SPACING.sm,
+    alignSelf: "flex-start",
+    backgroundColor: "rgba(245,158,11,0.18)",
     borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  ctaTitle: {
-    fontSize: FONT_SIZES.lg,
-    fontWeight: FONT_WEIGHTS.black,
-    color: COLORS.text,
-    marginBottom: SPACING.xs,
-  },
-  ctaBody: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.textSecondary,
-    textAlign: "center",
-    lineHeight: 20,
-    marginBottom: SPACING.lg,
-  },
-  ctaBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: SPACING.xs,
-    backgroundColor: COLORS.accent,
-    paddingVertical: SPACING.sm,
-    paddingHorizontal: SPACING.lg,
+    borderColor: "rgba(245,158,11,0.35)",
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 4,
     borderRadius: RADIUS.full,
   },
-  ctaBtnText: {
-    color: COLORS.white,
+  pointsText: {
+    fontSize: FONT_SIZES.sm,
+    color: "#FFE3AE",
     fontWeight: FONT_WEIGHTS.bold,
-    fontSize: FONT_SIZES.base,
+  },
+
+  perksList: { gap: 6 },
+  perkRow: { flexDirection: "row", alignItems: "center", gap: SPACING.xs },
+  perkText: {
+    fontSize: FONT_SIZES.sm,
+    color: "rgba(255,255,255,0.92)",
+  },
+
+  selectedPill: {
+    marginTop: SPACING.md,
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    backgroundColor: COLORS.white,
+    paddingHorizontal: SPACING.sm + 2,
+    paddingVertical: 5,
+    borderRadius: RADIUS.full,
+    shadowColor: "#000",
+    shadowOpacity: 0.18,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 10,
+    elevation: 4,
+  },
+  selectedPillText: {
+    color: COLORS.text,
+    fontSize: FONT_SIZES.xs,
+    fontWeight: FONT_WEIGHTS.bold,
+    letterSpacing: 0.4,
   },
 
   purchaseBar: {

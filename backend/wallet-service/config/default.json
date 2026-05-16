@@ -1,0 +1,15 @@
+{
+  "name": "UnityWalletService",
+  "jwtPrivateKey": "",
+  "db": {
+    "uri": "mongodb://localhost/unityfitness"
+  },
+  "port": 3002,
+  "stripe": {
+    "secretKey": "",
+    "publishableKey": "",
+    "webhookSecret": "",
+    "currency": "mad",
+    "merchantName": "UnityFitness"
+  }
+}

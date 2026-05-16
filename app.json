@@ -4,13 +4,25 @@
     "slug": "unityfitness",
     "version": "1.0.0",
     "scheme": "unityfitness",
-    "platforms": ["ios", "android"],
+    "platforms": [
+      "ios",
+      "android"
+    ],
     "newArchEnabled": true,
     "plugins": [
       "expo-router",
       [
         "expo-secure-store",
-        { "faceIDPermission": "Allow UnityFitness to use Face ID for secure login." }
+        {
+          "faceIDPermission": "Allow UnityFitness to use Face ID for secure login."
+        }
+      ],
+      [
+        "@stripe/stripe-react-native",
+        {
+          "merchantIdentifier": "merchant.unityfitness",
+          "enableGooglePay": true
+        }
       ]
     ],
     "experiments": {

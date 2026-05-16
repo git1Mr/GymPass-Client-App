@@ -1,4 +1,3 @@
-import React, { createContext, JSX, ReactNode, useContext, useEffect, useState } from "react";
 import api from "@/services/api";
 import {
     AuthResponse,
@@ -10,6 +9,14 @@ import {
     register,
     RegisterParams,
 } from "@/services/authService";
+import React, {
+    createContext,
+    JSX,
+    ReactNode,
+    useContext,
+    useEffect,
+    useState,
+} from "react";
 
 // AppUser extends AuthUser with optional JWT-only fields populated at startup
 export interface AppUser extends AuthUser {
@@ -45,13 +52,15 @@ function decodeJwtPayload(token: string): Record<string, unknown> | null {
   }
 }
 
-export function AuthProvider({ children }: { children: ReactNode }): JSX.Element {
+export function AuthProvider({
+  children,
+}: {
+  children: ReactNode;
+}): JSX.Element {
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<AppUser | null>(null);
   const [isLoading, setLoading] = useState<boolean>(true);
 
-  // On mount: restore persisted token, decode minimal user from it,
-  // then silently hydrate with full profile from /users/me.
   useEffect((): void => {
     (async (): Promise<void> => {
       try {
@@ -122,7 +131,9 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
   }
 
   return (
-    <AuthContext.Provider value={{ token, user, isLoading, signIn, signUp, signOut }}>
+    <AuthContext.Provider
+      value={{ token, user, isLoading, signIn, signUp, signOut }}
+    >
       {children}
     </AuthContext.Provider>
   );

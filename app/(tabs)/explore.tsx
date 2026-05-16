@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
   mapWrap: { flex: 1, position: "relative" },
   map: { flex: 1 },
   loader: {
-    ...StyleSheet.absoluteFill, //modification
+    ...StyleSheet.absoluteFillObject,
     backgroundColor: COLORS.background,
     alignItems: "center",
     justifyContent: "center",

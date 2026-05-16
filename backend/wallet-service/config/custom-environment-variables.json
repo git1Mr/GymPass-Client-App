@@ -1,0 +1,14 @@
+{
+  "jwtPrivateKey": "JWT_PRIVATE_KEY",
+  "db": {
+    "uri": "MONGO_URI"
+  },
+  "port": "PORT",
+  "stripe": {
+    "secretKey":      "STRIPE_SECRET_KEY",
+    "publishableKey": "STRIPE_PUBLISHABLE_KEY",
+    "webhookSecret":  "STRIPE_WEBHOOK_SECRET",
+    "currency":       "STRIPE_CURRENCY",
+    "merchantName":   "STRIPE_MERCHANT_NAME"
+  }
+}

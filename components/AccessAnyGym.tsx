@@ -18,6 +18,7 @@ import {
   SPACING,
 } from "@/constants/theme";
 import { useAuth } from "@/context/AuthContext";
+import GradientSurface from "@/components/ui/GradientSurface";
 import LightPillar from "@/components/ui/LightPillar";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -551,18 +552,16 @@ export default function AccessAnyGym({ variant = "pill" }: AccessAnyGymProps) {
   return (
     <>
       <TouchableOpacity
-        style={[pillS.wrap, !isReady && pillS.disabled]}
+        style={[pillS.touch, !isReady && pillS.disabled]}
         onPress={() => isReady && setOpen(true)}
-        activeOpacity={0.75}
+        activeOpacity={0.85}
       >
-        <Ionicons
-          name="qr-code"
-          size={18}
-          color={isReady ? COLORS.primary : COLORS.textMuted}
-        />
-        <Text style={[pillS.label, !isReady && pillS.labelMuted]}>
-          {isReady ? "Access\nAny Gym" : "Loading..."}
-        </Text>
+        <GradientSurface radius={RADIUS.md} style={pillS.surface}>
+          <View style={pillS.content}>
+            <Ionicons name="qr-code" size={20} color={COLORS.white} />
+            <Text style={pillS.label}>{isReady ? "Access Gym" : "Loading…"}</Text>
+          </View>
+        </GradientSurface>
       </TouchableOpacity>
       {modal}
     </>
@@ -590,24 +589,19 @@ const triggerS = StyleSheet.create({
 });
 
 const pillS = StyleSheet.create({
-  wrap: {
-    flex: 1,
-    flexDirection: "column",
+  touch: { flex: 1 },
+  surface: { flex: 1 },
+  content: {
     alignItems: "center",
     gap: 4,
-    backgroundColor: COLORS.surface,
-    borderRadius: RADIUS.md,
     paddingVertical: SPACING.md,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    ...SHADOWS.soft,
+    paddingHorizontal: SPACING.xs,
   },
   label: {
     fontSize: FONT_SIZES.xs,
-    fontWeight: FONT_WEIGHTS.semibold,
-    color: COLORS.text,
+    fontWeight: FONT_WEIGHTS.bold,
+    color: COLORS.white,
     textAlign: "center",
   },
-  labelMuted: { color: COLORS.textMuted },
   disabled: { opacity: 0.5 },
 });

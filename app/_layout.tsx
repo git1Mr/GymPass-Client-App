@@ -22,7 +22,32 @@ import Toast from "react-native-toast-message";
 
 import LoadingScreen from "@/components/ui/LoadingScreen";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
+import { isStripeAvailable } from "@/services/stripeEnv";
 import SplashScreen from "./splash";
+
+const STRIPE_PUBLISHABLE_KEY =
+  process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? "";
+const STRIPE_MERCHANT_ID =
+  process.env.EXPO_PUBLIC_STRIPE_MERCHANT_ID ?? "merchant.unityfitness";
+
+// Lazy require so Expo Go never even loads the native module. With a Dev Build
+// the native module IS linked and this `require` returns the real provider.
+function MaybeStripeProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}): JSX.Element {
+  if (!isStripeAvailable) return <>{children}</>;
+  const { StripeProvider } = require("@stripe/stripe-react-native");
+  return (
+    <StripeProvider
+      publishableKey={STRIPE_PUBLISHABLE_KEY}
+      merchantIdentifier={STRIPE_MERCHANT_ID}
+    >
+      {children}
+    </StripeProvider>
+  );
+}
 
 // ── AuthGate ──────────────────────────────────────────────────────────────────
 // Sits inside AuthProvider so it can read context.
@@ -83,11 +108,13 @@ export default function RootLayout(): JSX.Element {
   // Phase 2: splash done → mount providers → AuthGate decides the route.
   return (
     <SafeAreaProvider>
-      <AuthProvider>
-        <AuthGate />
-        {/* Toast must be outside NavigationContainer to render above all screens */}
-        <Toast />
-      </AuthProvider>
+      <MaybeStripeProvider>
+        <AuthProvider>
+          <AuthGate />
+          {/* Toast must be outside NavigationContainer to render above all screens */}
+          <Toast />
+        </AuthProvider>
+      </MaybeStripeProvider>
     </SafeAreaProvider>
   );
 }
