@@ -18,7 +18,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import FormInput from "@/components/ui/FormInput";
-import LightPillar from "@/components/ui/LightPillar";
+import DarkVeil from "@/components/ui/DarkVeil";
 import UFLogo from "@/components/ui/UFLogo";
 import toast from "@/components/ui/Toast";
 import {
@@ -121,7 +121,7 @@ export default function RegisterScreen(): JSX.Element {
           <SafeAreaView edges={["top"]} style={styles.heroSafe}>
             <View style={styles.hero}>
               <View style={styles.pillarLayer} pointerEvents="none">
-                <LightPillar width={500} height={400} seed="A" animated />
+                <DarkVeil />
               </View>
 
               <TouchableOpacity

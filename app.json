@@ -33,7 +33,8 @@
         "googleMaps": {
           "apiKey": "YOUR_GOOGLE_MAPS_API_KEY"
         }
-      }
+      },
+      "package": "com.anonymous.unityfitness"
     },
     "ios": {
       "supportsTablet": true

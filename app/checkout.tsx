@@ -7,6 +7,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+    Alert,
     ScrollView,
     StyleSheet,
     Text,
@@ -14,6 +15,7 @@ import {
     View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 import GradientSurface from "@/components/ui/GradientSurface";
 import {
     COLORS,
@@ -23,6 +25,23 @@ import {
     SHADOWS,
     SPACING,
 } from "@/constants/theme";
+import { useAuth } from "@/context/AuthContext";
+import {
+    CreateIntentResponse,
+    createPaymentIntent,
+} from "@/services/paymentsService";
+import { isStripeAvailable } from "@/services/stripeEnv";
+
+// Same lazy-require pattern as top-up.tsx so Expo Go doesn't crash on the
+// missing native module (only Dev/native builds have StripeSdk linked).
+const paymentSheetModule: {
+  usePaymentSheet: () => {
+    initPaymentSheet: (opts: any) => Promise<{ error?: { message: string } }>;
+    presentPaymentSheet: () => Promise<{
+      error?: { message: string; code?: string };
+    }>;
+  };
+} | null = isStripeAvailable ? require("@stripe/stripe-react-native") : null;
 
 type IoniconsName = React.ComponentProps<typeof Ionicons>["name"];
 
@@ -70,6 +89,10 @@ export default function CheckoutScreen() {
   const { planId } = useLocalSearchParams<{ planId: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { user, refreshUser } = useAuth();
+  const sheet = paymentSheetModule?.usePaymentSheet();
+  const initPaymentSheet = sheet?.initPaymentSheet;
+  const presentPaymentSheet = sheet?.presentPaymentSheet;
 
   const plan = PLANS[planId ?? ""] ?? PLANS.mobility;
   const [payMethod, setPayMethod] = useState("card");
@@ -79,12 +102,87 @@ export default function CheckoutScreen() {
   const total = plan.price + fees;
 
   async function handlePay() {
+    // Cash + CMI are not implemented server-side yet.
+    if (payMethod !== "card") {
+      Alert.alert(
+        "Coming soon",
+        `${payMethod === "cash" ? "Cash on site" : "CMI Online"} payment is not enabled in this build.`,
+      );
+      return;
+    }
+    if (!initPaymentSheet || !presentPaymentSheet) {
+      Alert.alert(
+        "Payments unavailable in Expo Go",
+        "Stripe Payment Sheet uses a native module that Expo Go can't load. " +
+          "Use a Dev Build:\n\n  npx expo run:android",
+      );
+      return;
+    }
+
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1400));
-    setLoading(false);
-    // TODO: call purchaseService.buyPlan(plan, payMethod)
-    // For now just go back to tabs
-    router.replace("/(tabs)");
+    try {
+      // Server pins points to the plan's value (e.g. 25 pts for 199 MAD) via
+      // the new `points` + `label` overrides on /api/payments/create-intent.
+      const intent: CreateIntentResponse = await createPaymentIntent(total, {
+        points: plan.points,
+        label:  `${plan.name} plan`,
+      });
+
+      const initRes = await initPaymentSheet({
+        merchantDisplayName: intent.merchantName || "UnityFitness",
+        customerId: intent.customer,
+        customerEphemeralKeySecret: intent.ephemeralKey,
+        paymentIntentClientSecret: intent.clientSecret,
+        appearance: {
+          colors: {
+            primary: COLORS.accent,
+            background: COLORS.surface,
+            componentBackground: COLORS.surfaceElevated,
+            componentBorder: COLORS.border,
+            componentDivider: COLORS.border,
+            primaryText: COLORS.text,
+            secondaryText: COLORS.textSecondary,
+            componentText: COLORS.text,
+            placeholderText: COLORS.textMuted,
+            icon: COLORS.primary,
+            error: COLORS.error,
+          },
+          shapes: { borderRadius: RADIUS.md, borderWidth: 1 },
+          primaryButton: {
+            colors: {
+              background: COLORS.accent,
+              text: COLORS.white,
+              border: COLORS.accent,
+            },
+            shapes: { borderRadius: RADIUS.full },
+          },
+        },
+        defaultBillingDetails: { name: user?.name, email: user?.email },
+        allowsDelayedPaymentMethods: false,
+        returnURL: "unityfitness://stripe-redirect",
+      });
+      if (initRes.error) throw new Error(initRes.error.message);
+
+      const present = await presentPaymentSheet();
+      if (present.error) {
+        if (present.error.code === "Canceled") return;
+        throw new Error(present.error.message);
+      }
+
+      Toast.show({
+        type: "success",
+        text1: `${plan.name} plan unlocked`,
+        text2: `${plan.points} credits added to your wallet.`,
+      });
+      // Refresh once immediately, again after the webhook has had time to land.
+      await refreshUser();
+      setTimeout(() => { refreshUser(); }, 1500);
+      router.replace("/(tabs)");
+    } catch (err: any) {
+      Alert.alert("Payment failed", err?.message || "Please try again.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (

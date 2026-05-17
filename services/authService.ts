@@ -105,6 +105,47 @@ export async function logout(): Promise<void> {
   await SecureStore.deleteItemAsync(TOKEN_KEY);
 }
 
+// ── Password reset ──────────────────────────────────────────────────────────
+// In production the resetToken is delivered by email and the API returns only
+// a generic message. In this build it's returned in the response so the demo
+// works without SMTP infra — the UI auto-fills it into the reset form.
+export interface ForgotPasswordResponse {
+  message:     string;
+  resetToken?: string;   // demo only
+  expiresAt?:  string;
+}
+
+export async function requestPasswordReset(
+  email: string,
+): Promise<ForgotPasswordResponse> {
+  try {
+    const { data } = await api.post<ForgotPasswordResponse>(
+      "/auth/forgot-password",
+      { email },
+    );
+    return data;
+  } catch (err: any) {
+    const msg = err.response?.data || err.message || "Reset request failed";
+    throw new Error(typeof msg === "string" ? msg : "Reset request failed");
+  }
+}
+
+export async function resetPassword(
+  resetToken: string,
+  newPassword: string,
+): Promise<{ message: string }> {
+  try {
+    const { data } = await api.post<{ message: string }>(
+      "/auth/reset-password",
+      { resetToken, newPassword },
+    );
+    return data;
+  } catch (err: any) {
+    const msg = err.response?.data || err.message || "Reset failed";
+    throw new Error(typeof msg === "string" ? msg : "Reset failed");
+  }
+}
+
 export async function getStoredToken(): Promise<string | null> {
   return SecureStore.getItemAsync(TOKEN_KEY);
 }

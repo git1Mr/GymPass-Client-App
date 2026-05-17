@@ -1,0 +1,28 @@
+# Override file for rebuilding images from local backend/ source.
+# Use: docker compose -f docker-compose.yml -f docker-compose.build.yml build
+# Then: docker compose push
+services:
+  auth-service:
+    build:
+      context: ./backend/auth-service
+      dockerfile: Dockerfile
+
+  wallet-service:
+    build:
+      context: ./backend/wallet-service
+      dockerfile: Dockerfile
+
+  qr-security-service:
+    build:
+      context: ./backend/qr-security-service
+      dockerfile: Dockerfile
+
+  settlement-engine:
+    build:
+      context: ./backend/settlement-engine
+      dockerfile: Dockerfile
+
+  gateway:
+    build:
+      context: ./backend/gateway
+      dockerfile: Dockerfile

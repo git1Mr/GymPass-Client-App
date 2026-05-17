@@ -3,56 +3,165 @@ services:
     image: mongo:latest
     container_name: unity-mongo
     restart: unless-stopped
+    command: ["--replSet", "rs0", "--bind_ip_all"]
     ports:
       - "27017:27017"
     volumes:
       - mongo-data:/data/db
     networks:
       - unity-net
+    healthcheck:
+      # Init RS on first run (idempotent — rs.status() throws code 94 if uninitialised).
+      test: |
+        mongosh --quiet --eval "
+          try { rs.status() }
+          catch (e) { if (e.codeName === 'NotYetInitialized') rs.initiate({_id:'rs0', members:[{_id:0, host:'mongo:27017'}]}) }
+        " && mongosh --quiet --eval "db.adminCommand('ping').ok"
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
 
   auth-service:
-    build:
-      context: ./backend/auth-service
-      dockerfile: Dockerfile
     image: ${DOCKERHUB_USER:-zakarialem}/unity-auth:v1
     container_name: unity-auth
     restart: unless-stopped
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
     environment:
       NODE_ENV: production
       PORT: 3001
-      MONGO_URI: mongodb://mongo:27017/unityfitness
+      MONGO_URI: mongodb://mongo:27017/unityfitness?replicaSet=rs0&directConnection=true
       JWT_PRIVATE_KEY: ${JWT_PRIVATE_KEY}
-    ports:
-      - "3001:3001"
+    expose:
+      - "3001"
     networks:
       - unity-net
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3001/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          memory: 256M
 
   wallet-service:
-    build:
-      context: ./backend/wallet-service
-      dockerfile: Dockerfile
     image: ${DOCKERHUB_USER:-zakarialem}/unity-wallet:v1
     container_name: unity-wallet
     restart: unless-stopped
     depends_on:
-      - mongo
-      - auth-service
+      mongo:
+        condition: service_healthy
+      auth-service:
+        condition: service_healthy
     environment:
       NODE_ENV: production
       PORT: 3002
-      MONGO_URI: mongodb://mongo:27017/unityfitness
+      MONGO_URI: mongodb://mongo:27017/unityfitness?replicaSet=rs0&directConnection=true
       JWT_PRIVATE_KEY: ${JWT_PRIVATE_KEY}
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
       STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY}
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
       STRIPE_CURRENCY: ${STRIPE_CURRENCY:-mad}
       STRIPE_MERCHANT_NAME: ${STRIPE_MERCHANT_NAME:-UnityFitness}
-    ports:
-      - "3002:3002"
+    expose:
+      - "3002"
     networks:
       - unity-net
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3002/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+  qr-security-service:
+    image: ${DOCKERHUB_USER:-zakarialem}/unity-qr-security:v1
+    container_name: unity-qr-security
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+      auth-service:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3003
+      MONGO_URI: mongodb://mongo:27017/unityfitness?replicaSet=rs0&directConnection=true
+      JWT_PRIVATE_KEY: ${JWT_PRIVATE_KEY}
+    expose:
+      - "3003"
+    networks:
+      - unity-net
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3003/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+  settlement-engine:
+    image: ${DOCKERHUB_USER:-zakarialem}/unity-settlement:v1
+    container_name: unity-settlement
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+      auth-service:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3004
+      MONGO_URI: mongodb://mongo:27017/unityfitness?replicaSet=rs0&directConnection=true
+      JWT_PRIVATE_KEY: ${JWT_PRIVATE_KEY}
+    expose:
+      - "3004"
+    networks:
+      - unity-net
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3004/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+  gateway:
+    image: ${DOCKERHUB_USER:-zakarialem}/unity-gateway:v1
+    container_name: unity-gateway
+    restart: unless-stopped
+    depends_on:
+      auth-service:
+        condition: service_healthy
+      wallet-service:
+        condition: service_healthy
+      qr-security-service:
+        condition: service_healthy
+      settlement-engine:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    networks:
+      - unity-net
+    deploy:
+      resources:
+        limits:
+          memory: 128M
 
 networks:
   unity-net:

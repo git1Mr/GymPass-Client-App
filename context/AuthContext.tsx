@@ -31,6 +31,9 @@ interface AuthContextValue {
   signIn: (credentials: LoginParams) => Promise<AuthResponse>;
   signUp: (fields: RegisterParams) => Promise<AuthResponse>;
   signOut: () => Promise<void>;
+  // Re-fetch /users/me to pick up balance/role changes after server-side state
+  // changes (e.g. a payment webhook updated pointsBalance). Safe to call freely.
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -130,9 +133,18 @@ export function AuthProvider({
     setUser(null);
   }
 
+  async function refreshUser(): Promise<void> {
+    try {
+      const res = await api.get("/users/me");
+      setUser(res.data as AppUser);
+    } catch {
+      // 401 will be handled globally by the response interceptor.
+    }
+  }
+
   return (
     <AuthContext.Provider
-      value={{ token, user, isLoading, signIn, signUp, signOut }}
+      value={{ token, user, isLoading, signIn, signUp, signOut, refreshUser }}
     >
       {children}
     </AuthContext.Provider>

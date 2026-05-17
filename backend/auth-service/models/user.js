@@ -11,7 +11,11 @@ const userSchema = new mongoose.Schema({
   deviceId: { type: String, required: true, unique: true },
   gymId:    { type: mongoose.Schema.Types.ObjectId, ref: 'Gym', default: null },
   pointsBalance: { type: Number, default: 0, min: 0 },
-  status:   { type: String, enum: ['active', 'suspended', 'pending'], default: 'active' }
+  status:   { type: String, enum: ['active', 'suspended', 'pending'], default: 'active' },
+  // Password reset — set by /api/auth/forgot-password, consumed by /reset-password.
+  // Hashed (sha256) at rest so a DB leak doesn't grant immediate password resets.
+  resetTokenHash:    { type: String, default: null },
+  resetTokenExpires: { type: Date,   default: null }
 }, { timestamps: true });
 
 userSchema.methods.generateAuthToken = function () {

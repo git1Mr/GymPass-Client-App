@@ -15,6 +15,14 @@ export interface CreateIntentResponse {
   amount:         number; // minor units (e.g. centimes)
   currency:       string;
   points:         number;
+  label:          string;
+}
+
+export interface CreateIntentOptions {
+  // Override the default 1 MAD = 1 point rule (e.g. plan packs).
+  points?: number;
+  // Label persisted in the ledger row (e.g. "Mobility plan").
+  label?:  string;
 }
 
 export interface CreditTransaction {
@@ -30,11 +38,16 @@ export interface CreditTransaction {
 
 export async function createPaymentIntent(
   amountMAD: number,
+  opts: CreateIntentOptions = {},
 ): Promise<CreateIntentResponse> {
   try {
     const { data } = await api.post<CreateIntentResponse>(
       "/payments/create-intent",
-      { amount: amountMAD },
+      {
+        amount: amountMAD,
+        ...(opts.points !== undefined && { points: opts.points }),
+        ...(opts.label  !== undefined && { label:  opts.label  }),
+      },
     );
     return data;
   } catch (err: any) {

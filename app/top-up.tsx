@@ -68,7 +68,7 @@ const paymentSheetModule: {
 export default function TopUpScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const sheet = paymentSheetModule?.usePaymentSheet();
   const initPaymentSheet = sheet?.initPaymentSheet;
   const presentPaymentSheet = sheet?.presentPaymentSheet;
@@ -168,8 +168,11 @@ export default function TopUpScreen() {
       Toast.show({
         type: "success",
         text1: "Payment confirmed",
-        text2: `${intent.points} UnityFitnessCredits will appear shortly.`,
+        text2: `${intent.points} UnityFitnessCredits added.`,
       });
+      // Webhook usually lands within ~1s; poll twice in case Stripe is slow.
+      await refreshUser();
+      setTimeout(() => { refreshUser(); }, 1500);
       router.replace("/credits");
     } catch (err: any) {
       Alert.alert("Payment failed", err?.message || "Please try again.");

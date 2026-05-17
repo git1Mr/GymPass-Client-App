@@ -1,0 +1,6 @@
+{
+  "name": "UnitySettlementEngine",
+  "jwtPrivateKey": "",
+  "db": { "uri": "mongodb://localhost/unityfitness" },
+  "port": 3004
+}

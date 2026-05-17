@@ -6,7 +6,6 @@ const { User }              = require('../models/user');
 const { Gym }               = require('../models/gym');
 const { Transaction }       = require('../models/transaction');
 const { PointsConfig, seedDefaultConfig } = require('../models/pointsconfig');
-const { Settlement }        = require('../models/settlement');
 const { WithdrawalRequest } = require('../models/withdrawalrequest');
 const { TierRequest }       = require('../models/tierrequest');
 
@@ -20,7 +19,6 @@ module.exports = async function initDB() {
     Gym.createCollection(),
     Transaction.createCollection(),
     PointsConfig.createCollection(),
-    Settlement.createCollection(),
     WithdrawalRequest.createCollection(),
     TierRequest.createCollection()
   ]);

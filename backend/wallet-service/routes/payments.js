@@ -29,7 +29,13 @@ function pointsFromAmount(amountMinor) { return Math.floor(amountMinor / 100); }
 function validateCreateIntent(body) {
   return Joi.object({
     amount:   Joi.number().integer().min(1).max(100000).required(),
-    currency: Joi.string().length(3).lowercase().optional()
+    currency: Joi.string().length(3).lowercase().optional(),
+    // Optional explicit points override. Used by plan packs where the
+    // points-per-MAD ratio isn't 1:1 (e.g. "Mobility": 199 MAD → 25 pts).
+    // Defaults to amount-in-major-units (1 MAD = 1 pt) when absent.
+    points:   Joi.number().integer().min(1).max(100000).optional(),
+    // Optional label shown in the ledger row (e.g. "Mobility plan").
+    label:    Joi.string().max(80).optional()
   }).validate(body);
 }
 
@@ -59,6 +65,10 @@ router.post('/create-intent', auth, async (req, res, next) => {
       { apiVersion: '2024-06-20' }
     );
 
+    // Client may pin a specific points value (plan packs). Otherwise default 1:1.
+    const points = value.points ?? pointsFromAmount(amountMinor);
+    const label  = value.label  ?? `${points} UnityFitnessCredits`;
+
     const intent = await stripe.paymentIntents.create({
       amount: amountMinor,
       currency,
@@ -66,8 +76,9 @@ router.post('/create-intent', auth, async (req, res, next) => {
       automatic_payment_methods: { enabled: true },
       metadata: {
         userId: String(user._id),
-        points: String(pointsFromAmount(amountMinor)),
-        kind:   'unityfitness_credits_topup'
+        points: String(points),
+        label,
+        kind:   value.points ? 'unityfitness_plan_purchase' : 'unityfitness_credits_topup'
       }
     });
 
@@ -79,7 +90,8 @@ router.post('/create-intent', auth, async (req, res, next) => {
       merchantName:   config.get('stripe.merchantName'),
       amount:         amountMinor,
       currency,
-      points:         pointsFromAmount(amountMinor)
+      points,
+      label
     });
   } catch (err) {
     if (err.statusCode === 503) {
@@ -134,7 +146,7 @@ router.post('/webhook', async (req, res) => {
       type:                  'purchase',
       pointsAmount:          points,
       amountPaidMAD:         amountMajor,
-      packLabel:             `${points} UnityFitnessCredits`,
+      packLabel:             intent.metadata?.label || `${points} UnityFitnessCredits`,
       source:                'online',
       status:                'confirmed',
       provider:              'stripe',

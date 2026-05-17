@@ -9,17 +9,13 @@ import { COLORS, FONT_SIZES, FONT_WEIGHTS, SPACING } from "@/constants/theme";
 import React, { JSX, useEffect, useRef } from "react";
 import {
   Animated,
-  Dimensions,
   Easing,
   StyleSheet,
-  Text,
   View,
 } from "react-native";
 
-import LightPillar from "@/components/ui/LightPillar";
+import DarkVeil from "@/components/ui/DarkVeil";
 import UFLogo from "@/components/ui/UFLogo";
-
-const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get("window");
 
 export default function SplashScreen({
   onFinish,
@@ -105,7 +101,7 @@ export default function SplashScreen({
 
   return (
     <Animated.View style={[styles.container, { opacity: screenOpacity }]}>
-      {/* ── Light pillar background ── */}
+      {/* ── DarkVeil shader background ── */}
       <Animated.View
         style={[
           styles.pillarLayer,
@@ -116,12 +112,7 @@ export default function SplashScreen({
         ]}
         pointerEvents="none"
       >
-        <LightPillar
-          width={SCREEN_W}
-          height={SCREEN_H}
-          seed="A"
-          animated
-        />
+        <DarkVeil />
       </Animated.View>
 
       {/* ── Bottom vignette to deepen the floor ── */}

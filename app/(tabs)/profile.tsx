@@ -28,7 +28,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import LightPillar from "@/components/ui/LightPillar";
+import DarkVeil from "@/components/ui/DarkVeil";
 
 type IoniconsName = React.ComponentProps<typeof Ionicons>["name"];
 
@@ -165,7 +165,7 @@ export default function ProfileScreen() {
           <View style={styles.hero}>
             {/* Animated pillar (no circle blobs) */}
             <View style={styles.pillarLayer} pointerEvents="none">
-              <LightPillar width={500} height={260} seed="B" animated />
+              <DarkVeil />
             </View>
 
             <View style={styles.heroRow}>

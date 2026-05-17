@@ -228,7 +228,7 @@ const banner = StyleSheet.create({
 // ── Main screen ───────────────────────────────────────────────────────────
 export default function HomeScreen() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
 
   const username = user?.name?.split(" ")[0] ?? "there";
@@ -236,11 +236,11 @@ export default function HomeScreen() {
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     try {
-      await new Promise((r) => setTimeout(r, 1200));
+      await refreshUser();
     } finally {
       setRefreshing(false);
     }
-  }, []);
+  }, [refreshUser]);
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>

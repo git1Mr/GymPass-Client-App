@@ -18,7 +18,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import FormInput from "@/components/ui/FormInput";
-import LightPillar from "@/components/ui/LightPillar";
+import DarkVeil from "@/components/ui/DarkVeil";
 import UFLogo from "@/components/ui/UFLogo";
 import toast from "@/components/ui/Toast";
 import {
@@ -131,7 +131,7 @@ export default function LoginScreen(): JSX.Element {
             <View style={styles.hero}>
               {/* Animated background */}
               <View style={styles.pillarLayer} pointerEvents="none">
-                <LightPillar width={500} height={420} seed="A" animated />
+                <DarkVeil />
               </View>
 
               <View style={styles.logoWrap}>

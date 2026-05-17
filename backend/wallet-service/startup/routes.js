@@ -4,10 +4,8 @@ const error   = require('../middleware/error');
 const gymsRoute         = require('../routes/gym');
 const transactionsRoute = require('../routes/transactions');
 const pointsConfigRoute = require('../routes/pointsconfig');
-const settlementsRoute  = require('../routes/settlements');
 const withdrawalsRoute  = require('../routes/withdrawalrequests');
 const tierRequestsRoute = require('../routes/tierrequests');
-const gymAccessRoute    = require('../routes/gymAccess');
 const paymentsRoute     = require('../routes/payments');
 
 module.exports = function initRoutes(app) {
@@ -24,11 +22,11 @@ module.exports = function initRoutes(app) {
   app.use('/api/gyms',          gymsRoute);
   app.use('/api/transactions',  transactionsRoute);
   app.use('/api/points-config', pointsConfigRoute);
-  app.use('/api/settlements',   settlementsRoute);
   app.use('/api/withdrawals',   withdrawalsRoute);
   app.use('/api/tier-requests', tierRequestsRoute);
-  app.use('/api/gym-access',    gymAccessRoute);
   app.use('/api/payments',      paymentsRoute);
+  // NOTE: /api/gym-access  → qr-security-service (port 3003)
+  // NOTE: /api/settlements → settlement-engine   (port 3004)
 
   app.use(error);
 };
