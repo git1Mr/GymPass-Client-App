@@ -1,10 +1,3 @@
-// app/splash.tsx
-//
-// Animated entry screen. Dark canvas, animated light pillar in the
-// background, and a staggered logo / wordmark / tagline reveal. The
-// pillar component handles its own breathing/drift loops; this file
-// owns the entry choreography + fade-out handoff.
-
 import { COLORS, FONT_SIZES, FONT_WEIGHTS, SPACING } from "@/constants/theme";
 import React, { JSX, useEffect, useRef } from "react";
 import {
@@ -22,7 +15,6 @@ export default function SplashScreen({
 }: {
   onFinish: () => void;
 }): JSX.Element {
-  // Entry animation values
   const pillarOpacity = useRef(new Animated.Value(0)).current;
   const pillarScale = useRef(new Animated.Value(0.85)).current;
   const logoOpacity = useRef(new Animated.Value(0)).current;
@@ -30,12 +22,10 @@ export default function SplashScreen({
   const wordOpacity = useRef(new Animated.Value(0)).current;
   const wordTranslate = useRef(new Animated.Value(12)).current;
   const tagOpacity = useRef(new Animated.Value(0)).current;
-  // Fade-out handoff
   const screenOpacity = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     Animated.sequence([
-      // 1. Pillar materializes
       Animated.parallel([
         Animated.timing(pillarOpacity, {
           toValue: 1,
@@ -50,7 +40,6 @@ export default function SplashScreen({
           useNativeDriver: true,
         }),
       ]),
-      // 2. Logo pops
       Animated.parallel([
         Animated.timing(logoOpacity, {
           toValue: 1,
@@ -65,7 +54,6 @@ export default function SplashScreen({
           useNativeDriver: true,
         }),
       ]),
-      // 3. Wordmark slides
       Animated.parallel([
         Animated.timing(wordOpacity, {
           toValue: 1,
@@ -80,16 +68,13 @@ export default function SplashScreen({
           useNativeDriver: true,
         }),
       ]),
-      // 4. Tagline whispers in
       Animated.timing(tagOpacity, {
         toValue: 1,
         duration: 600,
         easing: Easing.out(Easing.cubic),
         useNativeDriver: true,
       }),
-      // 5. Hold
       Animated.delay(1100),
-      // 6. Hand off
       Animated.timing(screenOpacity, {
         toValue: 0,
         duration: 500,
@@ -101,7 +86,6 @@ export default function SplashScreen({
 
   return (
     <Animated.View style={[styles.container, { opacity: screenOpacity }]}>
-      {/* ── DarkVeil shader background ── */}
       <Animated.View
         style={[
           styles.pillarLayer,
@@ -115,10 +99,8 @@ export default function SplashScreen({
         <DarkVeil />
       </Animated.View>
 
-      {/* ── Bottom vignette to deepen the floor ── */}
       <View style={styles.vignette} pointerEvents="none" />
 
-      {/* ── Logo + text ── */}
       <View style={styles.content}>
         <Animated.View
           style={{
@@ -163,9 +145,7 @@ const styles = StyleSheet.create({
   vignette: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "transparent",
-    // Subtle radial darkening at the bottom — emulated as a flat tint
-    // because RN can't do radial gradients in core. Layered above pillar
-    // so the floor reads dark and the headline lifts off.
+    // Emulates a radial darkening at the bottom — RN core can't do radial gradients.
     shadowColor: "#0E0A1F",
     shadowOpacity: 0.6,
     shadowRadius: 200,

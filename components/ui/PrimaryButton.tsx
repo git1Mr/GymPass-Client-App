@@ -1,5 +1,3 @@
-// app/components/PrimaryButton.tsx
-
 import React, { JSX, useRef } from "react";
 import {
     ActivityIndicator,

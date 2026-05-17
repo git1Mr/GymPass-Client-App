@@ -1,8 +1,3 @@
-// app/(tabs)/plans.tsx
-// Plans screen — each tier card now uses the brand hero treatment
-// (GradientSurface: burgundy → lavender diagonal gradient + crosshatch
-// texture), mirroring the home-screen hero card.
-
 import GradientSurface from "@/components/ui/GradientSurface";
 import {
     COLORS,
@@ -161,7 +156,6 @@ export default function PlansScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
-      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Plans</Text>
         <Text style={styles.headerSub}>Buy points once · Use them everywhere</Text>
@@ -186,7 +180,6 @@ export default function PlansScreen() {
         ))}
       </ScrollView>
 
-      {/* Sticky purchase bar */}
       <View style={styles.purchaseBar}>
         <View>
           <Text style={styles.purchaseLabel}>

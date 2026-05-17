@@ -1,9 +1,5 @@
-// app/services/authService.ts
-
 import * as SecureStore from "expo-secure-store";
 import api, { REMEMBER_KEY, TOKEN_KEY } from "./api";
-
-// ── Param types ──────────────────────────────────────────────────────────────
 
 export interface LoginParams {
   email: string;
@@ -19,8 +15,6 @@ export interface RegisterParams {
   deviceId: string;
 }
 
-// ── Response shape returned by the backend ───────────────────────────────────
-
 export interface AuthUser {
   _id: string;
   name: string;
@@ -33,8 +27,6 @@ export interface AuthResponse {
   token?: string;
   user?: AuthUser;
 }
-
-// ── Service functions ────────────────────────────────────────────────────────
 
 export async function login({
   email,
@@ -65,7 +57,6 @@ export async function login({
 
     return response.data;
   } catch (error: any) {
-    // Extract the message from the backend (e.g., "Invalid email or password")
     const message = error.response?.data || error.message || "Login failed";
     console.error("Login Service Error:", message);
     throw new Error(message);
@@ -80,7 +71,7 @@ export async function register({
 }: RegisterParams): Promise<AuthResponse> {
   try {
     const response = await api.post<AuthResponse>("/users", {
-      name, // Ensure this matches your backend Joi schema (name vs fullName)
+      name, // field name must match the backend Joi schema (name, not fullName)
       email,
       password,
       deviceId,
@@ -105,10 +96,8 @@ export async function logout(): Promise<void> {
   await SecureStore.deleteItemAsync(TOKEN_KEY);
 }
 
-// ── Password reset ──────────────────────────────────────────────────────────
-// In production the resetToken is delivered by email and the API returns only
-// a generic message. In this build it's returned in the response so the demo
-// works without SMTP infra — the UI auto-fills it into the reset form.
+// In production the reset token is delivered by email; in this build the API
+// returns it inline so the demo works without SMTP. The UI auto-fills it.
 export interface ForgotPasswordResponse {
   message:     string;
   resetToken?: string;   // demo only

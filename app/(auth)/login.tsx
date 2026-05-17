@@ -1,5 +1,3 @@
-// app/(auth)/login.tsx
-
 import * as Device from "expo-device";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -126,10 +124,8 @@ export default function LoginScreen(): JSX.Element {
           showsVerticalScrollIndicator={false}
           bounces={false}
         >
-          {/* ── Hero (dark with animated light pillar) ──────────── */}
           <SafeAreaView edges={["top"]} style={styles.heroSafe}>
             <View style={styles.hero}>
-              {/* Animated background */}
               <View style={styles.pillarLayer} pointerEvents="none">
                 <DarkVeil />
               </View>
@@ -142,7 +138,6 @@ export default function LoginScreen(): JSX.Element {
             </View>
           </SafeAreaView>
 
-          {/* ── Form panel ──────────────────────────────────────── */}
           <View style={styles.panel}>
             <FormInput
               label="Email"
@@ -186,7 +181,6 @@ export default function LoginScreen(): JSX.Element {
               </TouchableOpacity>
             </View>
 
-            {/* Primary CTA — lavender (was "orange" in inspiration) */}
             <Pressable
               onPress={handleLogin}
               disabled={loading}
@@ -206,14 +200,12 @@ export default function LoginScreen(): JSX.Element {
               )}
             </Pressable>
 
-            {/* OR divider */}
             <View style={styles.dividerRow}>
               <View style={styles.dividerLine} />
               <Text style={styles.dividerText}>OR</Text>
               <View style={styles.dividerLine} />
             </View>
 
-            {/* Footer */}
             <View style={styles.footer}>
               <Text style={styles.footerText}>New to Unity Fitness? </Text>
               <TouchableOpacity
@@ -235,12 +227,11 @@ const styles = StyleSheet.create({
   kav: { flex: 1 },
   scroll: { flexGrow: 1 },
 
-  // Hero
   heroSafe: { backgroundColor: "#0E0A1F" },
   hero: {
     backgroundColor: "#0E0A1F",
     paddingTop: SPACING.lg,
-    paddingBottom: SPACING.xxxl + SPACING.lg, // extra room so panel overlaps
+    paddingBottom: SPACING.xxxl + SPACING.lg,
     paddingHorizontal: SPACING.lg,
     alignItems: "center",
     position: "relative",
@@ -266,7 +257,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 
-  // Panel
   panel: {
     backgroundColor: COLORS.surface,
     borderTopLeftRadius: RADIUS.xl,
@@ -279,7 +269,6 @@ const styles = StyleSheet.create({
     minHeight: 420,
   },
 
-  // Remember + forgot row
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -309,7 +298,6 @@ const styles = StyleSheet.create({
     fontWeight: FONT_WEIGHTS.bold,
   },
 
-  // CTA
   cta: {
     backgroundColor: COLORS.primary,
     borderRadius: RADIUS.md,
@@ -332,7 +320,6 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
 
-  // Divider
   dividerRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -348,7 +335,6 @@ const styles = StyleSheet.create({
     letterSpacing: 0.8,
   },
 
-  // Footer
   footer: {
     flexDirection: "row",
     justifyContent: "center",

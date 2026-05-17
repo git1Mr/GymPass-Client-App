@@ -1,44 +1,38 @@
 export const COLORS = {
-  // Brand
-  primary: "#9f99c7", // soft lavender
+  primary: "#9f99c7",
   primaryLight: "#bfbbdc",
   primaryDark: "#7a73a8",
-  primaryMuted: "#9f99c726", // 15% opacity for backgrounds
+  primaryMuted: "#9f99c726", // 15% opacity
 
-  accent: "#3C0008", // deep burgundy
+  accent: "#3C0008",
   accentLight: "#6B0010",
-  accentMuted: "#3C000820",
+  accentMuted: "#3C000820", // 12% opacity
 
-  // Surfaces
-  background: "#F7F6FB", // near-white lavender tint
+  background: "#F7F6FB",
   surface: "#FFFFFF",
   surfaceElevated: "#EEEDF7",
   border: "#D8D6EE",
   borderFocus: "#9f99c7",
 
-  // Text
-  text: "#1A1728", // deep purple-black
+  text: "#1A1728",
   textSecondary: "#5C567A",
   textMuted: "#A09CC0",
   textOnPrimary: "#FFFFFF",
   textOnAccent: "#FFFFFF",
 
-  // Semantic
   error: "#D93025",
   errorBg: "#FFE9E8",
   success: "#1E8A4C",
   warning: "#F59E0B",
 
-  // Tab bar
   tabActive: "#3C0008",
   tabInactive: "#9f99c7",
   tabBar: "#FFFFFF",
 
-  // Auth screens — change these two to restyle every auth screen at once
-  authHeader: "#3C0008", // top brand panel background
-  authPanel: "#F7F6FB",  // bottom form panel background (off-white so inputs stand out)
+  // Change these two to restyle every auth screen at once.
+  authHeader: "#3C0008",
+  authPanel: "#F7F6FB",
 
-  // Wordmark
   wordmarkHighlight: "#E8723F",
 
   white: "#FFFFFF",

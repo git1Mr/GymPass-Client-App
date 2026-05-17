@@ -1,37 +1,14 @@
-// components/ui/DarkVeil.tsx
+// React Native port of the React Bits DarkVeil component. The GLSL shader runs
+// unchanged on the device GPU via expo-gl.
 //
-// React Native port of the React Bits DarkVeil component. The GLSL shader is
-// copied verbatim from the original — GLSL ES (the dialect WebGL uses) is the
-// same flavor OpenGL ES 2.0 uses, so the fragment program runs unchanged on
-// the device's GPU via expo-gl.
-//
-// Why no ogl wrapper:
-//   ogl's Renderer (even when given an external gl context) still touches
-//   `document.createElement('canvas')` somewhere inside, which throws
-//   `Property 'document' doesn't exist` in React Native. Since DarkVeil only
-//   needs a single fullscreen triangle + one fragment shader, the ogl wrapper
-//   buys us nothing — we just talk to expo-gl's WebGL context directly.
-//
-// Key bits:
-//   - Fullscreen triangle trick: a single triangle with verts
-//       (-1,-1), (3,-1), (-1,3)
-//     covers the entire NDC [-1,1]^2 viewport. Cheaper than a quad.
-//   - gl.endFrameEXP() is mandatory after every frame on expo-gl — without it
-//     the surface never flips. That's the equivalent of swapBuffers.
-//   - Props are mirrored into a ref so they hot-update the loop without
-//     re-creating the GL context.
-//
-// Usage:
-//   <View style={{ flex: 1 }}>
-//     <DarkVeil />              // absolute-fill background
-//     ...your foreground UI...
-//   </View>
+// We talk to expo-gl's WebGL context directly instead of using `ogl` — ogl's
+// Renderer touches `document.createElement('canvas')` internally, which throws
+// "Property 'document' doesn't exist" in React Native.
 
 import React, { useCallback, useEffect, useRef } from "react";
 import { StyleSheet, ViewStyle } from "react-native";
 import { ExpoWebGLRenderingContext, GLView } from "expo-gl";
 
-// ── Shader source (verbatim from React Bits) ───────────────────────────────
 const vertex = `
 attribute vec2 position;
 void main(){gl_Position=vec4(position,0.0,1.0);}
@@ -104,7 +81,6 @@ void main(){
 }
 `;
 
-// ── Component ──────────────────────────────────────────────────────────────
 export interface DarkVeilProps {
   hueShift?:          number;
   noiseIntensity?:    number;
@@ -126,7 +102,8 @@ export default function DarkVeil({
   resolutionScale   = 1,
   style,
 }: DarkVeilProps) {
-  // Hot-update props without re-creating the GL context.
+  // Mirror props into a ref so the render loop sees updates without
+  // re-creating the GL context.
   const propsRef = useRef({
     hueShift, noiseIntensity, scanlineIntensity, speed, scanlineFrequency, warpAmount,
   });
@@ -136,7 +113,6 @@ export default function DarkVeil({
     };
   }, [hueShift, noiseIntensity, scanlineIntensity, speed, scanlineFrequency, warpAmount]);
 
-  // Track unmount so the requestAnimationFrame loop self-terminates.
   const mountedRef = useRef(true);
   useEffect(() => () => { mountedRef.current = false; }, []);
 
@@ -144,7 +120,6 @@ export default function DarkVeil({
     const bufferW = gl.drawingBufferWidth;
     const bufferH = gl.drawingBufferHeight;
 
-    // ── Compile & link the shader program ───────────────────────────────────
     function compile(type: number, source: string): WebGLShader {
       const sh = gl.createShader(type)!;
       gl.shaderSource(sh, source);
@@ -167,7 +142,7 @@ export default function DarkVeil({
       throw new Error("DarkVeil program link failed: " + (gl.getProgramInfoLog(program) ?? ""));
     }
 
-    // ── Fullscreen triangle ─────────────────────────────────────────────────
+    // Fullscreen triangle: verts (-1,-1),(3,-1),(-1,3) cover the entire NDC viewport.
     const triBuf = gl.createBuffer()!;
     gl.bindBuffer(gl.ARRAY_BUFFER, triBuf);
     gl.bufferData(
@@ -180,7 +155,6 @@ export default function DarkVeil({
     gl.enableVertexAttribArray(posLoc);
     gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
 
-    // ── Uniform locations (looked up once) ──────────────────────────────────
     const uTime       = gl.getUniformLocation(program, "uTime");
     const uResolution = gl.getUniformLocation(program, "uResolution");
     const uHueShift   = gl.getUniformLocation(program, "uHueShift");
@@ -193,7 +167,6 @@ export default function DarkVeil({
     gl.viewport(0, 0, bufferW, bufferH);
     gl.uniform2f(uResolution, bufferW, bufferH);
 
-    // ── Render loop ─────────────────────────────────────────────────────────
     const start = Date.now();
     const loop = () => {
       if (!mountedRef.current) return;
@@ -205,13 +178,11 @@ export default function DarkVeil({
       gl.uniform1f(uScanFreq, p.scanlineFrequency);
       gl.uniform1f(uWarp,     p.warpAmount);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
-      // Critical for expo-gl — without this the surface never updates.
+      // gl.endFrameEXP() is required by expo-gl — without it the surface never flips.
       gl.endFrameEXP();
       requestAnimationFrame(loop);
     };
     loop();
-    // resolutionScale would change the viewport sizing if non-1; tracked here
-    // for completeness (not actively used in this simple path).
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resolutionScale]);
 
@@ -219,8 +190,7 @@ export default function DarkVeil({
     <GLView
       style={[StyleSheet.absoluteFillObject, style]}
       onContextCreate={onContextCreate}
-      // Prevent the GLView from absorbing touches so the foreground UI stays
-      // interactive (login form, buttons, etc.).
+      // pointerEvents="none" so foreground UI (forms, buttons) stays interactive.
       pointerEvents="none"
     />
   );

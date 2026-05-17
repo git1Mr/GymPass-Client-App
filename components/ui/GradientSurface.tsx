@@ -1,14 +1,3 @@
-// components/ui/GradientSurface.tsx
-//
-// The brand's hero/banner surface — a diagonal burgundy → lavender
-// gradient with a faint crosshatch texture overlay. Used on the home
-// hero, quick-action pills, "find clubs near you" card, and the
-// "discover plans" banner.
-//
-// Texture is a `<Pattern>` of two thin diagonal lines at 45°/-45°
-// drawn from react-native-svg. Both gradient and pattern fully cover
-// the surface via absoluteFill <Svg> layers.
-
 import React from "react";
 import { StyleSheet, View, ViewStyle } from "react-native";
 import Svg, {
@@ -21,9 +10,7 @@ import Svg, {
 } from "react-native-svg";
 
 interface GradientSurfaceProps {
-  /** Border radius — defaults to 22 (card radius from the design system). */
   radius?: number;
-  /** When > 0, adds a soft bottom-edge dimmer on top of the gradient. */
   dimmer?: number;
   style?: ViewStyle;
   children?: React.ReactNode;
@@ -45,7 +32,6 @@ export default function GradientSurface({
         style,
       ]}
     >
-      {/* Base gradient */}
       <Svg style={StyleSheet.absoluteFill} preserveAspectRatio="none">
         <Defs>
           <SvgLinearGradient
@@ -108,7 +94,6 @@ export default function GradientSurface({
         )}
       </Svg>
 
-      {/* Children render above the gradient stack */}
       <View style={styles.inner}>{children}</View>
     </View>
   );

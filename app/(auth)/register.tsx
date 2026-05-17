@@ -1,5 +1,3 @@
-// app/(auth)/register.tsx
-
 import * as Device from "expo-device";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -117,7 +115,6 @@ export default function RegisterScreen(): JSX.Element {
           showsVerticalScrollIndicator={false}
           bounces={false}
         >
-          {/* ── Hero ─────────────────────────────────────────── */}
           <SafeAreaView edges={["top"]} style={styles.heroSafe}>
             <View style={styles.hero}>
               <View style={styles.pillarLayer} pointerEvents="none">
@@ -143,7 +140,6 @@ export default function RegisterScreen(): JSX.Element {
             </View>
           </SafeAreaView>
 
-          {/* ── Form panel ───────────────────────────────────── */}
           <View style={styles.panel}>
             <FormInput
               label="Full Name"

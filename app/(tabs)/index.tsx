@@ -1,10 +1,3 @@
-// app/(tabs)/index.tsx
-//
-// Home / Dashboard. Hero, quick action pills, "find clubs near you"
-// card, and "discover our plans" banner all share the brand gradient
-// surface (burgundy → lavender with crosshatch). Other elements (stat
-// cards, nearby card chrome) stay light to give the screen rhythm.
-
 import AccessAnyGym from "@/components/AccessAnyGym";
 import GradientSurface from "@/components/ui/GradientSurface";
 import UFLogo from "@/components/ui/UFLogo";
@@ -34,7 +27,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 type IoniconsName = React.ComponentProps<typeof Ionicons>["name"];
 
-// ── Small "UNITYFITNESS" pill (top-right of hero) ─────────────────────────
 function UnityPill() {
   return (
     <View style={pillS.wrap}>
@@ -69,7 +61,6 @@ const pillS = StyleSheet.create({
   },
 });
 
-// ── Stat card (stays light) ───────────────────────────────────────────────
 interface StatCardProps {
   label: string;
   value: string;
@@ -93,7 +84,6 @@ function StatCard({ label, value, icon, onPress }: StatCardProps) {
   );
 }
 
-// ── Quick action pill (gradient) ──────────────────────────────────────────
 interface ActionPillProps {
   label: string;
   icon: IoniconsName;
@@ -116,7 +106,6 @@ function ActionPill({ label, icon, onPress }: ActionPillProps) {
   );
 }
 
-// ── "Discover our plans" banner ───────────────────────────────────────────
 function DiscoverPlansBanner({ onPress }: { onPress: () => void }) {
   const arrowScale = useRef(new Animated.Value(1)).current;
   const mount = useRef(new Animated.Value(0)).current;
@@ -225,7 +214,6 @@ const banner = StyleSheet.create({
   },
 });
 
-// ── Main screen ───────────────────────────────────────────────────────────
 export default function HomeScreen() {
   const router = useRouter();
   const { user, refreshUser } = useAuth();
@@ -244,7 +232,6 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
-      {/* ── Header ── */}
       <View style={styles.header}>
         <View style={styles.logoRow}>
           <UFLogo size={32} variant="light" />
@@ -276,9 +263,7 @@ export default function HomeScreen() {
           />
         }
       >
-        {/* ── Hero ── */}
         <GradientSurface radius={RADIUS.xl} style={styles.heroCard} dimmer={0.08}>
-          {/* Unity pill, absolute top-right */}
           <View style={styles.heroPill} pointerEvents="none">
             <UnityPill />
           </View>
@@ -302,7 +287,6 @@ export default function HomeScreen() {
           </View>
         </GradientSurface>
 
-        {/* ── Stats ── */}
         <View style={styles.statsRow}>
           <StatCard
             label="Credits"
@@ -318,7 +302,6 @@ export default function HomeScreen() {
           <StatCard label="Gyms" value="12+" icon="location-outline" />
         </View>
 
-        {/* ── Quick actions ── */}
         <Text style={styles.sectionTitle}>Quick actions</Text>
         <View style={styles.pillsRow}>
           <AccessAnyGym variant="pill" />
@@ -334,7 +317,6 @@ export default function HomeScreen() {
           />
         </View>
 
-        {/* ── Find clubs near you ── */}
         <TouchableOpacity
           onPress={() => router.push("/(tabs)/explore")}
           activeOpacity={0.88}
@@ -359,7 +341,6 @@ export default function HomeScreen() {
           </GradientSurface>
         </TouchableOpacity>
 
-        {/* ── Plans banner ── */}
         <DiscoverPlansBanner onPress={() => router.push("/(tabs)/plans")} />
       </ScrollView>
     </SafeAreaView>
@@ -389,7 +370,6 @@ const styles = StyleSheet.create({
   scroll: { flex: 1 },
   scrollContent: { padding: SPACING.lg, paddingBottom: SPACING.xxxl },
 
-  // Hero card
   heroCard: {
     marginBottom: SPACING.lg,
   },
@@ -447,7 +427,6 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.sm,
   },
 
-  // Stats
   statsRow: { flexDirection: "row", gap: SPACING.sm, marginBottom: SPACING.lg },
   statCard: {
     flex: 1,
@@ -473,7 +452,6 @@ const styles = StyleSheet.create({
   },
   statLabel: { fontSize: FONT_SIZES.xs, color: COLORS.textMuted, marginTop: 2 },
 
-  // Quick action pills (gradient)
   sectionTitle: {
     fontSize: FONT_SIZES.md,
     fontWeight: FONT_WEIGHTS.bold,
@@ -498,7 +476,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 
-  // Nearby
   nearbyRow: {
     flexDirection: "row",
     alignItems: "center",

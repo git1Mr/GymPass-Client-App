@@ -1,7 +1,3 @@
-// app/(auth)/_layout.tsx
-// Stack navigator for the auth group.
-// No tab bar, no header — each screen manages its own back button.
-
 import { Stack } from "expo-router";
 import React, { JSX } from "react";
 

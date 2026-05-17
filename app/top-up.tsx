@@ -1,5 +1,3 @@
-// app/top-up.tsx
-//
 // TopUpScreen — buy UnityFitnessCredits via Stripe Payment Sheet.
 //
 // Flow:
@@ -16,33 +14,33 @@
 
 import GradientSurface from "@/components/ui/GradientSurface";
 import {
-  COLORS,
-  FONT_SIZES,
-  FONT_WEIGHTS,
-  RADIUS,
-  SHADOWS,
-  SPACING,
+    COLORS,
+    FONT_SIZES,
+    FONT_WEIGHTS,
+    RADIUS,
+    SHADOWS,
+    SPACING,
 } from "@/constants/theme";
 import { useAuth } from "@/context/AuthContext";
 import {
-  CreateIntentResponse,
-  createPaymentIntent,
+    CreateIntentResponse,
+    createPaymentIntent,
 } from "@/services/paymentsService";
 import { isStripeAvailable } from "@/services/stripeEnv";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
@@ -105,9 +103,8 @@ export default function TopUpScreen() {
 
     setBusy(true);
     try {
-      const intent: CreateIntentResponse = await createPaymentIntent(
-        finalAmount,
-      );
+      const intent: CreateIntentResponse =
+        await createPaymentIntent(finalAmount);
 
       const initRes = await initPaymentSheet({
         merchantDisplayName: intent.merchantName || "UnityFitness",
@@ -172,7 +169,9 @@ export default function TopUpScreen() {
       });
       // Webhook usually lands within ~1s; poll twice in case Stripe is slow.
       await refreshUser();
-      setTimeout(() => { refreshUser(); }, 1500);
+      setTimeout(() => {
+        refreshUser();
+      }, 1500);
       router.replace("/credits");
     } catch (err: any) {
       Alert.alert("Payment failed", err?.message || "Please try again.");
@@ -221,11 +220,7 @@ export default function TopUpScreen() {
           )}
 
           {/* Hero */}
-          <GradientSurface
-            radius={RADIUS.xl}
-            style={styles.hero}
-            dimmer={0.08}
-          >
+          <GradientSurface radius={RADIUS.xl} style={styles.hero} dimmer={0.08}>
             <View style={styles.heroBody}>
               <Text style={styles.heroLabel}>UNITYFITNESS CREDITS</Text>
               <Text style={styles.heroValue}>
@@ -255,10 +250,20 @@ export default function TopUpScreen() {
                   }}
                   activeOpacity={0.85}
                 >
-                  <Text style={[styles.presetMad, active && styles.presetTextActive]}>
+                  <Text
+                    style={[
+                      styles.presetMad,
+                      active && styles.presetTextActive,
+                    ]}
+                  >
                     {p.mad} MAD
                   </Text>
-                  <Text style={[styles.presetLabel, active && styles.presetTextActive]}>
+                  <Text
+                    style={[
+                      styles.presetLabel,
+                      active && styles.presetTextActive,
+                    ]}
+                  >
                     {p.label}
                   </Text>
                 </TouchableOpacity>
@@ -283,7 +288,11 @@ export default function TopUpScreen() {
 
           {/* Security note */}
           <View style={styles.securityCard}>
-            <Ionicons name="shield-checkmark" size={18} color={COLORS.success} />
+            <Ionicons
+              name="shield-checkmark"
+              size={18}
+              color={COLORS.success}
+            />
             <View style={{ flex: 1 }}>
               <Text style={styles.securityTitle}>Secured by Stripe</Text>
               <Text style={styles.securityBody}>
@@ -302,7 +311,10 @@ export default function TopUpScreen() {
           ]}
         >
           <TouchableOpacity
-            style={[styles.payBtn, (busy || finalAmount < 1) && styles.payBtnDisabled]}
+            style={[
+              styles.payBtn,
+              (busy || finalAmount < 1) && styles.payBtnDisabled,
+            ]}
             onPress={handleTopUp}
             disabled={busy || finalAmount < 1}
             activeOpacity={0.9}

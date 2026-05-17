@@ -1,7 +1,3 @@
-// components/ui/LoadingScreen.tsx
-// Shown during the brief window between splash completing and
-// the first token check resolving. Prevents any flash of wrong content.
-
 import { COLORS } from "@/constants/theme";
 import React, { JSX, useEffect, useRef } from "react";
 import { ActivityIndicator, Animated, StyleSheet, View } from "react-native";

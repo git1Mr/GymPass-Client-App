@@ -18,7 +18,6 @@ import React, {
     useState,
 } from "react";
 
-// AppUser extends AuthUser with optional JWT-only fields populated at startup
 export interface AppUser extends AuthUser {
   gymId?: string | null;
   isAdmin?: boolean;
@@ -31,15 +30,13 @@ interface AuthContextValue {
   signIn: (credentials: LoginParams) => Promise<AuthResponse>;
   signUp: (fields: RegisterParams) => Promise<AuthResponse>;
   signOut: () => Promise<void>;
-  // Re-fetch /users/me to pick up balance/role changes after server-side state
-  // changes (e.g. a payment webhook updated pointsBalance). Safe to call freely.
+  // Re-fetch /users/me to pick up server-side changes (e.g. pointsBalance after a webhook).
   refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-// Decodes JWT payload without verifying the signature — UI purposes only.
-// Verification is the backend's responsibility.
+// Decodes JWT payload without verifying — UI display only. Verification is the backend's job.
 function decodeJwtPayload(token: string): Record<string, unknown> | null {
   try {
     const base64Payload = token.split(".")[1];
@@ -138,7 +135,7 @@ export function AuthProvider({
       const res = await api.get("/users/me");
       setUser(res.data as AppUser);
     } catch {
-      // 401 will be handled globally by the response interceptor.
+      // 401 is handled globally by the response interceptor.
     }
   }
 

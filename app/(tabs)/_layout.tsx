@@ -1,7 +1,3 @@
-// app/(tabs)/_layout.tsx
-// Fix: uses useSafeAreaInsets to calculate exact paddingBottom so the tab bar
-// never bleeds into the Android gesture/navigation area.
-
 import { COLORS, FONT_SIZES, FONT_WEIGHTS } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
@@ -31,9 +27,8 @@ function TabIcon({ name, focused }: TabIconProps) {
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
 
-  // TAB_CONTENT_HEIGHT: visible content area (icons + labels).
-  // We add the device's bottom inset on top so the bar never
-  // overlaps the Android gesture bar or iPhone home indicator.
+  // Bake insets.bottom into the height so the tab bar never overlaps
+  // the Android gesture bar or iPhone home indicator.
   const TAB_CONTENT_HEIGHT = 58;
   const tabBarHeight = TAB_CONTENT_HEIGHT + insets.bottom;
 
@@ -46,9 +41,6 @@ export default function TabLayout() {
           borderTopWidth: 1,
           borderTopColor: COLORS.border,
           height: tabBarHeight,
-          // Let the OS control the bottom safe area — do NOT hardcode paddingBottom.
-          // Instead we bake insets.bottom into the total height above and add a
-          // small visual padding for the label.
           paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
           paddingTop: 6,
         },

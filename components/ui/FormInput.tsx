@@ -1,5 +1,3 @@
-// components/ui/FormInput.tsx
-
 import React, { JSX, useState } from "react";
 import {
     StyleSheet,

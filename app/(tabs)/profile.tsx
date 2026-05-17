@@ -1,12 +1,3 @@
-// app/(tabs)/profile.tsx
-//
-// Dark profile with lavender accents — inspired by the orange/dark
-// screenshots, with orange swapped for COLORS.primary (lavender).
-//
-// The whole screen is dark on purpose — the "Dark Mode" toggle reflects
-// that state. If you wire it to a real theme context later, switch the
-// `dark` constant below to a hook value.
-
 import {
   COLORS,
   FONT_SIZES,
@@ -32,7 +23,6 @@ import DarkVeil from "@/components/ui/DarkVeil";
 
 type IoniconsName = React.ComponentProps<typeof Ionicons>["name"];
 
-// ── Dark palette (local to this screen) ────────────────────────────────────
 const DARK = {
   bg: "#13121C",
   bg2: "#1B1A26",
@@ -46,7 +36,6 @@ const DARK = {
   danger: "#FF6B6B",
 };
 
-// ── Row ────────────────────────────────────────────────────────────────────
 interface RowProps {
   icon: IoniconsName;
   label: string;
@@ -127,7 +116,6 @@ function Row({
   );
 }
 
-// ── Section label ──────────────────────────────────────────────────────────
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <View style={styles.sectionLabelRow}>
@@ -137,12 +125,10 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-// ── Card wrapper ───────────────────────────────────────────────────────────
 function Card({ children }: { children: React.ReactNode }) {
   return <View style={styles.card}>{children}</View>;
 }
 
-// ── Main screen ────────────────────────────────────────────────────────────
 export default function ProfileScreen() {
   const { user, signOut } = useAuth();
   const router = useRouter();
@@ -161,9 +147,7 @@ export default function ProfileScreen() {
           contentContainerStyle={styles.scroll}
           showsVerticalScrollIndicator={false}
         >
-          {/* ── Hero card ─────────────────────────────────── */}
           <View style={styles.hero}>
-            {/* Animated pillar (no circle blobs) */}
             <View style={styles.pillarLayer} pointerEvents="none">
               <DarkVeil />
             </View>
@@ -188,7 +172,6 @@ export default function ProfileScreen() {
               </TouchableOpacity>
             </View>
 
-            {/* Loyalty bar */}
             <View style={styles.loyalty}>
               <View style={styles.loyaltyHeader}>
                 <Text style={styles.loyaltyLabel}>Loyalty Points</Text>
@@ -209,7 +192,6 @@ export default function ProfileScreen() {
             </View>
           </View>
 
-          {/* ── Sections ──────────────────────────────────── */}
           <View style={styles.sections}>
             <SectionLabel>General</SectionLabel>
             <Card>
@@ -255,7 +237,6 @@ export default function ProfileScreen() {
               <Row icon="shield-checkmark-outline" label="Privacy Policy" last />
             </Card>
 
-            {/* Sign out — outlined pill */}
             <View style={styles.signOutWrap}>
               <TouchableOpacity
                 style={styles.signOutBtn}
@@ -285,7 +266,6 @@ const styles = StyleSheet.create({
     paddingBottom: SPACING.xxxl,
   },
 
-  // ── Hero ─────────────────────────────────────────────────
   hero: {
     paddingTop: SPACING.lg,
     paddingBottom: SPACING.lg,
@@ -372,7 +352,6 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
 
-  // ── Sections ─────────────────────────────────────────────
   sections: {
     paddingHorizontal: SPACING.md,
     paddingTop: SPACING.sm,
@@ -406,7 +385,6 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
 
-  // ── Row ──────────────────────────────────────────────────
   row: {
     flexDirection: "row",
     alignItems: "center",
@@ -437,7 +415,6 @@ const styles = StyleSheet.create({
     color: DARK.textMuted,
   },
 
-  // ── Badge ────────────────────────────────────────────────
   badge: {
     minWidth: 22,
     height: 22,
@@ -453,7 +430,6 @@ const styles = StyleSheet.create({
     fontWeight: FONT_WEIGHTS.bold,
   },
 
-  // ── Toggle ───────────────────────────────────────────────
   toggleTrack: {
     width: 44,
     height: 24,
@@ -472,7 +448,6 @@ const styles = StyleSheet.create({
     ...SHADOWS.soft,
   },
 
-  // ── Sign out ─────────────────────────────────────────────
   signOutWrap: {
     marginTop: SPACING.xl,
     alignItems: "center",

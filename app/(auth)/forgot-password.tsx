@@ -1,13 +1,3 @@
-// app/(auth)/forgot-password.tsx
-//
-// Two-step password reset.
-//   Step 1: enter email → POST /api/auth/forgot-password → token issued.
-//   Step 2: enter token + new password → POST /api/auth/reset-password.
-//
-// Demo behavior: the backend returns the raw reset token in the response so
-// the screen can auto-fill it (no email infra). In production the token would
-// be emailed and the user pastes it manually.
-
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { JSX, useState } from "react";
@@ -58,7 +48,7 @@ export default function ForgotPasswordScreen(): JSX.Element {
     setBusy(true);
     try {
       const res = await requestPasswordReset(email.trim().toLowerCase());
-      // Demo: backend returns the raw token. Auto-fill it for the next step.
+      // Demo: backend returns the raw token inline (no email infra). Auto-fill it.
       if (res.resetToken) {
         setToken(res.resetToken);
         toast.success("Auto-filled below — set your new password.", "Reset code issued");

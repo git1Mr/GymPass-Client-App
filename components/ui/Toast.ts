@@ -1,5 +1,3 @@
-// components/ui/Toast.ts
-
 import Toast from "react-native-toast-message";
 
 interface ToastHelper {

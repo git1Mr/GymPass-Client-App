@@ -1,19 +1,3 @@
-// components/ui/LightPillar.tsx
-//
-// A vertical "light pillar" background — a stylized streak of lavender
-// light against a dark surface. Replaces the brand's circular blob
-// motif on hero panels (splash, auth header, QR sheet).
-//
-// react-native-svg does not consistently support feGaussianBlur on
-// device, so the glow is faked by layering multiple stroke paths at
-// decreasing widths and increasing core brightness. The composite reads
-// as soft → bright → soft from outside in.
-//
-// Animation: when `animated` is true, the inner layers breathe (slow
-// opacity loop) and the core highlight slowly drifts vertically. The
-// effect is calm — not flashy — and is meant to play under content,
-// not compete with it.
-
 import {
   COLORS,
 } from "@/constants/theme";
@@ -29,19 +13,13 @@ import Svg, {
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 
 interface LightPillarProps {
-  /** Width of the rendered SVG canvas. Pillar scales to fill. */
   width?: number;
-  /** Height of the rendered SVG canvas. */
   height?: number;
-  /** Variant: "A" curves top-right→bottom-left, "B" is a near-vertical twin streak. */
   seed?: "A" | "B";
-  /** Drive the breath/drift loops. Defaults to true. */
   animated?: boolean;
-  /** Background color underneath the pillar. */
   bg?: string;
 }
 
-// Two stylized centerlines roughly matching the reference photo.
 const PATHS: Record<"A" | "B", { main: string; branch: string }> = {
   A: {
     main: "M 320 -40 C 220 60, 340 220, 220 380",
@@ -66,13 +44,14 @@ export default function LightPillar({
   useEffect(() => {
     if (!animated) return;
 
+    // useNativeDriver: false because opacity is driven on AnimatedPath (SVG).
     const breatheLoop = Animated.loop(
       Animated.sequence([
         Animated.timing(breathe, {
           toValue: 1,
           duration: 3600,
           easing: Easing.inOut(Easing.sin),
-          useNativeDriver: false, // we drive opacity on AnimatedPath
+          useNativeDriver: false,
         }),
         Animated.timing(breathe, {
           toValue: 0,
@@ -150,7 +129,6 @@ export default function LightPillar({
           </SvgLinearGradient>
         </Defs>
 
-        {/* Layer 1 — broadest halo */}
         <Path
           d={p.main}
           stroke={`url(#pillar-${seed})`}
@@ -159,7 +137,6 @@ export default function LightPillar({
           fill="none"
           opacity={0.35}
         />
-        {/* Layer 2 — branching halo */}
         <Path
           d={p.branch}
           stroke={`url(#pillar-${seed})`}
@@ -168,7 +145,6 @@ export default function LightPillar({
           fill="none"
           opacity={0.28}
         />
-        {/* Layer 3 — mid glow (breathes) */}
         <AnimatedPath
           d={p.main}
           stroke={`url(#pillar-${seed})`}
@@ -177,7 +153,6 @@ export default function LightPillar({
           fill="none"
           opacity={innerOpacity}
         />
-        {/* Layer 4 — tight glow */}
         <Path
           d={p.main}
           stroke={`url(#pillar-${seed})`}
@@ -186,7 +161,6 @@ export default function LightPillar({
           fill="none"
           opacity={0.95}
         />
-        {/* Layer 5 — inner haze */}
         <Path
           d={p.main}
           stroke={`url(#pillar-${seed})`}
@@ -195,7 +169,6 @@ export default function LightPillar({
           fill="none"
           opacity={1}
         />
-        {/* Layer 6 — bright core (drifts in width) */}
         <AnimatedPath
           d={p.main}
           stroke={`url(#core-${seed})`}
