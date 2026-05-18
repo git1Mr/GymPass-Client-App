@@ -19,7 +19,7 @@ import {
 } from "@/constants/theme";
 import { useAuth } from "@/context/AuthContext";
 import GradientSurface from "@/components/ui/GradientSurface";
-import LightPillar from "@/components/ui/LightPillar";
+import DarkVeil from "@/components/ui/DarkVeil";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -195,9 +195,9 @@ function CheckedInSheet({
     <View style={sheetS.root}>
       <StatusBar barStyle="light-content" />
 
-      {/* Animated light pillar background */}
+      {/* Animated DarkVeil background */}
       <View style={sheetS.pillarLayer} pointerEvents="none">
-        <LightPillar width={500} height={900} seed="B" animated />
+        <DarkVeil />
       </View>
 
       <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1 }}>
@@ -512,10 +512,19 @@ const sheetS = StyleSheet.create({
 
 // ── Exported trigger ───────────────────────────────────────────────────────
 interface AccessAnyGymProps {
-  variant?: "pill" | "full";
+  variant?: "pill" | "full" | "icon";
+  /** Override the circular icon button styles (icon variant only). */
+  iconStyle?: object;
+  iconColor?: string;
+  iconBg?: string;
 }
 
-export default function AccessAnyGym({ variant = "pill" }: AccessAnyGymProps) {
+export default function AccessAnyGym({
+  variant = "pill",
+  iconStyle,
+  iconColor,
+  iconBg,
+}: AccessAnyGymProps) {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
 
@@ -532,6 +541,32 @@ export default function AccessAnyGym({ variant = "pill" }: AccessAnyGymProps) {
       <CheckedInSheet userId={userId!} onClose={() => setOpen(false)} />
     </Modal>
   ) : null;
+
+  if (variant === "icon") {
+    return (
+      <>
+        <TouchableOpacity
+          style={[
+            triggerS.iconBtn,
+            iconBg ? { backgroundColor: iconBg } : null,
+            !isReady && triggerS.disabled,
+            iconStyle,
+          ]}
+          onPress={() => isReady && setOpen(true)}
+          activeOpacity={0.85}
+          accessibilityRole="button"
+          accessibilityLabel="Scan QR to access a gym"
+        >
+          <Ionicons
+            name="qr-code"
+            size={22}
+            color={iconColor ?? COLORS.white}
+          />
+        </TouchableOpacity>
+        {modal}
+      </>
+    );
+  }
 
   if (variant === "full") {
     return (
@@ -584,6 +619,15 @@ const triggerS = StyleSheet.create({
     fontSize: FONT_SIZES.base,
     fontWeight: FONT_WEIGHTS.bold,
     color: COLORS.white,
+  },
+  iconBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: COLORS.accent,
+    alignItems: "center",
+    justifyContent: "center",
+    ...SHADOWS.card,
   },
   disabled: { opacity: 0.45 },
 });

@@ -1,12 +1,21 @@
 import { Slot, useRouter, useSegments } from "expo-router";
 import React, { JSX, useEffect, useState } from "react";
+import { AppRegistry, Platform } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 
 import LoadingScreen from "@/components/ui/LoadingScreen";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { isStripeAvailable } from "@/services/stripeEnv";
+import { ThemeProvider } from "@/theme/ThemeContext";
 import SplashScreen from "./splash";
+
+// Register a no-op JS handler for Stripe's Android HeadlessJsTaskService.
+// Without it, the SDK logs "No task registered for key StripeKeepJsAwakeTask"
+// after every Payment Sheet completion.
+if (Platform.OS === "android") {
+  AppRegistry.registerHeadlessTask("StripeKeepJsAwakeTask", () => async () => {});
+}
 
 const STRIPE_PUBLISHABLE_KEY =
   process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? "";
@@ -62,21 +71,25 @@ export default function RootLayout(): JSX.Element {
   if (!splashDone) {
     return (
       <SafeAreaProvider>
-        <SplashScreen onFinish={(): void => setSplashDone(true)} />
-        <Toast />
+        <ThemeProvider>
+          <SplashScreen onFinish={(): void => setSplashDone(true)} />
+          <Toast />
+        </ThemeProvider>
       </SafeAreaProvider>
     );
   }
 
   return (
     <SafeAreaProvider>
-      <MaybeStripeProvider>
-        <AuthProvider>
-          <AuthGate />
-          {/* Toast must be outside NavigationContainer to render above all screens */}
-          <Toast />
-        </AuthProvider>
-      </MaybeStripeProvider>
+      <ThemeProvider>
+        <MaybeStripeProvider>
+          <AuthProvider>
+            <AuthGate />
+            {/* Toast must be outside NavigationContainer to render above all screens */}
+            <Toast />
+          </AuthProvider>
+        </MaybeStripeProvider>
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }

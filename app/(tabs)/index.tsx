@@ -1,6 +1,5 @@
 import AccessAnyGym from "@/components/AccessAnyGym";
 import GradientSurface from "@/components/ui/GradientSurface";
-import UFLogo from "@/components/ui/UFLogo";
 import {
   COLORS,
   FONT_SIZES,
@@ -232,22 +231,33 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
+      {/* ── Sticky header: avatar + status dot · QR scan button ── */}
       <View style={styles.header}>
-        <View style={styles.logoRow}>
-          <UFLogo size={32} variant="light" />
-          <Text style={styles.logoWord}>UNITYFITNESS</Text>
-        </View>
         <TouchableOpacity
-          style={styles.profileBtn}
+          style={styles.avatarBtn}
           onPress={() => router.push("/(tabs)/profile")}
-          activeOpacity={0.7}
+          activeOpacity={0.75}
+          accessibilityRole="button"
+          accessibilityLabel="Open profile"
         >
-          <Ionicons
-            name="person-circle-outline"
-            size={32}
-            color={COLORS.accent}
-          />
+          <View style={styles.avatarRing}>
+            <Ionicons name="person" size={20} color={COLORS.white} />
+          </View>
+          <View style={styles.statusDot} />
         </TouchableOpacity>
+
+        <View style={styles.headerCenter}>
+          <Text style={styles.headerHello}>Welcome back</Text>
+          <Text style={styles.headerName} numberOfLines={1}>
+            {username}
+          </Text>
+        </View>
+
+        <AccessAnyGym
+          variant="icon"
+          iconBg={COLORS.accent}
+          iconColor={COLORS.white}
+        />
       </View>
 
       <ScrollView
@@ -352,21 +362,52 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    gap: SPACING.md,
     paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.sm,
+    paddingVertical: SPACING.sm + 2,
     backgroundColor: COLORS.surface,
-    borderBottomWidth: 1,
+    borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: COLORS.border,
   },
-  logoRow: { flexDirection: "row", alignItems: "center", gap: SPACING.sm + 2 },
-  logoWord: {
+  avatarBtn: {
+    position: "relative",
+  },
+  avatarRing: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: COLORS.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: COLORS.surfaceElevated,
+  },
+  statusDot: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    width: 11,
+    height: 11,
+    borderRadius: 6,
+    backgroundColor: COLORS.success,
+    borderWidth: 2,
+    borderColor: COLORS.surface,
+  },
+  headerCenter: { flex: 1 },
+  headerHello: {
+    fontSize: 11,
+    fontWeight: FONT_WEIGHTS.semibold,
+    color: COLORS.textMuted,
+    letterSpacing: 0.6,
+    textTransform: "uppercase",
+  },
+  headerName: {
     fontSize: FONT_SIZES.md,
     fontWeight: FONT_WEIGHTS.black,
     color: COLORS.text,
-    letterSpacing: 3,
+    marginTop: 1,
+    letterSpacing: -0.3,
   },
-  profileBtn: { padding: SPACING.xs },
   scroll: { flex: 1 },
   scrollContent: { padding: SPACING.lg, paddingBottom: SPACING.xxxl },
 
