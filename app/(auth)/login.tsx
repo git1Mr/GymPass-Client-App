@@ -28,7 +28,7 @@ import {
   SPACING,
 } from "@/constants/theme";
 import { useAuth } from "@/context/AuthContext";
-import { getRememberedEmail } from "@/services/authService";
+import { AuthError, getRememberedEmail } from "@/services/authService";
 import { loginSchema, validate } from "@/validation/authSchema";
 
 interface LoginForm {
@@ -41,28 +41,26 @@ interface FormErrors {
   password?: string;
 }
 
-function parseBackendError(err: unknown): { field?: keyof FormErrors; message: string } {
-  const axiosErr = err as { response?: { data?: unknown; status?: number }; message?: string };
-  const status = axiosErr.response?.status;
-  const raw = axiosErr.response?.data;
-  const rawStr = typeof raw === "string" ? raw.toLowerCase() : "";
-
-  if (status === 400) {
-    if (rawStr.includes("email"))
-      return { field: "email", message: "No account found with this email." };
-    if (rawStr.includes("password") || rawStr.includes("invalid"))
-      return { field: "password", message: "Incorrect password. Please try again." };
-    return { message: typeof raw === "string" ? raw : "Invalid credentials." };
+function parseLoginError(
+  err: unknown,
+): { field?: keyof FormErrors; message: string } {
+  if (!(err instanceof AuthError)) {
+    return {
+      message:
+        err instanceof Error
+          ? err.message
+          : "Could not connect to the server. Check your network.",
+    };
   }
 
-  if (status === 403) {
-    if (rawStr.includes("device"))
-      return { message: "This account is linked to a different device." };
-    if (rawStr.includes("suspended"))
-      return { message: "Your account has been suspended. Contact support." };
+  switch (err.authCode) {
+    case "EMAIL_NOT_FOUND":
+      return { field: "email", message: err.message };
+    case "WRONG_PASSWORD":
+      return { field: "password", message: err.message };
+    default:
+      return { message: err.message };
   }
-
-  return { message: axiosErr.message ?? "Could not connect to the server. Check your network." };
 }
 
 export default function LoginScreen(): JSX.Element {
@@ -104,7 +102,7 @@ export default function LoginScreen(): JSX.Element {
       const deviceId = Device.modelId ?? Device.osInternalBuildId ?? "unknown-device";
       await signIn({ ...form, deviceId, rememberMe });
     } catch (err: unknown) {
-      const { field, message } = parseBackendError(err);
+      const { field, message } = parseLoginError(err);
       if (field) setErrors((e) => ({ ...e, [field]: message }));
       else toast.error(message);
     } finally {

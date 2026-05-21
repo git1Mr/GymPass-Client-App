@@ -1,5 +1,6 @@
 import AccessAnyGym from "@/components/AccessAnyGym";
 import GradientSurface from "@/components/ui/GradientSurface";
+import GradientText from "@/components/ui/GradientText";
 import {
   COLORS,
   FONT_SIZES,
@@ -146,7 +147,7 @@ function DiscoverPlansBanner({ onPress }: { onPress: () => void }) {
                 <Ionicons name="flash" size={20} color={COLORS.white} />
               </View>
               <View style={banner.textWrap}>
-                <Text style={banner.title}>Discover our plans</Text>
+                <GradientText style={banner.title}>Discover our plans</GradientText>
                 <Text style={banner.subtitle}>
                   Buy points once · Use them everywhere
                 </Text>
@@ -274,15 +275,16 @@ export default function HomeScreen() {
         }
       >
         <GradientSurface radius={RADIUS.xl} style={styles.heroCard} dimmer={0.08}>
-          <View style={styles.heroPill} pointerEvents="none">
-            <UnityPill />
-          </View>
-
           <View style={styles.heroBody}>
             <Text style={styles.heroGreeting}>Hey {username} 👋</Text>
-            <Text style={styles.heroHeadline}>
-              Get all-in-one{"\n"}access.
-            </Text>
+            <View style={styles.heroHeadlineWrap}>
+              <GradientText style={styles.heroHeadline}>
+                Get all-in-one
+              </GradientText>
+              <GradientText style={styles.heroHeadline}>
+                access.
+              </GradientText>
+            </View>
             <Text style={styles.heroDesc}>
               Explore clubs, take classes, UnityFitness with one subscription.
             </Text>
@@ -291,7 +293,9 @@ export default function HomeScreen() {
               onPress={() => router.push("/(tabs)/explore")}
               activeOpacity={0.9}
             >
-              <Text style={styles.heroBtnText}>Explore Clubs Near You</Text>
+              <GradientText style={styles.heroBtnText}>
+                Explore Clubs Near You
+              </GradientText>
               <Ionicons name="arrow-forward" size={16} color={COLORS.text} />
             </TouchableOpacity>
           </View>
@@ -431,13 +435,15 @@ const styles = StyleSheet.create({
     fontWeight: FONT_WEIGHTS.medium,
     marginBottom: SPACING.sm + 2,
   },
+  heroHeadlineWrap: {
+    marginBottom: SPACING.sm + 4,
+  },
   heroHeadline: {
     fontSize: 32,
     fontWeight: FONT_WEIGHTS.black,
     color: COLORS.white,
     lineHeight: 36,
     letterSpacing: -0.8,
-    marginBottom: SPACING.sm + 4,
     maxWidth: 240,
   },
   heroDesc: {

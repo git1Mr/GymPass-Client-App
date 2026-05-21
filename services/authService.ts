@@ -1,5 +1,6 @@
+import { AxiosResponse } from "axios";
 import * as SecureStore from "expo-secure-store";
-import api, { REMEMBER_KEY, TOKEN_KEY } from "./api";
+import api, { ApiError, ApiErrorCode, REMEMBER_KEY, TOKEN_KEY } from "./api";
 
 export interface LoginParams {
   email: string;
@@ -28,12 +29,134 @@ export interface AuthResponse {
   user?: AuthUser;
 }
 
-export async function login({
-  email,
-  password,
-  deviceId,
-  rememberMe = false,
-}: LoginParams): Promise<AuthResponse> {
+export type AuthErrorCode =
+  | "EMAIL_NOT_FOUND"
+  | "WRONG_PASSWORD"
+  | "INVALID_CREDENTIALS"
+  | "EMAIL_TAKEN"
+  | "DEVICE_MISMATCH"
+  | "ACCOUNT_SUSPENDED"
+  | "MISSING_TOKEN"
+  | "NETWORK_ERROR"
+  | "TIMEOUT"
+  | "UNKNOWN";
+
+export class AuthError extends ApiError {
+  readonly authCode: AuthErrorCode;
+
+  constructor(opts: {
+    authCode: AuthErrorCode;
+    code: ApiErrorCode;
+    message: string;
+    status?: number;
+    data?: unknown;
+  }) {
+    super(opts);
+    this.name = "AuthError";
+    this.authCode = opts.authCode;
+  }
+}
+
+type AuthIntent = "login" | "register" | "forgot" | "reset";
+
+function rawLower(data: unknown): string {
+  if (typeof data === "string") return data.toLowerCase();
+  if (data && typeof data === "object" && "message" in data) {
+    const m = (data as { message?: unknown }).message;
+    return typeof m === "string" ? m.toLowerCase() : "";
+  }
+  return "";
+}
+
+function mk(
+  authCode: AuthErrorCode,
+  message: string,
+  src: ApiError,
+): AuthError {
+  return new AuthError({
+    authCode,
+    code: src.code,
+    status: src.status,
+    data: src.data,
+    message,
+  });
+}
+
+function classifyAuth(err: unknown, intent: AuthIntent): AuthError {
+  if (!(err instanceof ApiError)) {
+    return new AuthError({
+      authCode: "UNKNOWN",
+      code: "UNKNOWN",
+      message: err instanceof Error ? err.message : "Unexpected error.",
+    });
+  }
+
+  if (err.code === "NETWORK_ERROR")
+    return mk("NETWORK_ERROR", err.message, err);
+  if (err.code === "TIMEOUT") return mk("TIMEOUT", err.message, err);
+
+  const raw = rawLower(err.data);
+
+  if (err.status === 400 && intent === "login") {
+    if (raw.includes("email"))
+      return mk("EMAIL_NOT_FOUND", "No account found with this email.", err);
+    if (raw.includes("password") || raw.includes("invalid"))
+      return mk("WRONG_PASSWORD", "Incorrect password. Please try again.", err);
+    return mk("INVALID_CREDENTIALS", "Invalid credentials.", err);
+  }
+
+  if ((err.status === 400 || err.status === 409) && intent === "register") {
+    if (raw.includes("email") || raw.includes("already"))
+      return mk(
+        "EMAIL_TAKEN",
+        "An account with this email already exists.",
+        err,
+      );
+    if (raw.includes("device"))
+      return mk(
+        "DEVICE_MISMATCH",
+        "This device is already linked to another account.",
+        err,
+      );
+  }
+
+  if (err.status === 403) {
+    if (raw.includes("device"))
+      return mk(
+        "DEVICE_MISMATCH",
+        "This account is linked to a different device.",
+        err,
+      );
+    if (raw.includes("suspended"))
+      return mk(
+        "ACCOUNT_SUSPENDED",
+        "Your account has been suspended. Contact support.",
+        err,
+      );
+  }
+
+  const fallback = typeof err.data === "string" ? err.data : err.message;
+  return mk("UNKNOWN", fallback, err);
+}
+
+function extractToken<T extends AuthResponse>(
+  response: AxiosResponse<T>,
+): string | undefined {
+  const header = response.headers["x-auth-token"];
+  if (typeof header === "string" && header.length > 0) return header;
+  return response.data?.token;
+}
+
+async function persistRememberedEmail(
+  email: string,
+  remember: boolean,
+): Promise<void> {
+  if (remember) await SecureStore.setItemAsync(REMEMBER_KEY, email);
+  else await SecureStore.deleteItemAsync(REMEMBER_KEY);
+}
+
+export async function login(params: LoginParams): Promise<AuthResponse> {
+  const { email, password, deviceId, rememberMe = false } = params;
   try {
     const response = await api.post<AuthResponse>("/auth", {
       email,
@@ -41,67 +164,54 @@ export async function login({
       deviceId,
     });
 
-    const token =
-      (response.headers["x-auth-token"] as string | undefined) ??
-      response.data.token;
-
-    if (!token) throw new Error("No token returned from server.");
-
-    await SecureStore.setItemAsync(TOKEN_KEY, token);
-
-    if (rememberMe) {
-      await SecureStore.setItemAsync(REMEMBER_KEY, email);
-    } else {
-      await SecureStore.deleteItemAsync(REMEMBER_KEY);
+    const token = extractToken(response);
+    if (!token) {
+      throw new AuthError({
+        authCode: "MISSING_TOKEN",
+        code: "UNKNOWN",
+        message: "No token returned from server.",
+      });
     }
 
-    return response.data;
-  } catch (error: any) {
-    const message = error.response?.data || error.message || "Login failed";
-    console.error("Login Service Error:", message);
-    throw new Error(message);
+    await SecureStore.setItemAsync(TOKEN_KEY, token);
+    await persistRememberedEmail(email, rememberMe);
+
+    return { ...response.data, token };
+  } catch (err) {
+    throw classifyAuth(err, "login");
   }
 }
 
-export async function register({
-  name,
-  email,
-  password,
-  deviceId,
-}: RegisterParams): Promise<AuthResponse> {
+export async function register(params: RegisterParams): Promise<AuthResponse> {
+  const { name, email, password, deviceId } = params;
   try {
     const response = await api.post<AuthResponse>("/users", {
-      name, // field name must match the backend Joi schema (name, not fullName)
+      // backend's Joi schema uses `name`, not `fullName`
+      name,
       email,
       password,
       deviceId,
       role: "member",
     });
 
-    const token =
-      (response.headers["x-auth-token"] as string | undefined) ??
-      response.data.token;
-
+    const token = extractToken(response);
     if (token) await SecureStore.setItemAsync(TOKEN_KEY, token);
 
-    return response.data;
-  } catch (error: any) {
-    const message =
-      error.response?.data || error.message || "Registration failed";
-    console.error("Register Service Error:", message);
-    throw new Error(message);
+    return token ? { ...response.data, token } : response.data;
+  } catch (err) {
+    throw classifyAuth(err, "register");
   }
 }
+
 export async function logout(): Promise<void> {
   await SecureStore.deleteItemAsync(TOKEN_KEY);
 }
 
-// In production the reset token is delivered by email; in this build the API
-// returns it inline so the demo works without SMTP. The UI auto-fills it.
 export interface ForgotPasswordResponse {
-  message:     string;
-  resetToken?: string;   // demo only
-  expiresAt?:  string;
+  message: string;
+  // Demo build returns the token inline; production delivers it by email.
+  resetToken?: string;
+  expiresAt?: string;
 }
 
 export async function requestPasswordReset(
@@ -113,9 +223,8 @@ export async function requestPasswordReset(
       { email },
     );
     return data;
-  } catch (err: any) {
-    const msg = err.response?.data || err.message || "Reset request failed";
-    throw new Error(typeof msg === "string" ? msg : "Reset request failed");
+  } catch (err) {
+    throw classifyAuth(err, "forgot");
   }
 }
 
@@ -129,9 +238,8 @@ export async function resetPassword(
       { resetToken, newPassword },
     );
     return data;
-  } catch (err: any) {
-    const msg = err.response?.data || err.message || "Reset failed";
-    throw new Error(typeof msg === "string" ? msg : "Reset failed");
+  } catch (err) {
+    throw classifyAuth(err, "reset");
   }
 }
 

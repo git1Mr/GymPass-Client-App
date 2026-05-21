@@ -27,6 +27,7 @@ import {
   SPACING,
 } from "@/constants/theme";
 import { useAuth } from "@/context/AuthContext";
+import { AuthError } from "@/services/authService";
 import { registerSchema, validate } from "@/validation/authSchema";
 
 interface RegisterForm {
@@ -43,21 +44,24 @@ interface FormErrors {
   confirmPassword?: string;
 }
 
-function parseBackendError(err: unknown): { field?: keyof FormErrors; message: string } {
-  const axiosErr = err as { response?: { data?: unknown; status?: number }; message?: string };
-  const status = axiosErr.response?.status;
-  const raw = axiosErr.response?.data;
-  const rawStr = typeof raw === "string" ? raw.toLowerCase() : "";
-
-  if (status === 400) {
-    if (rawStr.includes("email already") || rawStr.includes("already registered"))
-      return { field: "email", message: "An account with this email already exists." };
-    if (rawStr.includes("device"))
-      return { message: "This device is already linked to another account." };
-    if (typeof raw === "string") return { message: raw };
+function parseRegisterError(
+  err: unknown,
+): { field?: keyof FormErrors; message: string } {
+  if (!(err instanceof AuthError)) {
+    return {
+      message:
+        err instanceof Error
+          ? err.message
+          : "Could not connect to the server. Check your network.",
+    };
   }
 
-  return { message: axiosErr.message ?? "Could not connect to the server. Check your network." };
+  switch (err.authCode) {
+    case "EMAIL_TAKEN":
+      return { field: "email", message: err.message };
+    default:
+      return { message: err.message };
+  }
 }
 
 export default function RegisterScreen(): JSX.Element {
@@ -95,7 +99,7 @@ export default function RegisterScreen(): JSX.Element {
       await signUp({ ...form, deviceId });
       toast.success("Welcome to UnityFitness!");
     } catch (err: unknown) {
-      const { field, message } = parseBackendError(err);
+      const { field, message } = parseRegisterError(err);
       if (field) setErrors((e) => ({ ...e, [field]: message }));
       else toast.error(message);
     } finally {

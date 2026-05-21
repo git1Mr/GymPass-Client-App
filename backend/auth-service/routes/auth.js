@@ -30,7 +30,12 @@ router.post('/', async (req, res) => {
   const valid = await bcrypt.compare(req.body.password, user.password);
   if (!valid) return res.status(400).send('Invalid email or password.');
 
-  if (user.deviceId !== req.body.deviceId)
+  // Device binding is an anti-fraud guard for the mobile app where deviceId is
+  // a hardware fingerprint. The web client sends a per-browser id prefixed
+  // with "web-" — those should bypass the check so users can log in from any
+  // browser/computer. Mobile-to-mobile bindings remain enforced.
+  const incomingIsWeb = typeof req.body.deviceId === 'string' && req.body.deviceId.startsWith('web-');
+  if (!incomingIsWeb && user.deviceId !== req.body.deviceId)
     return res.status(403).send('This account is linked to a different device.');
 
   if (user.status === 'suspended')

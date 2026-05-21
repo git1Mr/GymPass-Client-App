@@ -142,7 +142,6 @@ function CheckedInSheet({
   const [isExpired, setExpired] = useState(false);
   const [showCode, setShowCode] = useState(true);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const pulse = useRef(new Animated.Value(1)).current;
 
   const startTimer = useCallback(() => {
     setExpired(false);
@@ -166,28 +165,6 @@ function CheckedInSheet({
       if (timerRef.current) clearInterval(timerRef.current);
     };
   }, [startTimer]);
-
-  useEffect(() => {
-    if (secondsLeft <= 3 && !isExpired) {
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(pulse, {
-            toValue: 1.04,
-            duration: 300,
-            useNativeDriver: true,
-          }),
-          Animated.timing(pulse, {
-            toValue: 1,
-            duration: 300,
-            useNativeDriver: true,
-          }),
-        ]),
-      ).start();
-    } else {
-      pulse.stopAnimation();
-      pulse.setValue(1);
-    }
-  }, [secondsLeft, isExpired]);
 
   const urgent = secondsLeft <= 3 && !isExpired;
 
@@ -215,11 +192,7 @@ function CheckedInSheet({
 
         {/* ── Headline ───────────────────────────────────── */}
         <View style={sheetS.headline}>
-          <View style={sheetS.livePill}>
-            <View style={sheetS.liveDot} />
-            <Text style={sheetS.livePillText}>LIVE PASS</Text>
-          </View>
-          <Text style={sheetS.title}>Checked in</Text>
+          <Text style={sheetS.title}>Check in</Text>
           <Text style={sheetS.subtitle}>
             Show this code at the front desk.{"\n"}
             It rotates every {TTL_SECONDS} seconds.
@@ -259,10 +232,9 @@ function CheckedInSheet({
 
             {/* QR */}
             {showCode ? (
-              <Animated.View
+              <View
                 style={[
                   sheetS.qrWrap,
-                  { transform: [{ scale: pulse }] },
                   urgent && { borderColor: COLORS.error },
                 ]}
               >
@@ -273,7 +245,7 @@ function CheckedInSheet({
                   backgroundColor={COLORS.white}
                 />
                 {isExpired && <ExpiredOverlay onRefresh={startTimer} />}
-              </Animated.View>
+              </View>
             ) : (
               <View style={sheetS.qrHidden}>
                 <Ionicons

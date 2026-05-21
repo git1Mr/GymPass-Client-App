@@ -21,7 +21,13 @@ transactionSchema.index({ userId: 1, type: 1 });
 transactionSchema.index({ gymId: 1, type: 1, createdAt: 1 });
 transactionSchema.index({ qrTokenHash: 1 }, { sparse: true });
 transactionSchema.index({ source: 1, offlineSynced: 1 });
-transactionSchema.index({ stripePaymentIntentId: 1 }, { unique: true, sparse: true });
+// `sparse: true` does NOT exclude documents where the field is explicitly set
+// to null — and our schema defaults stripePaymentIntentId to null. Use a
+// partial filter so only documents with an actual string id are indexed.
+transactionSchema.index(
+  { stripePaymentIntentId: 1 },
+  { unique: true, partialFilterExpression: { stripePaymentIntentId: { $type: 'string' } } }
+);
 
 const Transaction = mongoose.models.Transaction || mongoose.model('Transaction', transactionSchema);
 
