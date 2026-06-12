@@ -155,7 +155,7 @@ export default function LoginScreen(): JSX.Element {
               value={form.password}
               onChangeText={setField("password")}
               error={errors.password}
-              rightIcon={showPass ? "🙈" : "👁️"}
+              rightIcon={showPass ? "eye-off-outline" : "eye-outline"}
               onRightIconPress={(): void => setShowPass((v) => !v)}
             />
 

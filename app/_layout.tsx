@@ -1,14 +1,39 @@
 import { Slot, useRouter, useSegments } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import React, { JSX, useEffect, useState } from "react";
 import { AppRegistry, Platform } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import Toast from "react-native-toast-message";
+import Toast, { BaseToast, ErrorToast, ToastConfig } from "react-native-toast-message";
 
 import LoadingScreen from "@/components/ui/LoadingScreen";
+import { COLORS, FONT_SIZES, FONT_WEIGHTS } from "@/constants/theme";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { isStripeAvailable } from "@/services/stripeEnv";
 import { ThemeProvider } from "@/theme/ThemeContext";
 import SplashScreen from "./splash";
+
+// Dark-surface toasts — the library defaults are white cards with dark text.
+const toastBase = {
+  style: { backgroundColor: COLORS.surfaceElevated, borderLeftWidth: 4 },
+  text1Style: {
+    color: COLORS.text,
+    fontSize: FONT_SIZES.sm,
+    fontWeight: FONT_WEIGHTS.bold,
+  },
+  text2Style: { color: COLORS.textSecondary, fontSize: FONT_SIZES.sm },
+  text2NumberOfLines: 2,
+};
+const toastConfig: ToastConfig = {
+  success: (props) => (
+    <BaseToast {...props} {...toastBase} style={[toastBase.style, { borderLeftColor: COLORS.success }]} />
+  ),
+  error: (props) => (
+    <ErrorToast {...props} {...toastBase} style={[toastBase.style, { borderLeftColor: COLORS.error }]} />
+  ),
+  info: (props) => (
+    <BaseToast {...props} {...toastBase} style={[toastBase.style, { borderLeftColor: COLORS.primary }]} />
+  ),
+};
 
 // Register a no-op JS handler for Stripe's Android HeadlessJsTaskService.
 // Without it, the SDK logs "No task registered for key StripeKeepJsAwakeTask"
@@ -72,8 +97,9 @@ export default function RootLayout(): JSX.Element {
     return (
       <SafeAreaProvider>
         <ThemeProvider>
+          <StatusBar style="light" />
           <SplashScreen onFinish={(): void => setSplashDone(true)} />
-          <Toast />
+          <Toast config={toastConfig} />
         </ThemeProvider>
       </SafeAreaProvider>
     );
@@ -84,9 +110,10 @@ export default function RootLayout(): JSX.Element {
       <ThemeProvider>
         <MaybeStripeProvider>
           <AuthProvider>
+            <StatusBar style="light" />
             <AuthGate />
             {/* Toast must be outside NavigationContainer to render above all screens */}
-            <Toast />
+            <Toast config={toastConfig} />
           </AuthProvider>
         </MaybeStripeProvider>
       </ThemeProvider>

@@ -1,6 +1,12 @@
 import { AxiosResponse } from "axios";
 import * as SecureStore from "expo-secure-store";
-import api, { ApiError, ApiErrorCode, REMEMBER_KEY, TOKEN_KEY } from "./api";
+import api, {
+  ApiError,
+  ApiErrorCode,
+  REMEMBER_KEY,
+  TOKEN_KEY,
+  setApiToken,
+} from "./api";
 
 export interface LoginParams {
   email: string;
@@ -135,7 +141,11 @@ function classifyAuth(err: unknown, intent: AuthIntent): AuthError {
       );
   }
 
-  const fallback = typeof err.data === "string" ? err.data : err.message;
+  // Skip HTML bodies (proxy error pages) — err.message is already sanitized.
+  const fallback =
+    typeof err.data === "string" && !/^\s*</.test(err.data)
+      ? err.data
+      : err.message;
   return mk("UNKNOWN", fallback, err);
 }
 
@@ -173,7 +183,15 @@ export async function login(params: LoginParams): Promise<AuthResponse> {
       });
     }
 
-    await SecureStore.setItemAsync(TOKEN_KEY, token);
+    // Only persist the token to disk when the user opted into "Remember me".
+    // Otherwise we keep it in memory so the next cold start lands on the login
+    // screen instead of auto-restoring the session.
+    if (rememberMe) {
+      await SecureStore.setItemAsync(TOKEN_KEY, token);
+    } else {
+      await SecureStore.deleteItemAsync(TOKEN_KEY);
+    }
+    setApiToken(token);
     await persistRememberedEmail(email, rememberMe);
 
     return { ...response.data, token };
@@ -195,7 +213,10 @@ export async function register(params: RegisterParams): Promise<AuthResponse> {
     });
 
     const token = extractToken(response);
-    if (token) await SecureStore.setItemAsync(TOKEN_KEY, token);
+    if (token) {
+      await SecureStore.setItemAsync(TOKEN_KEY, token);
+      setApiToken(token);
+    }
 
     return token ? { ...response.data, token } : response.data;
   } catch (err) {
@@ -204,6 +225,7 @@ export async function register(params: RegisterParams): Promise<AuthResponse> {
 }
 
 export async function logout(): Promise<void> {
+  setApiToken(null);
   await SecureStore.deleteItemAsync(TOKEN_KEY);
 }
 

@@ -141,10 +141,12 @@ function CheckedInSheet({
   const [secondsLeft, setSecondsLeft] = useState(TTL_SECONDS);
   const [isExpired, setExpired] = useState(false);
   const [showCode, setShowCode] = useState(true);
+  const [isCheckedIn, setCheckedIn] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const startTimer = useCallback(() => {
     setExpired(false);
+    setCheckedIn(false);
     setSecondsLeft(TTL_SECONDS);
     setPayload(buildPayload(userId));
     timerRef.current = setInterval(() => {
@@ -192,10 +194,13 @@ function CheckedInSheet({
 
         {/* ── Headline ───────────────────────────────────── */}
         <View style={sheetS.headline}>
-          <Text style={sheetS.title}>Check in</Text>
+          <Text style={sheetS.title}>
+            {isCheckedIn ? "Checked in successfully" : "Check in"}
+          </Text>
           <Text style={sheetS.subtitle}>
-            Show this code at the front desk.{"\n"}
-            It rotates every {TTL_SECONDS} seconds.
+            {isCheckedIn
+              ? "Enjoy your session — you're all set."
+              : `Show this code at the front desk.\nIt rotates every ${TTL_SECONDS} seconds.`}
           </Text>
         </View>
 
@@ -232,20 +237,34 @@ function CheckedInSheet({
 
             {/* QR */}
             {showCode ? (
-              <View
+              <Pressable
+                onPress={() => !isExpired && setCheckedIn((v) => !v)}
                 style={[
                   sheetS.qrWrap,
                   urgent && { borderColor: COLORS.error },
+                  isCheckedIn && { borderColor: "#22A06B" },
                 ]}
               >
+                {/* QR must stay dark-on-white for scanner contrast — never theme it. */}
                 <QRCode
                   value={JSON.stringify(payload)}
                   size={QR_SIZE}
-                  color={COLORS.text}
+                  color="#1A1728"
                   backgroundColor={COLORS.white}
                 />
                 {isExpired && <ExpiredOverlay onRefresh={startTimer} />}
-              </View>
+                {isCheckedIn && !isExpired && (
+                  <View style={sheetS.checkedOverlay}>
+                    <View style={sheetS.checkedBadge}>
+                      <Ionicons
+                        name="checkmark"
+                        size={48}
+                        color={COLORS.white}
+                      />
+                    </View>
+                  </View>
+                )}
+              </Pressable>
             ) : (
               <View style={sheetS.qrHidden}>
                 <Ionicons
@@ -374,7 +393,7 @@ const sheetS = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: SPACING.md,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.surface,
     borderRadius: 18,
     padding: 14,
     ...SHADOWS.pop,
@@ -383,9 +402,9 @@ const sheetS = StyleSheet.create({
     width: 46,
     height: 46,
     borderRadius: 12,
-    backgroundColor: "#F4F0FB",
+    backgroundColor: COLORS.surfaceElevated,
     borderWidth: 1,
-    borderColor: "#E5DFF5",
+    borderColor: COLORS.border,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -402,7 +421,7 @@ const sheetS = StyleSheet.create({
   },
 
   qrCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.lg,
     paddingHorizontal: SPACING.md,
     paddingTop: SPACING.sm,
@@ -416,7 +435,7 @@ const sheetS = StyleSheet.create({
     gap: 8,
     paddingVertical: SPACING.sm + 2,
     borderBottomWidth: 1,
-    borderBottomColor: "#EFECF7",
+    borderBottomColor: COLORS.surfaceElevated,
     marginBottom: SPACING.md,
   },
   hideText: {
@@ -441,6 +460,23 @@ const sheetS = StyleSheet.create({
     justifyContent: "center",
     gap: 8,
     marginBottom: SPACING.md,
+  },
+  checkedOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(34,160,107,0.92)",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: RADIUS.md,
+  },
+  checkedBadge: {
+    width: 88,
+    height: 88,
+    borderRadius: 44,
+    backgroundColor: "rgba(255,255,255,0.18)",
+    borderWidth: 3,
+    borderColor: COLORS.white,
+    alignItems: "center",
+    justifyContent: "center",
   },
   qrHiddenText: {
     fontSize: FONT_SIZES.sm,

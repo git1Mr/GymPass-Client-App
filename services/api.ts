@@ -93,12 +93,35 @@ function normalize(err: AxiosError): ApiError {
   }
 
   const { status, data } = err.response;
-  const message =
-    typeof data === "string"
+  // Proxies (ngrok, nginx) answer with full HTML error pages — never surface
+  // raw markup to the UI.
+  const looksLikeHtml = typeof data === "string" && /^\s*</.test(data);
+  const message = looksLikeHtml
+    ? status >= 500
+      ? "The server is unreachable right now. Please try again shortly."
+      : err.message
+    : typeof data === "string"
       ? data
       : (data as { message?: string } | null)?.message ?? err.message;
 
   return new ApiError({ code: statusToCode(status), status, data, message });
+}
+
+// In-memory token register. Used for "session-only" logins where the token must
+// NOT survive a cold start (rememberMe=false). When set, takes precedence over
+// the persistent SecureStore value for outgoing requests.
+let inMemoryToken: string | null = null;
+export function setApiToken(token: string | null): void {
+  inMemoryToken = token;
+}
+
+// AuthContext subscribes here so a 401 from the server can clear in-memory auth
+// state — otherwise the interceptor only deletes the SecureStore copy and the
+// app keeps routing as if logged in.
+type UnauthorizedHandler = () => void;
+let unauthorizedHandler: UnauthorizedHandler | null = null;
+export function setUnauthorizedHandler(handler: UnauthorizedHandler | null): void {
+  unauthorizedHandler = handler;
 }
 
 const api: AxiosInstance = axios.create({
@@ -111,7 +134,7 @@ api.interceptors.request.use(
   async (
     config: InternalAxiosRequestConfig,
   ): Promise<InternalAxiosRequestConfig> => {
-    const token = await SecureStore.getItemAsync(TOKEN_KEY);
+    const token = inMemoryToken ?? (await SecureStore.getItemAsync(TOKEN_KEY));
     if (token && config.headers) {
       config.headers["x-auth-token"] = token;
     }
@@ -123,7 +146,9 @@ api.interceptors.response.use(
   (response: AxiosResponse) => response,
   async (error: AxiosError) => {
     if (error.response?.status === 401) {
+      inMemoryToken = null;
       await SecureStore.deleteItemAsync(TOKEN_KEY);
+      unauthorizedHandler?.();
     }
     return Promise.reject(normalize(error));
   },

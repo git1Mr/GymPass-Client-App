@@ -173,7 +173,7 @@ export default function RegisterScreen(): JSX.Element {
               value={form.password}
               onChangeText={setField("password")}
               error={errors.password}
-              rightIcon={showPass ? "🙈" : "👁️"}
+              rightIcon={showPass ? "eye-off-outline" : "eye-outline"}
               onRightIconPress={(): void => setShowPass((v) => !v)}
             />
 
@@ -185,7 +185,7 @@ export default function RegisterScreen(): JSX.Element {
               value={form.confirmPassword}
               onChangeText={setField("confirmPassword")}
               error={errors.confirmPassword}
-              rightIcon={showConf ? "🙈" : "👁️"}
+              rightIcon={showConf ? "eye-off-outline" : "eye-outline"}
               onRightIconPress={(): void => setShowConf((v) => !v)}
             />
 

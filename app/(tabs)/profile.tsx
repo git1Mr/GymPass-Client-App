@@ -9,7 +9,7 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -22,19 +22,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import DarkVeil from "@/components/ui/DarkVeil";
 
 type IoniconsName = React.ComponentProps<typeof Ionicons>["name"];
-
-const DARK = {
-  bg: "#13121C",
-  bg2: "#1B1A26",
-  cardBg: "rgba(255,255,255,0.04)",
-  cardBorder: "rgba(255,255,255,0.06)",
-  rowDivider: "rgba(255,255,255,0.06)",
-  text: "#FFFFFF",
-  textMuted: "rgba(255,255,255,0.5)",
-  tabInactive: "rgba(255,255,255,0.5)",
-  badge: "#E94B5C",
-  danger: "#FF6B6B",
-};
 
 interface RowProps {
   icon: IoniconsName;
@@ -68,18 +55,18 @@ function Row({
       <View
         style={[
           styles.rowIconWrap,
-          danger && { backgroundColor: "rgba(255,107,107,0.15)" },
+          danger && { backgroundColor: COLORS.errorBg },
         ]}
       >
         <Ionicons
           name={icon}
           size={18}
-          color={danger ? DARK.danger : COLORS.primary}
+          color={danger ? COLORS.error : COLORS.primaryDark}
         />
       </View>
 
       <Text
-        style={[styles.rowLabel, danger && { color: DARK.danger }]}
+        style={[styles.rowLabel, danger && { color: COLORS.error }]}
         numberOfLines={1}
       >
         {label}
@@ -110,7 +97,7 @@ function Row({
       ) : null}
 
       {toggle === undefined && badge === undefined && !danger ? (
-        <Ionicons name="chevron-forward" size={16} color={DARK.tabInactive} />
+        <Ionicons name="chevron-forward" size={16} color={COLORS.textMuted} />
       ) : null}
     </TouchableOpacity>
   );
@@ -132,7 +119,6 @@ function Card({ children }: { children: React.ReactNode }) {
 export default function ProfileScreen() {
   const { user, signOut } = useAuth();
   const router = useRouter();
-  const [darkMode, setDarkMode] = useState<boolean>(true);
 
   const username = user?.name ?? "Member";
   const email = user?.email ?? "—";
@@ -198,12 +184,6 @@ export default function ProfileScreen() {
               <Row icon="person-outline" label="Profile" />
               <Row icon="location-outline" label="My Addresses" />
               <Row icon="language-outline" label="Language" value="English" />
-              <Row
-                icon="moon-outline"
-                label="Dark Mode"
-                toggle={darkMode}
-                onToggle={() => setDarkMode((v) => !v)}
-              />
               <Row icon="notifications-outline" label="Notifications" badge={3} last />
             </Card>
 
@@ -259,10 +239,10 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: DARK.bg },
+  safe: { flex: 1, backgroundColor: COLORS.background },
   heroSafe: { flex: 1, backgroundColor: "#0E0A1F" },
   scroll: {
-    backgroundColor: DARK.bg,
+    backgroundColor: COLORS.background,
     paddingBottom: SPACING.xxxl,
   },
 
@@ -373,16 +353,17 @@ const styles = StyleSheet.create({
   sectionLabelText: {
     fontSize: 14,
     fontWeight: "800",
-    color: COLORS.primary,
+    color: COLORS.primaryDark,
     letterSpacing: 0.3,
   },
 
   card: {
-    backgroundColor: DARK.cardBg,
+    backgroundColor: COLORS.surface,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: DARK.cardBorder,
+    borderColor: COLORS.border,
     overflow: "hidden",
+    ...SHADOWS.soft,
   },
 
   row: {
@@ -394,25 +375,25 @@ const styles = StyleSheet.create({
   },
   rowBorder: {
     borderBottomWidth: 1,
-    borderBottomColor: DARK.rowDivider,
+    borderBottomColor: COLORS.surfaceElevated,
   },
   rowIconWrap: {
     width: 36,
     height: 36,
     borderRadius: 10,
-    backgroundColor: "rgba(159,153,199,0.14)",
+    backgroundColor: COLORS.primaryMuted,
     alignItems: "center",
     justifyContent: "center",
   },
   rowLabel: {
     flex: 1,
     fontSize: FONT_SIZES.base,
-    color: DARK.text,
+    color: COLORS.text,
     fontWeight: FONT_WEIGHTS.semibold,
   },
   rowValue: {
     fontSize: 13,
-    color: DARK.textMuted,
+    color: COLORS.textSecondary,
   },
 
   badge: {
@@ -420,7 +401,7 @@ const styles = StyleSheet.create({
     height: 22,
     borderRadius: 11,
     paddingHorizontal: 7,
-    backgroundColor: DARK.badge,
+    backgroundColor: COLORS.error,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -434,7 +415,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 24,
     borderRadius: 12,
-    backgroundColor: "rgba(255,255,255,0.15)",
+    backgroundColor: COLORS.border,
     position: "relative",
   },
   toggleThumb: {
@@ -472,7 +453,7 @@ const styles = StyleSheet.create({
   versionNote: {
     textAlign: "center",
     fontSize: FONT_SIZES.xs,
-    color: DARK.textMuted,
+    color: COLORS.textMuted,
     marginTop: SPACING.md,
   },
 });

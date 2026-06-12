@@ -1,43 +1,13 @@
+import { darkPalette } from "@/theme/palette";
+
+// The app ships permanently dark: COLORS *is* the dark palette
+// (see theme/palette.ts for the values and their contrast rationale).
+// `primaryDark` deliberately maps to the lighter lavender — call sites use it
+// for high-contrast brand text/links, and on dark surfaces "higher contrast"
+// means lighter, not darker.
 export const COLORS = {
-  primary: "#9f99c7",
-  primaryLight: "#bfbbdc",
-  primaryDark: "#7a73a8",
-  primaryMuted: "#9f99c726", // 15% opacity
-
-  accent: "#3C0008",
-  accentLight: "#6B0010",
-  accentMuted: "#3C000820", // 12% opacity
-
-  background: "#F7F6FB",
-  surface: "#FFFFFF",
-  surfaceElevated: "#EEEDF7",
-  border: "#D8D6EE",
-  borderFocus: "#9f99c7",
-
-  text: "#1A1728",
-  textSecondary: "#5C567A",
-  textMuted: "#A09CC0",
-  textOnPrimary: "#FFFFFF",
-  textOnAccent: "#FFFFFF",
-
-  error: "#D93025",
-  errorBg: "#FFE9E8",
-  success: "#1E8A4C",
-  warning: "#F59E0B",
-
-  tabActive: "#3C0008",
-  tabInactive: "#9f99c7",
-  tabBar: "#FFFFFF",
-
-  // Change these two to restyle every auth screen at once.
-  authHeader: "#3C0008",
-  authPanel: "#F7F6FB",
-
-  wordmarkHighlight: "#E8723F",
-
-  white: "#FFFFFF",
-  black: "#000000",
-  transparent: "transparent",
+  ...darkPalette,
+  primaryDark: darkPalette.primaryLight,
 };
 
 export type ColorKey = keyof typeof COLORS;
@@ -84,25 +54,28 @@ export const RADIUS = {
   full: 999,
 } as const;
 
+// Shadows barely render on dark backgrounds — elevation is carried by the
+// surface ladder (#1E1E1E → #252525 → #2A2A2A). Keep black-based shadows at
+// low opacity for Android elevation + subtle iOS depth.
 export const SHADOWS = {
   card: {
-    shadowColor: "#9f99c7",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.18,
+    shadowOpacity: 0.3,
     shadowRadius: 12,
     elevation: 6,
   },
   soft: {
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 3,
   },
   pop: {
-    shadowColor: "#3C0008",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.18,
+    shadowOpacity: 0.35,
     shadowRadius: 24,
     elevation: 10,
   },

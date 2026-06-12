@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import React, { JSX, useState } from "react";
 import {
     StyleSheet,
@@ -19,7 +20,7 @@ import {
 interface FormInputProps extends TextInputProps {
   label?: string;
   error?: string;
-  rightIcon?: string;
+  rightIcon?: keyof typeof Ionicons.glyphMap;
   onRightIconPress?: () => void;
   containerStyle?: ViewStyle;
 }
@@ -59,8 +60,9 @@ export default function FormInput({
             onPress={onRightIconPress}
             style={styles.iconBtn}
             activeOpacity={0.7}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
-            <Text style={styles.iconText}>{rightIcon}</Text>
+            <Ionicons name={rightIcon} size={21} color={COLORS.textSecondary} />
           </TouchableOpacity>
         ) : null}
       </View>
@@ -82,7 +84,8 @@ const styles = StyleSheet.create({
   inputWrap: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: COLORS.surface,
+    // One step above the panel surface so fields read as wells, not blends.
+    backgroundColor: COLORS.surfaceElevated,
     borderWidth: 1.5,
     borderRadius: RADIUS.md,
     paddingHorizontal: SPACING.md,
@@ -98,7 +101,6 @@ const styles = StyleSheet.create({
     height: 52,
     justifyContent: "center",
   },
-  iconText: { fontSize: 18 },
   error: {
     marginTop: SPACING.xs,
     fontSize: FONT_SIZES.sm,

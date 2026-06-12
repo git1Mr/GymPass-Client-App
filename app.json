@@ -4,6 +4,8 @@
     "slug": "unityfitness",
     "version": "1.0.0",
     "scheme": "unityfitness",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#121212",
     "platforms": [
       "ios",
       "android"

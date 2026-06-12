@@ -138,7 +138,8 @@ function PlanCard({
 
           {selected && (
             <View style={styles.selectedPill}>
-              <Ionicons name="checkmark-circle" size={14} color={COLORS.text} />
+              {/* Fixed ink — the pill is white-on-gradient regardless of theme */}
+              <Ionicons name="checkmark-circle" size={14} color="#1A1728" />
               <Text style={styles.selectedPillText}>Selected</Text>
             </View>
           )}
@@ -235,7 +236,7 @@ const styles = StyleSheet.create({
   cardWrap: {
     marginBottom: SPACING.md,
     borderRadius: RADIUS.xl,
-    shadowColor: "#3C0008",
+    shadowColor: "#000",
     shadowOpacity: 0.18,
     shadowOffset: { width: 0, height: 12 },
     shadowRadius: 28,
@@ -355,7 +356,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   selectedPillText: {
-    color: COLORS.text,
+    color: "#1A1728",
     fontSize: FONT_SIZES.xs,
     fontWeight: FONT_WEIGHTS.bold,
     letterSpacing: 0.4,
