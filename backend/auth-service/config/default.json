@@ -1,6 +1,7 @@
 {
   "name": "UnityAuthService",
   "jwtPrivateKey": "",
+  "cookieDomain": "",
   "db": {
     "uri": "mongodb://localhost/unityfitness"
   },

@@ -1,15 +1,19 @@
-import GradientSurface from "@/components/ui/GradientSurface";
+import AuroraBackground from "@/components/ui/AuroraBackground";
+import Eyebrow from "@/components/ui/Eyebrow";
+import GlassCard from "@/components/ui/GlassCard";
+import GradientFill from "@/components/ui/GradientFill";
+import toast from "@/components/ui/Toast";
 import {
     COLORS,
+    FONTS,
     FONT_SIZES,
-    FONT_WEIGHTS,
+    GRADIENTS,
     RADIUS,
-    SHADOWS,
     SPACING,
 } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React from "react";
 import {
     ScrollView,
     StyleSheet,
@@ -19,379 +23,302 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-interface Plan {
-  id: string;
-  name: string;
-  tier: 1 | 2 | 3;
-  price: number;
-  points: number;
-  perPoint: number;
-  description: string;
-  perks: string[];
-  popular: boolean;
-}
-
-const PLANS: Plan[] = [
-  {
-    id: "starter",
-    name: "Starter",
-    tier: 1,
-    price: 99,
-    points: 10,
-    perPoint: 9.9,
-    popular: false,
-    description: "Perfect for occasional visits to standard clubs.",
-    perks: [
-      "10 points included",
-      "Tier 1 gyms (1 pt / session)",
-      "Mobile pass",
-      "Check-in history",
-    ],
-  },
-  {
-    id: "mobility",
-    name: "Mobility",
-    tier: 2,
-    price: 199,
-    points: 25,
-    perPoint: 7.96,
-    popular: true,
-    description: "Our most popular pack for regular city-hoppers.",
-    perks: [
-      "25 points included",
-      "Tier 1 & 2 gyms",
-      "Priority support",
-      "All Starter perks",
-    ],
-  },
-  {
-    id: "elite",
-    name: "Elite",
-    tier: 3,
-    price: 349,
-    points: 50,
-    perPoint: 6.98,
-    popular: false,
-    description: "Unlimited access across our entire partner network.",
-    perks: [
-      "50 points included",
-      "All Tier 1, 2 & 3 gyms",
-      "Dedicated support",
-      "Early access to new clubs",
-    ],
-  },
+// Pricing mirrors the landing PricingSection (without the Partner plan):
+// Explorer = pay-per-session credit packs, Unity Unlimited = monthly pass.
+const CREDIT_PACKS = [
+  { id: "pack5", credits: 5, price: "60 DH" },
+  { id: "pack15", credits: 15, price: "150 DH" },
+  { id: "pack30", credits: 30, price: "270 DH" },
 ];
 
-function PlanCard({
-  plan,
-  selected,
-  onSelect,
-}: {
-  plan: Plan;
-  selected: boolean;
-  onSelect: () => void;
-}) {
+const EXPLORER_FEATURES = [
+  "Accès à l'ensemble du réseau partenaire",
+  "Génération de QR code instantanée",
+  "Aucun engagement mensuel",
+  "Historique et journal d'activité",
+];
+
+const UNLIMITED_FEATURES = [
+  "Accès illimité chaque jour",
+  "Accès complet au réseau partenaire",
+  "Génération de QR prioritaire",
+  "Statistiques d'activité avancées",
+  "Itinérance multi-villes incluse",
+  "Accès anticipé aux nouveaux partenaires",
+];
+
+const EXPLORER_ACCENT = COLORS.success;
+const UNLIMITED_ACCENT = COLORS.primaryLight;
+
+function Feature({ text, accent }: { text: string; accent: string }) {
   return (
-    <TouchableOpacity
-      style={[styles.cardWrap, selected && styles.cardWrapSelected]}
-      onPress={onSelect}
-      activeOpacity={0.92}
-    >
-      <GradientSurface radius={RADIUS.xl} dimmer={selected ? 0 : 0.08}>
-        {plan.popular && (
-          <View style={styles.popularBadge}>
-            <Text style={styles.popularText}>Most Popular</Text>
-          </View>
-        )}
-
-        <View style={styles.cardBody}>
-          <View style={styles.cardHeader}>
-            <View style={{ flex: 1, paddingRight: SPACING.sm }}>
-              <Text style={styles.planName}>{plan.name}</Text>
-              <Text style={styles.planDesc}>{plan.description}</Text>
-            </View>
-            <View style={styles.priceChip}>
-              <Text style={styles.priceAmount}>{plan.price}</Text>
-              <Text style={styles.priceCurrency}>MAD</Text>
-            </View>
-          </View>
-
-          <View style={styles.pointsRow}>
-            <Ionicons name="flash" size={14} color="#F59E0B" />
-            <Text style={styles.pointsText}>
-              {plan.points} pts · {plan.perPoint.toFixed(2)} MAD/pt
-            </Text>
-          </View>
-
-          <View style={styles.perksList}>
-            {plan.perks.map((p) => (
-              <View key={p} style={styles.perkRow}>
-                <Ionicons
-                  name="checkmark"
-                  size={14}
-                  color="rgba(255,255,255,0.95)"
-                />
-                <Text style={styles.perkText}>{p}</Text>
-              </View>
-            ))}
-          </View>
-
-          {selected && (
-            <View style={styles.selectedPill}>
-              {/* Fixed ink — the pill is white-on-gradient regardless of theme */}
-              <Ionicons name="checkmark-circle" size={14} color="#1A1728" />
-              <Text style={styles.selectedPillText}>Selected</Text>
-            </View>
-          )}
-        </View>
-      </GradientSurface>
-    </TouchableOpacity>
+    <View style={styles.featureRow}>
+      <Ionicons name="checkmark" size={14} color={accent} style={styles.check} />
+      <Text style={styles.featureText}>{text}</Text>
+    </View>
   );
 }
 
 export default function PlansScreen() {
   const router = useRouter();
-  const [selected, setSelected] = useState<string>("mobility");
 
-  const selectedPlan = PLANS.find((p) => p.id === selected)!;
+  const buyPack = (id: string) =>
+    router.push({ pathname: "/checkout", params: { planId: id } });
 
   return (
-    <SafeAreaView style={styles.safe} edges={["top"]}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Plans</Text>
-        <Text style={styles.headerSub}>Buy points once · Use them everywhere</Text>
-      </View>
-
-      <ScrollView
-        contentContainerStyle={styles.scroll}
-        showsVerticalScrollIndicator={false}
-      >
-        <Text style={styles.intro}>
-          Buy points once, use them across our entire partner network. No
-          monthly commitment.
-        </Text>
-
-        {PLANS.map((plan) => (
-          <PlanCard
-            key={plan.id}
-            plan={plan}
-            selected={selected === plan.id}
-            onSelect={() => setSelected(plan.id)}
-          />
-        ))}
-      </ScrollView>
-
-      <View style={styles.purchaseBar}>
-        <View>
-          <Text style={styles.purchaseLabel}>
-            Selected: {selectedPlan.name}
-          </Text>
-          <Text style={styles.purchasePrice}>
-            {selectedPlan.price} MAD · {selectedPlan.points} pts
-          </Text>
-        </View>
-        <TouchableOpacity
-          style={styles.purchaseBtn}
-          activeOpacity={0.85}
-          onPress={() =>
-            router.push({
-              pathname: "/checkout",
-              params: { planId: selectedPlan.id },
-            })
-          }
+    <View style={styles.root}>
+      <AuroraBackground />
+      <SafeAreaView style={styles.safe} edges={["top"]}>
+        <ScrollView
+          contentContainerStyle={styles.scroll}
+          showsVerticalScrollIndicator={false}
         >
-          <Text style={styles.purchaseBtnText}>Buy now</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+          <View style={styles.head}>
+            <Eyebrow>Tarifs</Eyebrow>
+            <Text style={styles.title}>Une tarification simple et transparente.</Text>
+            <Text style={styles.subtitle}>
+              Que vous veniez une fois par semaine ou tous les jours, il y a une
+              formule faite pour vous.
+            </Text>
+          </View>
+
+          {/* ── Explorer (credit packs) ── */}
+          <GlassCard style={styles.card}>
+            <View
+              style={[
+                styles.iconWell,
+                { backgroundColor: EXPLORER_ACCENT + "22", borderColor: EXPLORER_ACCENT + "55" },
+              ]}
+            >
+              <Ionicons name="flash-outline" size={22} color={EXPLORER_ACCENT} />
+            </View>
+            <Text style={styles.name}>Explorer</Text>
+            <Text style={styles.tagline}>Payez à la séance</Text>
+
+            <Text style={styles.packsLabel}>Packs de crédits</Text>
+            <View style={styles.packsRow}>
+              {CREDIT_PACKS.map((pack) => (
+                <TouchableOpacity
+                  key={pack.id}
+                  style={styles.pack}
+                  activeOpacity={0.85}
+                  onPress={() => buyPack(pack.id)}
+                >
+                  <Text style={styles.packCredits}>{pack.credits}</Text>
+                  <Text style={styles.packUnit}>crédits</Text>
+                  <Text style={[styles.packPrice, { color: EXPLORER_ACCENT }]}>
+                    {pack.price}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <View style={styles.features}>
+              {EXPLORER_FEATURES.map((f) => (
+                <Feature key={f} text={f} accent={EXPLORER_ACCENT} />
+              ))}
+            </View>
+
+            <TouchableOpacity
+              style={[styles.cta, styles.ctaIdle]}
+              activeOpacity={0.9}
+              onPress={() => router.push("/top-up")}
+            >
+              <Text style={[styles.ctaText, styles.ctaTextIdle]}>
+                Acheter des crédits
+              </Text>
+            </TouchableOpacity>
+          </GlassCard>
+
+          {/* ── Unity Unlimited (monthly) ── */}
+          <GlassCard highlighted style={styles.card}>
+            <View style={styles.badge}>
+              <GradientFill colors={GRADIENTS.primary} />
+              <Text style={styles.badgeText}>LE PLUS POPULAIRE</Text>
+            </View>
+
+            <View
+              style={[
+                styles.iconWell,
+                { backgroundColor: UNLIMITED_ACCENT + "22", borderColor: UNLIMITED_ACCENT + "55" },
+              ]}
+            >
+              <Ionicons name="infinite-outline" size={22} color={UNLIMITED_ACCENT} />
+            </View>
+            <Text style={styles.name}>Unity Unlimited</Text>
+            <Text style={styles.tagline}>Un seul prix, toutes les salles</Text>
+
+            <View style={styles.priceRow}>
+              <Text style={styles.price}>199</Text>
+              <Text style={styles.priceUnit}> DH / mois</Text>
+            </View>
+
+            <View style={styles.features}>
+              {UNLIMITED_FEATURES.map((f) => (
+                <Feature key={f} text={f} accent={UNLIMITED_ACCENT} />
+              ))}
+            </View>
+
+            <TouchableOpacity
+              style={styles.cta}
+              activeOpacity={0.9}
+              onPress={() =>
+                toast.info(
+                  "Les abonnements mensuels arrivent bientôt.",
+                  "Bientôt disponible",
+                )
+              }
+            >
+              <GradientFill colors={GRADIENTS.primary} />
+              <Text style={styles.ctaText}>Démarrer l&apos;essai gratuit</Text>
+            </TouchableOpacity>
+          </GlassCard>
+        </ScrollView>
+      </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: COLORS.background },
+  root: { flex: 1, backgroundColor: COLORS.background },
+  safe: { flex: 1 },
+  scroll: { padding: SPACING.lg, paddingBottom: SPACING.xxxl },
 
-  header: {
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
-    backgroundColor: COLORS.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-  },
-  headerTitle: {
-    fontSize: FONT_SIZES.xl,
-    fontWeight: FONT_WEIGHTS.black,
+  head: { marginBottom: SPACING.xl },
+  title: {
+    fontSize: FONT_SIZES.xxl,
+    fontFamily: FONTS.display,
     color: COLORS.text,
+    letterSpacing: -0.6,
+    marginTop: SPACING.sm,
   },
-  headerSub: { fontSize: FONT_SIZES.sm, color: COLORS.textMuted, marginTop: 2 },
-
-  scroll: { padding: SPACING.lg, paddingBottom: 100 },
-
-  intro: {
+  subtitle: {
     fontSize: FONT_SIZES.base,
-    color: COLORS.textSecondary,
+    fontFamily: FONTS.regular,
+    color: COLORS.textMuted,
     lineHeight: 22,
-    marginBottom: SPACING.lg,
+    marginTop: SPACING.sm,
   },
 
-  cardWrap: {
-    marginBottom: SPACING.md,
-    borderRadius: RADIUS.xl,
-    shadowColor: "#000",
-    shadowOpacity: 0.18,
-    shadowOffset: { width: 0, height: 12 },
-    shadowRadius: 28,
-    elevation: 6,
-  },
-  cardWrapSelected: {
-    shadowOpacity: 0.3,
-    shadowRadius: 32,
-    elevation: 10,
-  },
+  card: { padding: SPACING.lg, marginBottom: SPACING.lg },
 
-  cardBody: {
-    padding: SPACING.lg,
-  },
-
-  popularBadge: {
+  badge: {
     position: "absolute",
     top: 0,
-    right: 0,
-    paddingHorizontal: 12,
+    right: SPACING.lg,
+    paddingHorizontal: SPACING.sm + 2,
     paddingVertical: 5,
-    backgroundColor: "#FFFFFF",
-    borderBottomLeftRadius: RADIUS.md,
-    zIndex: 2,
+    borderBottomLeftRadius: RADIUS.sm,
+    borderBottomRightRadius: RADIUS.sm,
+    overflow: "hidden",
   },
-  popularText: {
-    color: "#3C0008",
-    fontSize: FONT_SIZES.xs,
-    fontWeight: FONT_WEIGHTS.black,
-    letterSpacing: 0.6,
-  },
-
-  cardHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: SPACING.sm,
-  },
-  planName: {
-    fontSize: FONT_SIZES.xl,
-    fontWeight: FONT_WEIGHTS.black,
-    color: COLORS.white,
-    letterSpacing: -0.4,
-  },
-  planDesc: {
-    fontSize: FONT_SIZES.sm,
-    color: "rgba(255,255,255,0.75)",
-    marginTop: 4,
-    lineHeight: 18,
-    maxWidth: 220,
-  },
-
-  priceChip: {
-    backgroundColor: "rgba(255,255,255,0.14)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.22)",
-    borderRadius: RADIUS.md,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    alignItems: "center",
-    minWidth: 70,
-  },
-  priceAmount: {
-    fontSize: FONT_SIZES.xl,
-    fontWeight: FONT_WEIGHTS.black,
-    color: COLORS.white,
-    lineHeight: FONT_SIZES.xl,
-  },
-  priceCurrency: {
-    fontSize: FONT_SIZES.xs,
-    fontWeight: FONT_WEIGHTS.medium,
-    color: "rgba(255,255,255,0.85)",
-    marginTop: 3,
+  badgeText: {
+    fontSize: 10,
+    fontFamily: FONTS.mono,
+    color: COLORS.textOnPrimary,
     letterSpacing: 1,
   },
 
-  pointsRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    marginBottom: SPACING.md,
-    alignSelf: "flex-start",
-    backgroundColor: "rgba(245,158,11,0.18)",
+  iconWell: {
+    width: 46,
+    height: 46,
+    borderRadius: RADIUS.md,
     borderWidth: 1,
-    borderColor: "rgba(245,158,11,0.35)",
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: 4,
-    borderRadius: RADIUS.full,
-  },
-  pointsText: {
-    fontSize: FONT_SIZES.sm,
-    color: "#FFE3AE",
-    fontWeight: FONT_WEIGHTS.bold,
-  },
-
-  perksList: { gap: 6 },
-  perkRow: { flexDirection: "row", alignItems: "center", gap: SPACING.xs },
-  perkText: {
-    fontSize: FONT_SIZES.sm,
-    color: "rgba(255,255,255,0.92)",
-  },
-
-  selectedPill: {
-    marginTop: SPACING.md,
-    alignSelf: "flex-start",
-    flexDirection: "row",
     alignItems: "center",
-    gap: 5,
-    backgroundColor: COLORS.white,
-    paddingHorizontal: SPACING.sm + 2,
-    paddingVertical: 5,
-    borderRadius: RADIUS.full,
-    shadowColor: "#000",
-    shadowOpacity: 0.18,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 10,
-    elevation: 4,
+    justifyContent: "center",
+    marginBottom: SPACING.md,
   },
-  selectedPillText: {
-    color: "#1A1728",
+  name: {
+    fontSize: FONT_SIZES.xl,
+    fontFamily: FONTS.bold,
+    color: COLORS.text,
+    letterSpacing: -0.4,
+  },
+  tagline: {
+    fontSize: FONT_SIZES.sm,
+    fontFamily: FONTS.regular,
+    color: COLORS.textMuted,
+    marginTop: 2,
+  },
+
+  // Explorer credit packs
+  packsLabel: {
     fontSize: FONT_SIZES.xs,
-    fontWeight: FONT_WEIGHTS.bold,
-    letterSpacing: 0.4,
+    fontFamily: FONTS.mono,
+    color: COLORS.textMuted,
+    marginTop: SPACING.lg,
+    marginBottom: SPACING.sm,
   },
-
-  purchaseBar: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    flexDirection: "row",
+  packsRow: { flexDirection: "row", gap: SPACING.sm },
+  pack: {
+    flex: 1,
     alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: COLORS.surface,
-    paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
-    ...SHADOWS.card,
+    borderRadius: RADIUS.md,
+    backgroundColor: COLORS.surfaceSolid,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
-  purchaseLabel: { fontSize: FONT_SIZES.xs, color: COLORS.textMuted },
-  purchasePrice: {
-    fontSize: FONT_SIZES.base,
-    fontWeight: FONT_WEIGHTS.bold,
+  packCredits: {
+    fontSize: FONT_SIZES.lg,
+    fontFamily: FONTS.bold,
     color: COLORS.text,
   },
-  purchaseBtn: {
-    backgroundColor: COLORS.accent,
-    paddingVertical: SPACING.sm,
-    paddingHorizontal: SPACING.xl,
+  packUnit: {
+    fontSize: FONT_SIZES.xs,
+    fontFamily: FONTS.regular,
+    color: COLORS.textMuted,
+    marginTop: 1,
+  },
+  packPrice: {
+    fontSize: FONT_SIZES.sm,
+    fontFamily: FONTS.mono,
+    marginTop: SPACING.xs,
+  },
+
+  // Unlimited price
+  priceRow: { flexDirection: "row", alignItems: "flex-end", marginTop: SPACING.lg },
+  price: {
+    fontSize: FONT_SIZES.hero,
+    fontFamily: FONTS.display,
+    color: COLORS.text,
+    letterSpacing: -1.5,
+    lineHeight: FONT_SIZES.hero,
+  },
+  priceUnit: {
+    fontSize: FONT_SIZES.md,
+    fontFamily: FONTS.medium,
+    color: COLORS.textSecondary,
+    paddingBottom: 4,
+  },
+
+  features: { gap: SPACING.sm, marginTop: SPACING.lg, marginBottom: SPACING.lg },
+  featureRow: { flexDirection: "row", alignItems: "flex-start" },
+  check: { marginTop: 2, marginRight: SPACING.sm },
+  featureText: {
+    flex: 1,
+    fontSize: FONT_SIZES.sm,
+    fontFamily: FONTS.regular,
+    color: COLORS.textSecondary,
+    lineHeight: 20,
+  },
+
+  cta: {
+    height: 50,
     borderRadius: RADIUS.full,
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
   },
-  purchaseBtnText: {
-    color: COLORS.white,
-    fontWeight: FONT_WEIGHTS.bold,
+  ctaIdle: {
+    backgroundColor: COLORS.glass,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  ctaText: {
     fontSize: FONT_SIZES.base,
+    fontFamily: FONTS.semibold,
+    color: COLORS.textOnPrimary,
   },
+  ctaTextIdle: { color: COLORS.text },
 });

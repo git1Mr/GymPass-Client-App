@@ -3,10 +3,8 @@ import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import React, { JSX, useEffect, useState } from "react";
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -15,16 +13,20 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import AuroraBackground from "@/components/ui/AuroraBackground";
+import Eyebrow from "@/components/ui/Eyebrow";
 import FormInput from "@/components/ui/FormInput";
-import DarkVeil from "@/components/ui/DarkVeil";
-import UFLogo from "@/components/ui/UFLogo";
+import GlassCard from "@/components/ui/GlassCard";
+import GradientText from "@/components/ui/GradientText";
+import PrimaryButton from "@/components/ui/PrimaryButton";
+import UnityLogo from "@/components/ui/UnityLogo";
 import toast from "@/components/ui/Toast";
 import {
   COLORS,
+  FONTS,
   FONT_SIZES,
-  FONT_WEIGHTS,
+  GRADIENTS,
   RADIUS,
-  SHADOWS,
   SPACING,
 } from "@/constants/theme";
 import { useAuth } from "@/context/AuthContext";
@@ -49,7 +51,7 @@ function parseLoginError(
       message:
         err instanceof Error
           ? err.message
-          : "Could not connect to the server. Check your network.",
+          : "Impossible de joindre le serveur. Vérifiez votre connexion.",
     };
   }
 
@@ -112,6 +114,7 @@ export default function LoginScreen(): JSX.Element {
 
   return (
     <View style={styles.root}>
+      <AuroraBackground />
       <KeyboardAvoidingView
         style={styles.kav}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -124,22 +127,34 @@ export default function LoginScreen(): JSX.Element {
         >
           <SafeAreaView edges={["top"]} style={styles.heroSafe}>
             <View style={styles.hero}>
-              <View style={styles.pillarLayer} pointerEvents="none">
-                <DarkVeil />
-              </View>
-
-              <View style={styles.logoWrap}>
-                <UFLogo size={92} variant="light" />
-              </View>
-              <Text style={styles.heroTitle}>Welcome back !</Text>
-              <Text style={styles.heroSubtitle}>Sign in to continue</Text>
+              <UnityLogo size={46} />
             </View>
           </SafeAreaView>
 
-          <View style={styles.panel}>
+          <GlassCard style={styles.panel} radius={RADIUS.xl}>
+            <View style={styles.cardTitleWrap}>
+              <Eyebrow style={styles.eyebrow}>Accès membre</Eyebrow>
+              <View style={styles.titleRow}>
+                <Text style={styles.cardTitle}>Bon </Text>
+                <GradientText colors={[...GRADIENTS.text]} style={styles.cardTitle}>
+                  retour
+                </GradientText>
+              </View>
+              <Text style={styles.cardSubtitle}>Connectez-vous pour continuer</Text>
+              <View style={styles.switchRow}>
+                <Text style={styles.footerText}>Nouveau sur Unity Fitness ? </Text>
+                <TouchableOpacity
+                  onPress={(): void => router.push("/(auth)/register")}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.footerLink}>Créer un compte</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
             <FormInput
-              label="Email"
-              placeholder="you@example.com"
+              label="E-mail"
+              placeholder="vous@exemple.com"
               keyboardType="email-address"
               autoComplete="email"
               value={form.email}
@@ -148,7 +163,7 @@ export default function LoginScreen(): JSX.Element {
             />
 
             <FormInput
-              label="Password"
+              label="Mot de passe"
               placeholder="••••••••"
               secureTextEntry={!showPass}
               autoComplete="password"
@@ -166,54 +181,26 @@ export default function LoginScreen(): JSX.Element {
                 activeOpacity={0.7}
               >
                 <View style={[styles.checkbox, rememberMe && styles.checkboxActive]}>
-                  {rememberMe ? <Ionicons name="checkmark" size={14} color={COLORS.white} /> : null}
+                  {rememberMe ? <Ionicons name="checkmark" size={14} color={COLORS.textOnPrimary} /> : null}
                 </View>
-                <Text style={styles.rememberLabel}>Remember me</Text>
+                <Text style={styles.rememberLabel}>Se souvenir de moi</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 onPress={(): void => router.push("/(auth)/forgot-password")}
                 activeOpacity={0.7}
               >
-                <Text style={styles.forgotLink}>Forgot password?</Text>
+                <Text style={styles.forgotLink}>Mot de passe oublié ?</Text>
               </TouchableOpacity>
             </View>
 
-            <Pressable
+            <PrimaryButton
+              title="Se connecter"
               onPress={handleLogin}
-              disabled={loading}
-              style={({ pressed }) => [
-                styles.cta,
-                loading && styles.ctaDisabled,
-                pressed && { opacity: 0.9 },
-              ]}
-            >
-              {loading ? (
-                <ActivityIndicator color={COLORS.white} />
-              ) : (
-                <>
-                  <Text style={styles.ctaLabel}>Sign In</Text>
-                  <Ionicons name="arrow-forward" size={18} color={COLORS.white} />
-                </>
-              )}
-            </Pressable>
-
-            <View style={styles.dividerRow}>
-              <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>OR</Text>
-              <View style={styles.dividerLine} />
-            </View>
-
-            <View style={styles.footer}>
-              <Text style={styles.footerText}>New to Unity Fitness? </Text>
-              <TouchableOpacity
-                onPress={(): void => router.push("/(auth)/register")}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.footerLink}>Create Account</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+              loading={loading}
+              style={styles.cta}
+            />
+          </GlassCard>
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
@@ -221,50 +208,49 @@ export default function LoginScreen(): JSX.Element {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: "#0E0A1F" },
+  root: { flex: 1, backgroundColor: COLORS.background },
   kav: { flex: 1 },
-  scroll: { flexGrow: 1 },
+  scroll: { flexGrow: 1, paddingBottom: SPACING.lg },
 
-  heroSafe: { backgroundColor: "#0E0A1F" },
+  heroSafe: { backgroundColor: COLORS.transparent },
   hero: {
-    backgroundColor: "#0E0A1F",
-    paddingTop: SPACING.lg,
-    paddingBottom: SPACING.xxxl + SPACING.lg,
+    paddingTop: SPACING.xl,
+    paddingBottom: SPACING.xl,
     paddingHorizontal: SPACING.lg,
     alignItems: "center",
-    position: "relative",
-    overflow: "hidden",
-  },
-  pillarLayer: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  logoWrap: { marginTop: SPACING.sm, zIndex: 1 },
-  heroTitle: {
-    fontSize: FONT_SIZES.xxl,
-    fontWeight: FONT_WEIGHTS.black,
-    color: COLORS.white,
-    marginTop: SPACING.lg,
-    letterSpacing: -0.5,
-    textAlign: "center",
-  },
-  heroSubtitle: {
-    fontSize: FONT_SIZES.base,
-    color: "rgba(255,255,255,0.78)",
-    fontWeight: FONT_WEIGHTS.medium,
-    marginTop: SPACING.xs,
-    textAlign: "center",
   },
 
+  // Glass auth panel: frosted card inset from the edges holding the title,
+  // the switch link, and the form.
   panel: {
-    backgroundColor: COLORS.surface,
-    borderTopLeftRadius: RADIUS.xl,
-    borderTopRightRadius: RADIUS.xl,
-    marginTop: -SPACING.xl,
-    paddingTop: SPACING.xl,
+    marginHorizontal: SPACING.md,
+    paddingTop: SPACING.lg,
     paddingHorizontal: SPACING.lg,
     paddingBottom: SPACING.xl,
-    flex: 1,
-    minHeight: 420,
+  },
+
+  cardTitleWrap: {
+    alignItems: "center",
+    marginBottom: SPACING.lg,
+  },
+  eyebrow: { marginBottom: SPACING.sm },
+  titleRow: { flexDirection: "row", alignItems: "baseline" },
+  cardTitle: {
+    fontSize: FONT_SIZES.xxl,
+    fontFamily: FONTS.display,
+    color: COLORS.text,
+    letterSpacing: -0.5,
+  },
+  cardSubtitle: {
+    fontSize: FONT_SIZES.sm,
+    fontFamily: FONTS.regular,
+    color: COLORS.textSecondary,
+    marginTop: SPACING.xs,
+  },
+  switchRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: SPACING.sm,
   },
 
   row: {
@@ -278,7 +264,7 @@ const styles = StyleSheet.create({
   checkbox: {
     width: 22,
     height: 22,
-    borderRadius: 6,
+    borderRadius: 7,
     borderWidth: 1.5,
     borderColor: COLORS.border,
     alignItems: "center",
@@ -288,60 +274,24 @@ const styles = StyleSheet.create({
   rememberLabel: {
     fontSize: FONT_SIZES.sm,
     color: COLORS.text,
-    fontWeight: FONT_WEIGHTS.medium,
+    fontFamily: FONTS.medium,
   },
   forgotLink: {
     fontSize: FONT_SIZES.sm,
-    color: COLORS.primaryDark,
-    fontWeight: FONT_WEIGHTS.bold,
+    color: COLORS.primaryLight,
+    fontFamily: FONTS.semibold,
   },
 
-  cta: {
-    backgroundColor: COLORS.primary,
-    borderRadius: RADIUS.md,
-    height: 54,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: SPACING.sm,
-    shadowColor: COLORS.primary,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.4,
-    shadowRadius: 16,
-    elevation: 6,
-  },
-  ctaDisabled: { opacity: 0.7 },
-  ctaLabel: {
-    color: COLORS.white,
-    fontSize: FONT_SIZES.md,
-    fontWeight: FONT_WEIGHTS.bold,
-    letterSpacing: 0.3,
-  },
+  cta: { marginTop: SPACING.xs },
 
-  dividerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: SPACING.md,
-    marginTop: SPACING.xl,
-    marginBottom: SPACING.lg,
-  },
-  dividerLine: { flex: 1, height: 1, backgroundColor: COLORS.border },
-  dividerText: {
-    fontSize: FONT_SIZES.xs,
+  footerText: {
+    fontSize: FONT_SIZES.sm,
+    fontFamily: FONTS.regular,
     color: COLORS.textSecondary,
-    fontWeight: FONT_WEIGHTS.medium,
-    letterSpacing: 0.8,
   },
-
-  footer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  footerText: { fontSize: FONT_SIZES.sm, color: COLORS.text },
   footerLink: {
     fontSize: FONT_SIZES.sm,
-    color: COLORS.primaryDark,
-    fontWeight: FONT_WEIGHTS.bold,
+    color: COLORS.primaryLight,
+    fontFamily: FONTS.semibold,
   },
 });

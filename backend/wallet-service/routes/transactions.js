@@ -8,6 +8,7 @@ const { Gym }          = require('../models/gym');
 const { PointsConfig } = require('../models/pointsconfig');
 const auth             = require('../middleware/auth');
 const admin            = require('../middleware/admin');
+const gymStaff         = require('../middleware/gymstaff');
 
 router.get('/me', auth, async (req, res) => {
   const txs = await Transaction.find({ userId: req.user._id })
@@ -17,7 +18,7 @@ router.get('/me', auth, async (req, res) => {
   res.send(txs);
 });
 
-router.get('/gym/:gymId', auth, async (req, res) => {
+router.get('/gym/:gymId', [auth, gymStaff], async (req, res) => {
   const startOfDay = new Date();
   startOfDay.setHours(0, 0, 0, 0);
 
@@ -26,10 +27,54 @@ router.get('/gym/:gymId', auth, async (req, res) => {
     type:      'deduction',
     createdAt: { $gte: startOfDay }
   })
-    .populate('userId', 'name email')
+    .populate('userId', 'name email status')
     .sort({ createdAt: -1 });
 
   res.send(txs);
+});
+
+// Occupancy proxy — count of check-ins in a trailing window vs gym capacity.
+// (No check-out event exists, so this is an approximation.)
+router.get('/gym/:gymId/occupancy', [auth, gymStaff], async (req, res) => {
+  const hours = Math.min(24, Math.max(1, Number(req.query.hours) || 2));
+  const since = new Date(Date.now() - hours * 3600 * 1000);
+  const current = await Transaction.countDocuments({
+    gymId: req.params.gymId, type: 'deduction', createdAt: { $gte: since }
+  });
+  const gym = await Gym.findById(req.params.gymId).select('capacity acceptingCheckins');
+  res.send({
+    current,
+    capacity: gym?.capacity ?? 100,
+    acceptingCheckins: gym?.acceptingCheckins ?? true,
+    windowHours: hours
+  });
+});
+
+// Analytics — peak hours + popular days + totals over the trailing N days.
+router.get('/gym/:gymId/analytics', [auth, gymStaff], async (req, res) => {
+  const days = Math.min(90, Math.max(7, Number(req.query.days) || 30));
+  const since = new Date(Date.now() - days * 86400 * 1000);
+  const txs = await Transaction.find({
+    gymId: req.params.gymId, type: 'deduction', createdAt: { $gte: since }
+  }).select('createdAt userId');
+
+  const peakHours   = Array.from({ length: 24 }, (_, h) => ({ hour: h, count: 0 }));
+  const popularDays = Array.from({ length: 7 },  (_, d) => ({ day: d,  count: 0 })); // 0 = Sunday
+  const members = new Set();
+  for (const t of txs) {
+    const dt = new Date(t.createdAt);
+    peakHours[dt.getHours()].count++;
+    popularDays[dt.getDay()].count++;
+    if (t.userId) members.add(String(t.userId));
+  }
+
+  res.send({
+    windowDays:    days,
+    totalCheckins: txs.length,
+    uniqueMembers: members.size,
+    peakHours,
+    popularDays
+  });
 });
 
 router.post('/purchase', auth, async (req, res) => {

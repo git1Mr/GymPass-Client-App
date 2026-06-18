@@ -50,16 +50,15 @@ router.post('/', [auth, admin], async (req, res) => {
 });
 
 router.put('/:id', [auth, gymStaff, validateObjectId], async (req, res) => {
-  const gym = await Gym.findByIdAndUpdate(
-    req.params.id,
-    { $set: {
-      description:  req.body.description,
-      equipment:    req.body.equipment,
-      openingHours: req.body.openingHours,
-      photos:       req.body.photos
-    } },
-    { new: true, runValidators: true }
-  );
+  // Non-admins (gym_staff / gym_admin) may only edit their own gym.
+  if (!req.user.isAdmin && String(req.user.gymId) !== req.params.id)
+    return res.status(403).send('Access denied. You can only manage your own gym.');
+
+  const ALLOWED = ['name', 'city', 'description', 'capacity', 'acceptingCheckins', 'equipment', 'openingHours', 'photos'];
+  const update = {};
+  for (const k of ALLOWED) if (req.body[k] !== undefined) update[k] = req.body[k];
+
+  const gym = await Gym.findByIdAndUpdate(req.params.id, { $set: update }, { new: true, runValidators: true });
   if (!gym) return res.status(404).send('Gym not found.');
   res.send(gym);
 });

@@ -23,10 +23,11 @@ import Svg, {
     Stop,
 } from "react-native-svg";
 
+import AuroraBackground from "@/components/ui/AuroraBackground";
 import {
     COLORS,
+    FONTS,
     FONT_SIZES,
-    FONT_WEIGHTS,
     RADIUS,
     SHADOWS,
     SPACING,
@@ -100,7 +101,7 @@ const stat = StyleSheet.create({
   label: {
     color: "rgba(255,255,255,0.85)",
     fontSize: FONT_SIZES.sm,
-    fontWeight: FONT_WEIGHTS.semibold,
+    fontFamily: FONTS.semibold,
   },
 });
 
@@ -131,7 +132,7 @@ const card = StyleSheet.create({
   },
   title: {
     fontSize: FONT_SIZES.sm,
-    fontWeight: FONT_WEIGHTS.bold,
+    fontFamily: FONTS.bold,
     color: COLORS.textMuted,
     textTransform: "uppercase",
     letterSpacing: 0.8,
@@ -149,6 +150,7 @@ export default function GymDetailScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
+      <AuroraBackground />
       {/* ── Silk gradient header ── */}
       <View style={styles.header}>
         <Svg style={StyleSheet.absoluteFill} preserveAspectRatio="none">
@@ -288,7 +290,11 @@ export default function GymDetailScreen() {
           </Text>
         </View>
         <TouchableOpacity style={styles.checkInBtn} activeOpacity={0.85}>
-          <Ionicons name="qr-code-outline" size={18} color={COLORS.white} />
+          <Ionicons
+            name="qr-code-outline"
+            size={18}
+            color={COLORS.textOnPrimary}
+          />
           <Text style={styles.checkInText}>Check In</Text>
         </TouchableOpacity>
       </View>
@@ -357,12 +363,12 @@ const styles = StyleSheet.create({
   tierText: {
     color: "rgba(255,255,255,0.85)",
     fontSize: FONT_SIZES.xs,
-    fontWeight: FONT_WEIGHTS.bold,
+    fontFamily: FONTS.bold,
     letterSpacing: 0.5,
   },
   gymName: {
     fontSize: FONT_SIZES.xxl,
-    fontWeight: FONT_WEIGHTS.black,
+    fontFamily: FONTS.black,
     color: COLORS.white,
     letterSpacing: -0.5,
     marginBottom: SPACING.xs,
@@ -409,7 +415,7 @@ const styles = StyleSheet.create({
   classTime: { width: 56 },
   classTimeText: {
     fontSize: FONT_SIZES.sm,
-    fontWeight: FONT_WEIGHTS.bold,
+    fontFamily: FONTS.bold,
     color: COLORS.text,
   },
   classDuration: {
@@ -419,7 +425,7 @@ const styles = StyleSheet.create({
   className: {
     flex: 1,
     fontSize: FONT_SIZES.base,
-    fontWeight: FONT_WEIGHTS.semibold,
+    fontFamily: FONTS.semibold,
     color: COLORS.text,
   },
 
@@ -436,8 +442,8 @@ const styles = StyleSheet.create({
   },
   equipmentText: {
     fontSize: FONT_SIZES.xs,
-    fontWeight: FONT_WEIGHTS.semibold,
-    color: COLORS.accent,
+    fontFamily: FONTS.semibold,
+    color: COLORS.accentLight,
   },
 
   hoursRow: {
@@ -452,7 +458,7 @@ const styles = StyleSheet.create({
   hoursDay: {
     fontSize: FONT_SIZES.base,
     color: COLORS.text,
-    fontWeight: FONT_WEIGHTS.medium,
+    fontFamily: FONTS.medium,
   },
   hoursTime: {
     fontSize: FONT_SIZES.base,
@@ -477,21 +483,21 @@ const styles = StyleSheet.create({
   },
   footerValue: {
     fontSize: FONT_SIZES.base,
-    fontWeight: FONT_WEIGHTS.bold,
+    fontFamily: FONTS.bold,
     color: COLORS.text,
   },
   checkInBtn: {
     flexDirection: "row",
     alignItems: "center",
     gap: SPACING.xs,
-    backgroundColor: COLORS.accent,
-    paddingVertical: SPACING.sm,
+    backgroundColor: COLORS.primary,
+    paddingVertical: SPACING.sm + 2,
     paddingHorizontal: SPACING.lg,
     borderRadius: RADIUS.full,
   },
   checkInText: {
-    color: COLORS.white,
-    fontWeight: FONT_WEIGHTS.bold,
+    color: COLORS.textOnPrimary,
+    fontFamily: FONTS.semibold,
     fontSize: FONT_SIZES.base,
   },
 });

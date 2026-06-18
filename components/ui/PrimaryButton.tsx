@@ -9,17 +9,20 @@ import {
 } from "react-native";
 import {
     COLORS,
+    FONTS,
     FONT_SIZES,
-    FONT_WEIGHTS,
+    GRADIENTS,
     RADIUS,
-    SHADOWS,
 } from "@/constants/theme";
+import GradientFill from "./GradientFill";
 
 interface PrimaryButtonProps {
   title: string;
   onPress: () => void;
   loading?: boolean;
   disabled?: boolean;
+  /** "primary" = violet gradient + glow; "secondary" = glass outline pill. */
+  variant?: "primary" | "secondary";
   style?: ViewStyle;
 }
 
@@ -28,39 +31,45 @@ export default function PrimaryButton({
   onPress,
   loading = false,
   disabled = false,
+  variant = "primary",
   style,
 }: PrimaryButtonProps): JSX.Element {
   const scale = useRef(new Animated.Value(1)).current;
+  const secondary = variant === "secondary";
 
   function handlePressIn(): void {
-    Animated.spring(scale, {
-      toValue: 0.96,
-      useNativeDriver: true,
-      speed: 50,
-    }).start();
+    Animated.spring(scale, { toValue: 0.96, useNativeDriver: true, speed: 50 }).start();
   }
-
   function handlePressOut(): void {
-    Animated.spring(scale, {
-      toValue: 1,
-      useNativeDriver: true,
-      speed: 50,
-    }).start();
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 50 }).start();
   }
 
   return (
-    <Animated.View style={[{ transform: [{ scale }] }, style]}>
+    <Animated.View
+      style={[
+        { transform: [{ scale }] },
+        secondary ? styles.secondaryShadow : styles.shadow,
+        style,
+      ]}
+    >
       <Pressable
         onPress={onPress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         disabled={disabled || loading}
-        style={[styles.btn, (disabled || loading) && styles.disabled]}
+        style={[
+          styles.btn,
+          secondary && styles.secondaryBtn,
+          (disabled || loading) && styles.disabled,
+        ]}
       >
+        {!secondary && <GradientFill colors={GRADIENTS.primary} />}
         {loading ? (
-          <ActivityIndicator color={COLORS.white} />
+          <ActivityIndicator color={secondary ? COLORS.primaryLight : COLORS.textOnPrimary} />
         ) : (
-          <Text style={styles.label}>{title}</Text>
+          <Text style={[styles.label, secondary && styles.secondaryLabel]}>
+            {title}
+          </Text>
         )}
       </Pressable>
     </Animated.View>
@@ -68,21 +77,35 @@ export default function PrimaryButton({
 }
 
 const styles = StyleSheet.create({
-  btn: {
-    backgroundColor: COLORS.accent,
+  // Shadow lives on the outer wrapper: the Pressable clips to the pill for the
+  // gradient, and Android drops shadows on overflow:"hidden" views.
+  shadow: {
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.6,
+    shadowRadius: 24,
+    elevation: 10,
     borderRadius: RADIUS.full,
-    height: 54,
+  },
+  secondaryShadow: { borderRadius: RADIUS.full },
+  btn: {
+    borderRadius: RADIUS.full,
+    height: 56,
     alignItems: "center",
     justifyContent: "center",
-    ...SHADOWS.soft,
+    overflow: "hidden",
   },
-  disabled: {
-    opacity: 0.5,
+  secondaryBtn: {
+    backgroundColor: COLORS.glass,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
+  disabled: { opacity: 0.5 },
   label: {
     fontSize: FONT_SIZES.md,
-    fontWeight: FONT_WEIGHTS.bold,
-    color: COLORS.white,
-    letterSpacing: 0.5,
+    fontFamily: FONTS.semibold,
+    color: COLORS.textOnPrimary,
+    letterSpacing: 0.2,
   },
+  secondaryLabel: { color: COLORS.text },
 });

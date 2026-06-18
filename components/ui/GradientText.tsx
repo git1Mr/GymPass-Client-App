@@ -44,7 +44,7 @@ const SCALE = 3;
 
 export default function GradientText({
   children,
-  colors = ["#5227FF", "#FF9FFC", "#B497CF"],
+  colors = ["#BB9BFF", "#C925AB", "#7C3AED"],
   animationSpeed = 8,
   direction = "horizontal",
   yoyo = true,

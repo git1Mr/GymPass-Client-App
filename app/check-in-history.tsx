@@ -23,8 +23,8 @@ import Svg, {
 
 import {
     COLORS,
+    FONTS,
     FONT_SIZES,
-    FONT_WEIGHTS,
     RADIUS,
     SHADOWS,
     SPACING,
@@ -141,8 +141,6 @@ export default function CheckInHistoryScreen() {
             <Rect x="0" y="0" width="100%" height="100%" fill="url(#histGrad)" />
           </Svg>
 
-          <View style={styles.statsBlob} />
-
           {/* Top stats row */}
           <View style={styles.topStats}>
             <View style={styles.topStat}>
@@ -239,27 +237,26 @@ export default function CheckInHistoryScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
 
+  // CaFit header: bare background, outlined circle back button, centered title.
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
-    backgroundColor: COLORS.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
   },
   backBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: COLORS.surfaceElevated,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: COLORS.border,
     alignItems: "center",
     justifyContent: "center",
   },
   headerTitle: {
     fontSize: FONT_SIZES.md,
-    fontWeight: FONT_WEIGHTS.black,
+    fontFamily: FONTS.semibold,
     color: COLORS.text,
   },
 
@@ -272,17 +269,6 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     ...SHADOWS.pop,
   },
-  statsBlob: {
-    position: "absolute",
-    top: -40,
-    right: -40,
-    width: 160,
-    height: 160,
-    borderRadius: 80,
-    backgroundColor: COLORS.primaryLight,
-    opacity: 0.35,
-  },
-
   topStats: {
     flexDirection: "row",
     alignItems: "center",
@@ -291,7 +277,7 @@ const styles = StyleSheet.create({
   topStat: { flex: 1, alignItems: "center" },
   topStatValue: {
     fontSize: FONT_SIZES.xl,
-    fontWeight: FONT_WEIGHTS.black,
+    fontFamily: FONTS.black,
     color: COLORS.white,
   },
   topStatLabel: {
@@ -315,12 +301,12 @@ const styles = StyleSheet.create({
   favText: {
     fontSize: FONT_SIZES.sm,
     color: "rgba(255,255,255,0.8)",
-    fontWeight: FONT_WEIGHTS.medium,
+    fontFamily: FONTS.medium,
   },
 
   chartTitle: {
     fontSize: FONT_SIZES.xs,
-    fontWeight: FONT_WEIGHTS.bold,
+    fontFamily: FONTS.bold,
     color: "rgba(255,255,255,0.6)",
     textTransform: "uppercase",
     letterSpacing: 0.8,
@@ -357,7 +343,7 @@ const styles = StyleSheet.create({
 
   sectionLabel: {
     fontSize: FONT_SIZES.xs,
-    fontWeight: FONT_WEIGHTS.bold,
+    fontFamily: FONTS.bold,
     color: COLORS.textMuted,
     textTransform: "uppercase",
     letterSpacing: 0.8,
@@ -408,7 +394,7 @@ const styles = StyleSheet.create({
   timelineName: { flex: 1 },
   gymName: {
     fontSize: FONT_SIZES.base,
-    fontWeight: FONT_WEIGHTS.semibold,
+    fontFamily: FONTS.semibold,
     color: COLORS.text,
   },
   cityRow: {
@@ -429,7 +415,7 @@ const styles = StyleSheet.create({
   },
   ptsText: {
     fontSize: FONT_SIZES.xs,
-    fontWeight: FONT_WEIGHTS.bold,
+    fontFamily: FONTS.bold,
     color: COLORS.accent,
   },
   timelineBottom: {
@@ -446,7 +432,7 @@ const styles = StyleSheet.create({
   },
   tierText: {
     fontSize: FONT_SIZES.xs,
-    fontWeight: FONT_WEIGHTS.bold,
+    fontFamily: FONTS.bold,
     color: COLORS.primary,
   },
 });

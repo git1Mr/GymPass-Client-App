@@ -1,29 +1,34 @@
-// Production-grade light + dark palettes.
+// Unity Fitness — "SaaS Futuristic" palette.
 //
-// Dark mode uses deep charcoal (#121212) rather than pure black to reduce
-// halation on OLED. Elevation is simulated via lighter surface overlays
-// (#1E1E1E, #252525, #2A2A2A) rather than shadows, which barely render on
-// dark backgrounds. Primary accents are desaturated in dark mode to prevent
-// OLED vibration. All foreground/background pairs satisfy WCAG 2.2 AA at
-// the 4.5:1 minimum for normal text and 3:1 for large text / UI components.
+// Ported from the landing app's design export (frontend/apps/landing): a deep
+// purple-black canvas with a violet→magenta accent spectrum, translucent glass
+// surfaces over the canvas, and white→transparent gradient hairline borders.
+// The mobile app ships permanently dark, so both palettes resolve to the same
+// values (light mode would clash with the aurora atmosphere).
 
 export interface Palette {
-  // Brand
-  primary: string;
-  primaryLight: string;
-  primaryDark: string;
-  primaryMuted: string;
+  // Brand — violet primary, magenta accent
+  primary: string;        // violet  #7c3aed
+  primaryLight: string;   // bright  #bb9bff
+  primaryDark: string;    // violet-magenta #9525c9
+  primaryMuted: string;   // translucent violet wash
 
-  accent: string;
+  accent: string;         // magenta #c925ab
   accentLight: string;
   accentMuted: string;
 
-  // Surfaces — elevation layers
-  background: string;       // app root
-  surface: string;          // resting card
-  surfaceElevated: string;  // raised card / interactive
+  magenta: string;
+  indigo: string;
+
+  // Surfaces
+  background: string;       // app root (deep purple-black)
+  surface: string;          // resting card (lifted purple)
+  surfaceElevated: string;  // raised / interactive
   surfaceOverlay: string;   // modals, dropdowns
+  surfaceSolid: string;     // opaque chip / mark backing
+  glass: string;            // translucent white for glass cards
   border: string;
+  borderStrong: string;
   borderFocus: string;
 
   // Text
@@ -33,7 +38,7 @@ export interface Palette {
   textOnPrimary: string;
   textOnAccent: string;
 
-  // Semantic
+  // Semantic (tuned toward the neon palette)
   error: string;
   errorBg: string;
   success: string;
@@ -54,87 +59,59 @@ export interface Palette {
   transparent: string;
 }
 
-export const lightPalette: Palette = {
-  primary: "#9f99c7",
-  primaryLight: "#bfbbdc",
-  primaryDark: "#7a73a8",
-  primaryMuted: "#9f99c726",
+export const darkPalette: Palette = {
+  // Accent spectrum (violet → magenta glow)
+  primary: "#7C3AED",
+  primaryLight: "#BB9BFF",
+  primaryDark: "#9525C9",
+  primaryMuted: "#7C3AED29", // ~16%
 
-  accent: "#3C0008",
-  accentLight: "#6B0010",
-  accentMuted: "#3C000820",
+  accent: "#C925AB",
+  accentLight: "#E26FD0",
+  accentMuted: "#C925AB26",
 
-  background: "#F7F6FB",
-  surface: "#FFFFFF",
-  surfaceElevated: "#EEEDF7",
-  surfaceOverlay: "#FFFFFF",
-  border: "#D8D6EE",
-  borderFocus: "#9f99c7",
+  magenta: "#C925AB",
+  indigo: "#591DDD",
 
-  text: "#1A1728",
-  textSecondary: "#5C567A",
-  textMuted: "#A09CC0",
+  // Canvas (deep purple-black) + lifted card surfaces
+  background: "#0B0121",
+  surface: "#150733",
+  surfaceElevated: "#1E0A3C",
+  surfaceOverlay: "#1A0838",
+  surfaceSolid: "#110230",
+  glass: "#FFFFFF0D",        // ~5% white — reads as glass over the aurora
+
+  // Hairlines (white over the purple canvas)
+  border: "#FFFFFF1F",       // ~12%
+  borderStrong: "#FFFFFF38", // ~22%
+  borderFocus: "#7C3AED",
+
+  // Text
+  text: "#ECECEC",
+  textSecondary: "#ECECEC94", // ~58%
+  textMuted: "#ECECEC57",     // ~34%
   textOnPrimary: "#FFFFFF",
   textOnAccent: "#FFFFFF",
 
-  error: "#D93025",
-  errorBg: "#FFE9E8",
-  success: "#1E8A4C",
-  warning: "#F59E0B",
+  error: "#FB5A8C",
+  errorBg: "#FB5A8C1F",
+  success: "#22D3A7",
+  warning: "#F5B73D",
 
-  tabActive: "#3C0008",
-  tabInactive: "#9f99c7",
-  tabBar: "#FFFFFF",
+  // Bottom nav: bright-violet active, faint inactive, bar melts into canvas.
+  tabActive: "#BB9BFF",
+  tabInactive: "#ECECEC57",
+  tabBar: "#0B0121",
 
-  authHeader: "#3C0008",
-  authPanel: "#F7F6FB",
+  authHeader: "#0B0121",
+  authPanel: "#0B0121",
 
-  wordmarkHighlight: "#E8723F",
-
-  white: "#FFFFFF",
-  black: "#000000",
-  transparent: "transparent",
-};
-
-export const darkPalette: Palette = {
-  // Brand: desaturated for OLED comfort, still recognizably lavender / crimson.
-  primary: "#8B86B0",       // 5.1:1 on #121212 (AA)
-  primaryLight: "#A8A3C9",
-  primaryDark: "#6E6890",
-  primaryMuted: "#8B86B033",
-
-  accent: "#C44A55",        // lifted crimson; 4.6:1 on #121212 (AA)
-  accentLight: "#D86F78",
-  accentMuted: "#C44A5526",
-
-  background: "#121212",
-  surface: "#1E1E1E",
-  surfaceElevated: "#252525",
-  surfaceOverlay: "#2A2A2A",
-  border: "#2A2A2A",
-  borderFocus: "#A8A3C9",
-
-  text: "#F5F5F5",          // 17:1 (AAA)
-  textSecondary: "#C8C5D8", // ~10:1 (AAA)
-  textMuted: "#8E8AA0",     // ~4.6:1 (AA)
-  textOnPrimary: "#0E0B1A",
-  textOnAccent: "#FFFFFF",
-
-  error: "#F08080",         // ~7.4:1 (AAA)
-  errorBg: "#3A1A1C",
-  success: "#5DC689",
-  warning: "#E0A857",
-
-  tabActive: "#C44A55",
-  tabInactive: "#8B86B0",
-  tabBar: "#1E1E1E",
-
-  authHeader: "#1E1E1E",
-  authPanel: "#121212",
-
-  wordmarkHighlight: "#F08F5C",
+  wordmarkHighlight: "#BB9BFF",
 
   white: "#FFFFFF",
   black: "#000000",
   transparent: "transparent",
 };
+
+// Permanently dark — light mode would fight the aurora atmosphere.
+export const lightPalette: Palette = darkPalette;

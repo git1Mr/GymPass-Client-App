@@ -1,10 +1,13 @@
+import AuroraBackground from "@/components/ui/AuroraBackground";
+import Eyebrow from "@/components/ui/Eyebrow";
+import GlassCard from "@/components/ui/GlassCard";
+import GradientFill from "@/components/ui/GradientFill";
 import {
-  COLORS,
-  FONT_SIZES,
-  FONT_WEIGHTS,
-  RADIUS,
-  SHADOWS,
-  SPACING,
+    COLORS,
+    FONTS,
+    FONT_SIZES,
+    GRADIENTS,
+    SPACING,
 } from "@/constants/theme";
 import { useAuth } from "@/context/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
@@ -19,101 +22,40 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import DarkVeil from "@/components/ui/DarkVeil";
-
 type IoniconsName = React.ComponentProps<typeof Ionicons>["name"];
 
 interface RowProps {
   icon: IoniconsName;
   label: string;
+  color: string;
   value?: string;
   badge?: string | number;
-  toggle?: boolean;
-  onToggle?: () => void;
-  danger?: boolean;
   last?: boolean;
   onPress?: () => void;
 }
 
-function Row({
-  icon,
-  label,
-  value,
-  badge,
-  toggle,
-  onToggle,
-  danger,
-  last,
-  onPress,
-}: RowProps) {
+function Row({ icon, label, color, value, badge, last, onPress }: RowProps) {
   return (
     <TouchableOpacity
       style={[styles.row, !last && styles.rowBorder]}
-      onPress={toggle !== undefined ? onToggle : onPress}
+      onPress={onPress}
       activeOpacity={0.7}
     >
-      <View
-        style={[
-          styles.rowIconWrap,
-          danger && { backgroundColor: COLORS.errorBg },
-        ]}
-      >
-        <Ionicons
-          name={icon}
-          size={18}
-          color={danger ? COLORS.error : COLORS.primaryDark}
-        />
+      <View style={[styles.rowCircle, { backgroundColor: color + "26", borderColor: color + "55" }]}>
+        <Ionicons name={icon} size={18} color={color} />
       </View>
-
-      <Text
-        style={[styles.rowLabel, danger && { color: COLORS.error }]}
-        numberOfLines={1}
-      >
+      <Text style={styles.rowLabel} numberOfLines={1}>
         {label}
       </Text>
-
       {value ? <Text style={styles.rowValue}>{value}</Text> : null}
-
       {badge !== undefined ? (
         <View style={styles.badge}>
           <Text style={styles.badgeText}>{badge}</Text>
         </View>
       ) : null}
-
-      {toggle !== undefined ? (
-        <View
-          style={[
-            styles.toggleTrack,
-            toggle && { backgroundColor: COLORS.primary },
-          ]}
-        >
-          <View
-            style={[
-              styles.toggleThumb,
-              toggle && { left: 22 },
-            ]}
-          />
-        </View>
-      ) : null}
-
-      {toggle === undefined && badge === undefined && !danger ? (
-        <Ionicons name="chevron-forward" size={16} color={COLORS.textMuted} />
-      ) : null}
+      <Ionicons name="chevron-forward" size={18} color={COLORS.textMuted} />
     </TouchableOpacity>
   );
-}
-
-function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <View style={styles.sectionLabelRow}>
-      <View style={styles.sectionDot} />
-      <Text style={styles.sectionLabelText}>{children}</Text>
-    </View>
-  );
-}
-
-function Card({ children }: { children: React.ReactNode }) {
-  return <View style={styles.card}>{children}</View>;
 }
 
 export default function ProfileScreen() {
@@ -121,117 +63,100 @@ export default function ProfileScreen() {
   const router = useRouter();
 
   const username = user?.name ?? "Member";
-  const email = user?.email ?? "—";
   const points = user?.pointsBalance ?? 0;
-  const nextReward = 100;
-  const pct = Math.min(1, points / nextReward);
 
   return (
-    <View style={styles.safe}>
-      <SafeAreaView edges={["top"]} style={styles.heroSafe}>
+    <View style={styles.root}>
+      <AuroraBackground />
+      <SafeAreaView style={styles.safe} edges={["top"]}>
         <ScrollView
           contentContainerStyle={styles.scroll}
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.hero}>
-            <View style={styles.pillarLayer} pointerEvents="none">
-              <DarkVeil />
-            </View>
+          <View style={styles.header}>
+            <Text style={styles.headerTitle}>Profil</Text>
+          </View>
 
-            <View style={styles.heroRow}>
+          {/* ── Account card ── */}
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={() => router.push("/edit-profile")}
+          >
+            <GlassCard highlighted style={styles.accountCard}>
               <View style={styles.avatarCircle}>
-                <Ionicons name="person" size={30} color={COLORS.white} />
+                <GradientFill colors={GRADIENTS.primary} />
+                <Ionicons name="person" size={28} color={COLORS.textOnPrimary} />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={styles.heroName} numberOfLines={1}>
+                <Text style={styles.accountName} numberOfLines={1}>
                   {username}
                 </Text>
-                <Text style={styles.heroEmail} numberOfLines={1}>
-                  {email}
-                </Text>
+                <View style={styles.proRow}>
+                  <Ionicons name="flash" size={12} color={COLORS.primaryLight} />
+                  <Text style={styles.accountTier}>{points} crédits</Text>
+                </View>
               </View>
-              <TouchableOpacity
-                style={styles.editBtn}
-                activeOpacity={0.7}
-              >
-                <Ionicons name="create-outline" size={16} color={COLORS.white} />
-              </TouchableOpacity>
-            </View>
+              <View style={styles.editPill}>
+                <Ionicons name="pencil" size={14} color={COLORS.text} />
+              </View>
+            </GlassCard>
+          </TouchableOpacity>
 
-            <View style={styles.loyalty}>
-              <View style={styles.loyaltyHeader}>
-                <Text style={styles.loyaltyLabel}>Loyalty Points</Text>
-                <Text style={styles.loyaltyValue}>{points} pts</Text>
-              </View>
-              <View style={styles.loyaltyTrack}>
-                <View
-                  style={[
-                    styles.loyaltyFill,
-                    { width: `${pct * 100}%` },
-                  ]}
-                />
-              </View>
-              <Text style={styles.loyaltyHint}>
-                Earn {Math.max(0, nextReward - points)} more points for a
-                free check-in
-              </Text>
-            </View>
+          {/* ── General ── */}
+          <Eyebrow style={styles.sectionLabel}>Général</Eyebrow>
+          <GlassCard style={styles.group}>
+            <Row
+              icon="notifications"
+              label="Notifications"
+              color={COLORS.magenta}
+              badge={3}
+              onPress={() => router.push("/notifications")}
+            />
+            <Row
+              icon="wallet"
+              label="Mes crédits"
+              color={COLORS.warning}
+              value={`${points}`}
+              onPress={() => router.push("/credits")}
+            />
+            <Row
+              icon="time"
+              label="Historique des entrées"
+              color={COLORS.success}
+              last
+              onPress={() => router.push("/check-in-history")}
+            />
+          </GlassCard>
+
+          {/* ── Network ── */}
+          <Eyebrow style={styles.sectionLabel}>Réseau</Eyebrow>
+          <GlassCard style={styles.group}>
+            <Row icon="location" label="Mes adresses" color={COLORS.primaryLight} />
+            <Row icon="language" label="Langue" color={COLORS.indigo} value="Français" />
+            <Row icon="ticket" label="Mes coupons" color={COLORS.primary} badge={2} />
+            <Row icon="card" label="Moyens de paiement" color={COLORS.success} last />
+          </GlassCard>
+
+          {/* ── Support ── */}
+          <Eyebrow style={styles.sectionLabel}>Aide &amp; Support</Eyebrow>
+          <GlassCard style={styles.group}>
+            <Row icon="information-circle" label="À propos" color={COLORS.primaryLight} />
+            <Row icon="document-text" label="Conditions générales" color={COLORS.indigo} />
+            <Row icon="shield-checkmark" label="Politique de confidentialité" color={COLORS.magenta} last />
+          </GlassCard>
+
+          <View style={styles.signOutWrap}>
+            <TouchableOpacity
+              style={styles.signOutBtn}
+              onPress={signOut}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="log-out-outline" size={18} color={COLORS.primaryLight} />
+              <Text style={styles.signOutText}>Se déconnecter</Text>
+            </TouchableOpacity>
           </View>
 
-          <View style={styles.sections}>
-            <SectionLabel>General</SectionLabel>
-            <Card>
-              <Row icon="person-outline" label="Profile" />
-              <Row icon="location-outline" label="My Addresses" />
-              <Row icon="language-outline" label="Language" value="English" />
-              <Row icon="notifications-outline" label="Notifications" badge={3} last />
-            </Card>
-
-            <SectionLabel>My Club</SectionLabel>
-            <Card>
-              <Row
-                icon="wallet-outline"
-                label="My Points"
-                value={`${points} pts`}
-              />
-              <Row icon="barbell-outline" label="Schedule a class" />
-              <Row
-                icon="time-outline"
-                label="Check-in history"
-                last
-                onPress={() => router.push("/check-in-history")}
-              />
-            </Card>
-
-            <SectionLabel>Promotions &amp; Rewards</SectionLabel>
-            <Card>
-              <Row icon="ticket-outline" label="My Coupons" badge={2} />
-              <Row icon="gift-outline" label="Rewards" />
-              <Row icon="card-outline" label="Payment Methods" last />
-            </Card>
-
-            <SectionLabel>Help &amp; Support</SectionLabel>
-            <Card>
-              <Row icon="information-circle-outline" label="About" />
-              <Row icon="document-text-outline" label="Terms &amp; Conditions" />
-              <Row icon="shield-checkmark-outline" label="Privacy Policy" last />
-            </Card>
-
-            <View style={styles.signOutWrap}>
-              <TouchableOpacity
-                style={styles.signOutBtn}
-                onPress={signOut}
-                activeOpacity={0.8}
-              >
-                <Ionicons name="log-out-outline" size={18} color={COLORS.primary} />
-                <Text style={styles.signOutText}>Sign Out</Text>
-              </TouchableOpacity>
-            </View>
-
-            <Text style={styles.versionNote}>
-              v1.0.0 · Made with ♥ in Morocco
-            </Text>
-          </View>
+          <Text style={styles.versionNote}>v1.0.0 · Conçu avec ♥ au Maroc</Text>
         </ScrollView>
       </SafeAreaView>
     </View>
@@ -239,200 +164,101 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: COLORS.background },
-  heroSafe: { flex: 1, backgroundColor: "#0E0A1F" },
+  root: { flex: 1, backgroundColor: COLORS.background },
+  safe: { flex: 1 },
   scroll: {
-    backgroundColor: COLORS.background,
+    paddingHorizontal: SPACING.lg,
     paddingBottom: SPACING.xxxl,
   },
 
-  hero: {
-    paddingTop: SPACING.lg,
-    paddingBottom: SPACING.lg,
-    paddingHorizontal: SPACING.lg,
-    overflow: "hidden",
-    position: "relative",
-    borderBottomLeftRadius: RADIUS.lg,
-    borderBottomRightRadius: RADIUS.lg,
-    backgroundColor: "#0E0A1F",
+  header: { alignItems: "center", paddingVertical: SPACING.md },
+  headerTitle: {
+    fontSize: FONT_SIZES.md,
+    fontFamily: FONTS.semibold,
+    color: COLORS.text,
   },
-  heroBlob: { display: "none" },
-  pillarLayer: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  heroRow: {
+
+  accountCard: {
     flexDirection: "row",
     alignItems: "center",
     gap: SPACING.md,
+    padding: SPACING.md,
+    marginTop: SPACING.xs,
   },
   avatarCircle: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: "rgba(255,255,255,0.18)",
-    borderWidth: 1.5,
-    borderColor: "rgba(255,255,255,0.4)",
     alignItems: "center",
     justifyContent: "center",
+    overflow: "hidden",
   },
-  heroName: {
-    fontSize: 18,
-    fontWeight: FONT_WEIGHTS.black,
-    color: COLORS.white,
-    letterSpacing: -0.3,
+  accountName: {
+    fontSize: FONT_SIZES.md,
+    fontFamily: FONTS.bold,
+    color: COLORS.text,
   },
-  heroEmail: {
+  proRow: { flexDirection: "row", alignItems: "center", gap: 4, marginTop: 3 },
+  accountTier: {
     fontSize: FONT_SIZES.sm,
-    color: "rgba(255,255,255,0.8)",
-    marginTop: 2,
+    fontFamily: FONTS.medium,
+    color: COLORS.primaryLight,
   },
-  editBtn: {
+  editPill: {
     width: 36,
     height: 36,
-    borderRadius: 10,
-    backgroundColor: "rgba(255,255,255,0.15)",
+    borderRadius: 18,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.25)",
+    borderColor: COLORS.borderStrong,
+    backgroundColor: COLORS.glass,
     alignItems: "center",
     justifyContent: "center",
   },
-  loyalty: {
-    marginTop: SPACING.md,
-  },
-  loyaltyHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "baseline",
-    marginBottom: 6,
-  },
-  loyaltyLabel: {
-    fontSize: 13,
-    color: "rgba(255,255,255,0.92)",
-    fontWeight: FONT_WEIGHTS.semibold,
-  },
-  loyaltyValue: {
-    fontSize: 14,
-    color: COLORS.white,
-    fontWeight: FONT_WEIGHTS.black,
-  },
-  loyaltyTrack: {
-    height: 6,
-    borderRadius: 999,
-    backgroundColor: "rgba(255,255,255,0.22)",
-    overflow: "hidden",
-  },
-  loyaltyFill: {
-    height: "100%",
-    borderRadius: 999,
-    backgroundColor: COLORS.white,
-  },
-  loyaltyHint: {
-    fontSize: 11,
-    color: "rgba(255,255,255,0.75)",
-    marginTop: 6,
-  },
 
-  sections: {
-    paddingHorizontal: SPACING.md,
-    paddingTop: SPACING.sm,
-  },
-  sectionLabelRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: SPACING.sm,
-    paddingTop: SPACING.lg,
-    paddingBottom: SPACING.sm,
-    paddingHorizontal: 4,
-  },
-  sectionDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: COLORS.primary,
-  },
-  sectionLabelText: {
-    fontSize: 14,
-    fontWeight: "800",
-    color: COLORS.primaryDark,
-    letterSpacing: 0.3,
-  },
+  sectionLabel: { marginTop: SPACING.xl, marginBottom: SPACING.sm },
 
-  card: {
-    backgroundColor: COLORS.surface,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    overflow: "hidden",
-    ...SHADOWS.soft,
-  },
-
+  group: { paddingHorizontal: SPACING.md },
   row: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: SPACING.sm + 6,
-    paddingVertical: SPACING.sm + 6,
-    gap: SPACING.sm + 4,
+    gap: SPACING.md,
+    paddingVertical: SPACING.sm + 4,
   },
   rowBorder: {
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.surfaceElevated,
+    borderBottomColor: COLORS.border,
   },
-  rowIconWrap: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    backgroundColor: COLORS.primaryMuted,
+  rowCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
   },
   rowLabel: {
     flex: 1,
     fontSize: FONT_SIZES.base,
+    fontFamily: FONTS.medium,
     color: COLORS.text,
-    fontWeight: FONT_WEIGHTS.semibold,
   },
   rowValue: {
-    fontSize: 13,
+    fontSize: FONT_SIZES.sm,
+    fontFamily: FONTS.regular,
     color: COLORS.textSecondary,
   },
-
   badge: {
     minWidth: 22,
     height: 22,
     borderRadius: 11,
     paddingHorizontal: 7,
-    backgroundColor: COLORS.error,
+    backgroundColor: COLORS.magenta,
     alignItems: "center",
     justifyContent: "center",
   },
-  badgeText: {
-    color: COLORS.white,
-    fontSize: 11,
-    fontWeight: FONT_WEIGHTS.bold,
-  },
+  badgeText: { color: COLORS.white, fontSize: 11, fontFamily: FONTS.bold },
 
-  toggleTrack: {
-    width: 44,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: COLORS.border,
-    position: "relative",
-  },
-  toggleThumb: {
-    position: "absolute",
-    top: 2,
-    left: 2,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: COLORS.white,
-    ...SHADOWS.soft,
-  },
-
-  signOutWrap: {
-    marginTop: SPACING.xl,
-    alignItems: "center",
-  },
+  signOutWrap: { marginTop: SPACING.xl, alignItems: "center" },
   signOutBtn: {
     flexDirection: "row",
     alignItems: "center",
@@ -440,20 +266,21 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.sm + 4,
     paddingHorizontal: SPACING.xl,
     borderRadius: 999,
-    backgroundColor: "rgba(159,153,199,0.1)",
     borderWidth: 1,
-    borderColor: "rgba(159,153,199,0.3)",
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.glass,
   },
   signOutText: {
     fontSize: FONT_SIZES.sm,
-    color: COLORS.primary,
-    fontWeight: FONT_WEIGHTS.bold,
+    color: COLORS.primaryLight,
+    fontFamily: FONTS.semibold,
   },
 
   versionNote: {
     textAlign: "center",
     fontSize: FONT_SIZES.xs,
+    fontFamily: FONTS.regular,
     color: COLORS.textMuted,
-    marginTop: SPACING.md,
+    marginTop: SPACING.lg,
   },
 });

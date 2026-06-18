@@ -5,6 +5,7 @@ const Joi     = require('joi');
 const router  = express.Router();
 
 const { User } = require('../models/user');
+const { setSessionCookies, clearSessionCookies } = require('../utils/sessionCookies');
 
 const RESET_TOKEN_TTL_MS = 30 * 60 * 1000; // 30 minutes
 
@@ -42,7 +43,17 @@ router.post('/', async (req, res) => {
     return res.status(403).send('Account suspended. Contact support.');
 
   const token = user.generateAuthToken();
+  setSessionCookies(res, token);
   res.header('x-auth-token', token).send({ token });
+});
+
+// POST /api/auth/logout
+// Clears the cross-subdomain session cookies (uf_token + uf_authed). The
+// HttpOnly token cookie can only be removed server-side, so the web client
+// calls this on logout in addition to wiping its own localStorage.
+router.post('/logout', (_req, res) => {
+  clearSessionCookies(res);
+  res.send({ message: 'Logged out.' });
 });
 
 // POST /api/auth/forgot-password

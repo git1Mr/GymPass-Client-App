@@ -20,6 +20,10 @@ const gymSchema = new mongoose.Schema({
   },
   tier: { type: Number, enum: [1, 2, 3], required: true },
   pointsPerSession: { type: Number, required: true, min: 1 },
+  // Max simultaneous occupancy — drives the reception Terminal's capacity widget.
+  capacity: { type: Number, min: 1, default: 100 },
+  // Owner can temporarily pause network check-ins (HQ → Paramètres).
+  acceptingCheckins: { type: Boolean, default: true },
   equipment: { type: [String], default: [] },
   openingHours: { type: openingHoursSchema, default: {} },
   description: { type: String, maxlength: 1000, default: '' },
@@ -38,6 +42,8 @@ function validateGym(gym) {
     coordinates:      Joi.array().items(Joi.number()).length(2).required(),
     tier:             Joi.number().valid(1, 2, 3).required(),
     pointsPerSession: Joi.number().min(1).required(),
+    capacity:          Joi.number().min(1).optional(),
+    acceptingCheckins: Joi.boolean().optional(),
     equipment:        Joi.array().items(Joi.string()).optional(),
     description:      Joi.string().max(1000).optional()
   });

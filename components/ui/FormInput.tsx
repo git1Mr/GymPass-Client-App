@@ -11,8 +11,8 @@ import {
 } from "react-native";
 import {
     COLORS,
+    FONTS,
     FONT_SIZES,
-    FONT_WEIGHTS,
     RADIUS,
     SPACING,
 } from "@/constants/theme";
@@ -73,37 +73,38 @@ export default function FormInput({
 
 const styles = StyleSheet.create({
   container: { marginBottom: SPACING.md },
+  // Auth-kit labels: small, sentence-case, sitting close above the field.
   label: {
     fontSize: FONT_SIZES.sm,
-    fontWeight: FONT_WEIGHTS.medium,
+    fontFamily: FONTS.medium,
     color: COLORS.textSecondary,
-    marginBottom: SPACING.xs,
-    letterSpacing: 0.5,
-    textTransform: "uppercase",
+    marginBottom: SPACING.xs + 2,
   },
   inputWrap: {
     flexDirection: "row",
     alignItems: "center",
     // One step above the panel surface so fields read as wells, not blends.
     backgroundColor: COLORS.surfaceElevated,
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderRadius: RADIUS.md,
     paddingHorizontal: SPACING.md,
   },
   input: {
     flex: 1,
-    height: 52,
+    height: 54,
     fontSize: FONT_SIZES.base,
+    fontFamily: FONTS.regular,
     color: COLORS.text,
   },
   iconBtn: {
     paddingLeft: SPACING.sm,
-    height: 52,
+    height: 54,
     justifyContent: "center",
   },
   error: {
     marginTop: SPACING.xs,
     fontSize: FONT_SIZES.sm,
+    fontFamily: FONTS.regular,
     color: COLORS.error,
   },
 });

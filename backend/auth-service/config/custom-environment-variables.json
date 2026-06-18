@@ -1,5 +1,6 @@
 {
   "jwtPrivateKey": "JWT_PRIVATE_KEY",
+  "cookieDomain": "COOKIE_DOMAIN",
   "db": {
     "uri": "MONGO_URI"
   },

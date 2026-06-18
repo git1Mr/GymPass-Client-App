@@ -4,14 +4,15 @@
 // chronological feed of ledger activity (top-ups + gym deductions).
 // "Top up" CTA routes to /top-up which hosts the Stripe Payment Sheet flow.
 
+import AuroraBackground from "@/components/ui/AuroraBackground";
 import GradientSurface from "@/components/ui/GradientSurface";
 import {
-  COLORS,
-  FONT_SIZES,
-  FONT_WEIGHTS,
-  RADIUS,
-  SHADOWS,
-  SPACING,
+    COLORS,
+    FONTS,
+    FONT_SIZES,
+    RADIUS,
+    SHADOWS,
+    SPACING,
 } from "@/constants/theme";
 import { useAuth } from "@/context/AuthContext";
 import api from "@/services/api";
@@ -106,7 +107,7 @@ const txStyles = StyleSheet.create({
   },
   title: {
     fontSize: FONT_SIZES.sm,
-    fontWeight: FONT_WEIGHTS.bold,
+    fontFamily: FONTS.bold,
     color: COLORS.text,
   },
   meta: {
@@ -116,7 +117,7 @@ const txStyles = StyleSheet.create({
   },
   amount: {
     fontSize: FONT_SIZES.base,
-    fontWeight: FONT_WEIGHTS.black,
+    fontFamily: FONTS.black,
   },
 });
 
@@ -165,6 +166,7 @@ export default function CreditsScreen() {
         { paddingTop: insets.top, paddingBottom: insets.bottom },
       ]}
     >
+      <AuroraBackground />
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backBtn}
@@ -243,27 +245,26 @@ export default function CreditsScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
 
+  // CaFit header: bare background, outlined circle back button, centered title.
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
-    backgroundColor: COLORS.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
   },
   backBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: COLORS.surfaceElevated,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: COLORS.border,
     alignItems: "center",
     justifyContent: "center",
   },
   headerTitle: {
     fontSize: FONT_SIZES.md,
-    fontWeight: FONT_WEIGHTS.black,
+    fontFamily: FONTS.semibold,
     color: COLORS.text,
   },
 
@@ -273,20 +274,20 @@ const styles = StyleSheet.create({
   heroBody: { padding: SPACING.xl },
   heroLabel: {
     fontSize: FONT_SIZES.xs,
-    fontWeight: FONT_WEIGHTS.bold,
+    fontFamily: FONTS.bold,
     color: "rgba(255,255,255,0.65)",
     letterSpacing: 1.6,
     marginBottom: SPACING.sm,
   },
   heroValue: {
     fontSize: FONT_SIZES.hero,
-    fontWeight: FONT_WEIGHTS.black,
+    fontFamily: FONTS.black,
     color: COLORS.white,
     letterSpacing: -1,
   },
   heroUnit: {
     fontSize: FONT_SIZES.md,
-    fontWeight: FONT_WEIGHTS.medium,
+    fontFamily: FONTS.medium,
     color: "rgba(255,255,255,0.7)",
   },
   heroSub: {
@@ -308,13 +309,13 @@ const styles = StyleSheet.create({
   },
   topUpText: {
     color: COLORS.accent,
-    fontWeight: FONT_WEIGHTS.bold,
+    fontFamily: FONTS.bold,
     fontSize: FONT_SIZES.sm,
   },
 
   sectionLabel: {
     fontSize: FONT_SIZES.xs,
-    fontWeight: FONT_WEIGHTS.bold,
+    fontFamily: FONTS.bold,
     color: COLORS.textMuted,
     textTransform: "uppercase",
     letterSpacing: 0.8,
@@ -336,7 +337,7 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: FONT_SIZES.base,
-    fontWeight: FONT_WEIGHTS.bold,
+    fontFamily: FONTS.bold,
     color: COLORS.text,
     marginTop: SPACING.sm,
   },

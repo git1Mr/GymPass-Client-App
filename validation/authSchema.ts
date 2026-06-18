@@ -9,40 +9,40 @@ export const loginSchema: Schema = Joi.object({
     .email({ tlds: { allow: false } })
     .required()
     .messages({
-      "string.email": "Please enter a valid email address.",
-      "string.empty": "Email is required.",
-      "any.required": "Email is required.",
+      "string.email": "Saisissez une adresse e-mail valide.",
+      "string.empty": "L'e-mail est requis.",
+      "any.required": "L'e-mail est requis.",
     }),
   password: Joi.string().min(8).required().messages({
-    "string.min": "Password must be at least 8 characters.",
-    "string.empty": "Password is required.",
-    "any.required": "Password is required.",
+    "string.min": "Le mot de passe doit comporter au moins 8 caractères.",
+    "string.empty": "Le mot de passe est requis.",
+    "any.required": "Le mot de passe est requis.",
   }),
 });
 
 export const registerSchema: Schema = Joi.object({
   name: Joi.string().min(2).max(100).required().messages({
-    "string.min": "Name must be at least 2 characters.",
-    "string.empty": "Full name is required.",
-    "any.required": "Full name is required.",
+    "string.min": "Le nom doit comporter au moins 2 caractères.",
+    "string.empty": "Le nom complet est requis.",
+    "any.required": "Le nom complet est requis.",
   }),
   email: Joi.string()
     .email({ tlds: { allow: false } })
     .required()
     .messages({
-      "string.email": "Please enter a valid email address.",
-      "string.empty": "Email is required.",
-      "any.required": "Email is required.",
+      "string.email": "Saisissez une adresse e-mail valide.",
+      "string.empty": "L'e-mail est requis.",
+      "any.required": "L'e-mail est requis.",
     }),
   password: Joi.string().min(8).max(1024).required().messages({
-    "string.min": "Password must be at least 8 characters.",
-    "string.empty": "Password is required.",
-    "any.required": "Password is required.",
+    "string.min": "Le mot de passe doit comporter au moins 8 caractères.",
+    "string.empty": "Le mot de passe est requis.",
+    "any.required": "Le mot de passe est requis.",
   }),
   confirmPassword: Joi.string().valid(Joi.ref("password")).required().messages({
-    "any.only": "Passwords do not match.",
-    "string.empty": "Please confirm your password.",
-    "any.required": "Please confirm your password.",
+    "any.only": "Les mots de passe ne correspondent pas.",
+    "string.empty": "Veuillez confirmer votre mot de passe.",
+    "any.required": "Veuillez confirmer votre mot de passe.",
   }),
 });
 
@@ -51,8 +51,8 @@ export const forgotSchema: Schema = Joi.object({
     .email({ tlds: { allow: false } })
     .required()
     .messages({
-      "string.email": "Please enter a valid email address.",
-      "string.empty": "Email is required.",
+      "string.email": "Saisissez une adresse e-mail valide.",
+      "string.empty": "L'e-mail est requis.",
     }),
 });
 

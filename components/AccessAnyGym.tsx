@@ -1,39 +1,30 @@
-// components/AccessAnyGym.tsx
-//
-// Generates a short-lived QR code (10s TTL) containing a signed payload:
-//   { userId, token, issuedAt, expiresAt }
-//
-// QR sheet redesigned to match the "Checked in" pattern: lavender hero
-// at the top with close X + big headline, two stacked white cards below
-// (gym info + QR card with countdown footer). All visual orange/accent
-// surfaces use COLORS.primary (lavender) — the auth/QR modal now reads
-// as a single brand surface.
-
+import AuroraBackground from "@/components/ui/AuroraBackground";
+import GradientFill from "@/components/ui/GradientFill";
+import GradientSurface from "@/components/ui/GradientSurface";
 import {
-  COLORS,
-  FONT_SIZES,
-  FONT_WEIGHTS,
-  RADIUS,
-  SHADOWS,
-  SPACING,
+    COLORS,
+    FONTS,
+    FONT_SIZES,
+    GRADIENTS,
+    RADIUS,
+    SHADOWS,
+    SPACING,
 } from "@/constants/theme";
 import { useAuth } from "@/context/AuthContext";
-import GradientSurface from "@/components/ui/GradientSurface";
-import DarkVeil from "@/components/ui/DarkVeil";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
-  Animated,
-  Modal,
-  Pressable,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Animated,
+    Modal,
+    Pressable,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import QRCode from "react-native-qrcode-svg";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const TTL_SECONDS = 10;
 const QR_SIZE = 220;
@@ -101,7 +92,7 @@ const expiredS = StyleSheet.create({
   },
   title: {
     fontSize: FONT_SIZES.lg,
-    fontWeight: FONT_WEIGHTS.black,
+    fontFamily: FONTS.black,
     color: COLORS.white,
     marginTop: SPACING.sm,
     marginBottom: SPACING.xs,
@@ -124,7 +115,7 @@ const expiredS = StyleSheet.create({
   },
   btnText: {
     fontSize: FONT_SIZES.sm,
-    fontWeight: FONT_WEIGHTS.bold,
+    fontFamily: FONTS.bold,
     color: COLORS.primary,
   },
 });
@@ -145,6 +136,9 @@ function CheckedInSheet({
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const startTimer = useCallback(() => {
+    // Callable while a pass is still live ("Generate New Pass") — kill the
+    // running interval first so two timers never race.
+    if (timerRef.current) clearInterval(timerRef.current);
     setExpired(false);
     setCheckedIn(false);
     setSecondsLeft(TTL_SECONDS);
@@ -173,138 +167,92 @@ function CheckedInSheet({
   return (
     <View style={sheetS.root}>
       <StatusBar barStyle="light-content" />
-
-      {/* Animated DarkVeil background */}
-      <View style={sheetS.pillarLayer} pointerEvents="none">
-        <DarkVeil />
-      </View>
+      <AuroraBackground />
 
       <SafeAreaView edges={["top", "bottom"]} style={{ flex: 1 }}>
-        {/* ── Top bar (close) ───────────────────────────── */}
+        {/* ── Plain back chevron, per the kit's QR screen ── */}
         <View style={sheetS.topBar}>
-          <TouchableOpacity
-            onPress={onClose}
-            style={sheetS.closeBtn}
-            activeOpacity={0.8}
-            hitSlop={10}
-          >
-            <Ionicons name="close" size={20} color={COLORS.white} />
+          <TouchableOpacity onPress={onClose} activeOpacity={0.8} hitSlop={12}>
+            <Ionicons name="chevron-back" size={26} color={COLORS.text} />
           </TouchableOpacity>
         </View>
 
-        {/* ── Headline ───────────────────────────────────── */}
-        <View style={sheetS.headline}>
-          <Text style={sheetS.title}>
-            {isCheckedIn ? "Checked in successfully" : "Check in"}
+        {/* ── Big rounded card: QR, then title + caption inside ── */}
+        <View style={sheetS.qrCard}>
+          {showCode ? (
+            <Pressable
+              onPress={() => !isExpired && setCheckedIn((v) => !v)}
+              style={[
+                sheetS.qrTile,
+                urgent && { borderColor: COLORS.error },
+                isCheckedIn && { borderColor: "#22A06B" },
+              ]}
+            >
+              {/* QR must stay dark-on-white for scanner contrast — never theme it. */}
+              <QRCode
+                value={JSON.stringify(payload)}
+                size={QR_SIZE}
+                color="#1A1728"
+                backgroundColor={COLORS.white}
+              />
+              {isExpired && <ExpiredOverlay onRefresh={startTimer} />}
+              {isCheckedIn && !isExpired && (
+                <View style={sheetS.checkedOverlay}>
+                  <View style={sheetS.checkedBadge}>
+                    <Ionicons name="checkmark" size={48} color={COLORS.white} />
+                  </View>
+                </View>
+              )}
+            </Pressable>
+          ) : (
+            <View style={sheetS.qrHidden}>
+              <Ionicons
+                name="eye-off-outline"
+                size={36}
+                color={COLORS.textMuted}
+              />
+            </View>
+          )}
+
+          <Text style={sheetS.cardTitle}>
+            {isCheckedIn ? "Checked in successfully" : "Scan to check in"}
           </Text>
-          <Text style={sheetS.subtitle}>
+          <Text style={sheetS.cardCaption}>
             {isCheckedIn
               ? "Enjoy your session — you're all set."
-              : `Show this code at the front desk.\nIt rotates every ${TTL_SECONDS} seconds.`}
+              : isExpired
+                ? "This pass expired for security reasons.\nGenerate a new one below."
+                : `Show this code at the front desk.\nRotates in ${secondsLeft}s · One-time use`}
           </Text>
         </View>
 
-        {/* ── Card stack ─────────────────────────────────── */}
-        <View style={sheetS.cards}>
-          {/* Gym info card */}
-          <View style={sheetS.gymCard}>
-            <View style={sheetS.gymBadge}>
-              <Ionicons name="barbell" size={22} color={COLORS.accent} />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={sheetS.gymName}>Iron Forge Casablanca</Text>
-              <Text style={sheetS.gymMeta}>Gym access · 2 pts</Text>
-            </View>
-          </View>
+        <View style={{ flex: 1 }} />
 
-          {/* QR card */}
-          <View style={sheetS.qrCard}>
-            {/* Hide / Show toggle */}
-            <TouchableOpacity
-              onPress={() => setShowCode((v) => !v)}
-              style={sheetS.hideRow}
-              activeOpacity={0.7}
-            >
-              <Ionicons
-                name="scan-outline"
-                size={16}
-                color={COLORS.text}
-              />
-              <Text style={sheetS.hideText}>
-                {showCode ? "Hide Code" : "Show Code"}
-              </Text>
-            </TouchableOpacity>
+        {/* ── Bottom actions: filled gradient pill + outlined pill ── */}
+        <View style={sheetS.btnCol}>
+          <TouchableOpacity
+            style={sheetS.primaryBtn}
+            onPress={startTimer}
+            activeOpacity={0.85}
+          >
+            <GradientFill colors={GRADIENTS.primary} />
+            <Text style={sheetS.primaryBtnText}>Generate New Pass</Text>
+          </TouchableOpacity>
 
-            {/* QR */}
-            {showCode ? (
-              <Pressable
-                onPress={() => !isExpired && setCheckedIn((v) => !v)}
-                style={[
-                  sheetS.qrWrap,
-                  urgent && { borderColor: COLORS.error },
-                  isCheckedIn && { borderColor: "#22A06B" },
-                ]}
-              >
-                {/* QR must stay dark-on-white for scanner contrast — never theme it. */}
-                <QRCode
-                  value={JSON.stringify(payload)}
-                  size={QR_SIZE}
-                  color="#1A1728"
-                  backgroundColor={COLORS.white}
-                />
-                {isExpired && <ExpiredOverlay onRefresh={startTimer} />}
-                {isCheckedIn && !isExpired && (
-                  <View style={sheetS.checkedOverlay}>
-                    <View style={sheetS.checkedBadge}>
-                      <Ionicons
-                        name="checkmark"
-                        size={48}
-                        color={COLORS.white}
-                      />
-                    </View>
-                  </View>
-                )}
-              </Pressable>
-            ) : (
-              <View style={sheetS.qrHidden}>
-                <Ionicons
-                  name="eye-off-outline"
-                  size={36}
-                  color={COLORS.textMuted}
-                />
-                <Text style={sheetS.qrHiddenText}>Tap "Show Code"</Text>
-              </View>
-            )}
-
-            {/* Countdown footer */}
-            {!isExpired && showCode && (
-              <View style={sheetS.countdown}>
-                <View
-                  style={[
-                    sheetS.countdownBubble,
-                    urgent && { backgroundColor: COLORS.error },
-                  ]}
-                >
-                  <Text style={sheetS.countdownBubbleText}>
-                    {secondsLeft}s
-                  </Text>
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={sheetS.countdownTitle}>
-                    {urgent ? "Expiring soon" : "Secured pass"}
-                  </Text>
-                  <Text style={sheetS.countdownBody}>
-                    Rotates every {TTL_SECONDS}s · One-time use
-                  </Text>
-                </View>
-                <Ionicons
-                  name="shield-checkmark"
-                  size={16}
-                  color={COLORS.primaryDark}
-                />
-              </View>
-            )}
-          </View>
+          <TouchableOpacity
+            style={sheetS.secondaryBtn}
+            onPress={() => setShowCode((v) => !v)}
+            activeOpacity={0.85}
+          >
+            <Ionicons
+              name={showCode ? "eye-off-outline" : "eye-outline"}
+              size={18}
+              color={COLORS.primaryLight}
+            />
+            <Text style={sheetS.secondaryBtnText}>
+              {showCode ? "Hide Code" : "Show Code"}
+            </Text>
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
     </View>
@@ -314,152 +262,41 @@ function CheckedInSheet({
 const sheetS = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: "#0E0A1F",
+    backgroundColor: COLORS.background,
     overflow: "hidden",
-  },
-  pillarLayer: {
-    ...StyleSheet.absoluteFillObject,
   },
 
   topBar: {
     flexDirection: "row",
-    justifyContent: "flex-end",
+    justifyContent: "flex-start",
     paddingHorizontal: SPACING.lg,
-    paddingTop: SPACING.sm,
-  },
-  closeBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: "rgba(255,255,255,0.18)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.25)",
-    alignItems: "center",
-    justifyContent: "center",
+    paddingVertical: SPACING.sm + 4,
   },
 
-  headline: {
-    paddingHorizontal: SPACING.xl - 4,
-    paddingTop: SPACING.lg,
-  },
-  livePill: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    alignSelf: "flex-start",
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: 999,
-    backgroundColor: "rgba(255,255,255,0.22)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.3)",
-    marginBottom: SPACING.sm + 4,
-  },
-  liveDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 4,
-    backgroundColor: "#5DEC9F",
-  },
-  livePillText: {
-    fontSize: 11,
-    fontWeight: FONT_WEIGHTS.bold,
-    color: COLORS.white,
-    letterSpacing: 0.3,
-  },
-  title: {
-    fontSize: 40,
-    fontWeight: FONT_WEIGHTS.black,
-    color: COLORS.white,
-    letterSpacing: -1,
-    lineHeight: 44,
-  },
-  subtitle: {
-    fontSize: FONT_SIZES.base,
-    color: "rgba(255,255,255,0.82)",
-    fontWeight: FONT_WEIGHTS.medium,
-    marginTop: SPACING.sm,
-    lineHeight: 21,
-  },
-
-  cards: {
-    flex: 1,
-    justifyContent: "flex-end",
-    paddingHorizontal: SPACING.md + 4,
-    paddingBottom: SPACING.lg,
-    gap: 12,
-  },
-  gymCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: SPACING.md,
-    backgroundColor: COLORS.surface,
-    borderRadius: 18,
-    padding: 14,
-    ...SHADOWS.pop,
-  },
-  gymBadge: {
-    width: 46,
-    height: 46,
-    borderRadius: 12,
-    backgroundColor: COLORS.surfaceElevated,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  gymName: {
-    fontSize: FONT_SIZES.base,
-    fontWeight: FONT_WEIGHTS.black,
-    color: COLORS.text,
-    letterSpacing: -0.2,
-  },
-  gymMeta: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-    marginTop: 2,
-  },
-
+  // Kit QR screen: one big rounded light-gray card holding the code,
+  // title, and caption.
   qrCard: {
-    backgroundColor: COLORS.surface,
+    marginHorizontal: SPACING.lg,
+    backgroundColor: COLORS.surfaceOverlay,
     borderRadius: RADIUS.lg,
-    paddingHorizontal: SPACING.md,
-    paddingTop: SPACING.sm,
-    paddingBottom: SPACING.md + 4,
-    ...SHADOWS.pop,
-  },
-  hideRow: {
-    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    paddingVertical: SPACING.sm + 2,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.surfaceElevated,
-    marginBottom: SPACING.md,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.xl,
   },
-  hideText: {
-    fontSize: FONT_SIZES.sm,
-    fontWeight: FONT_WEIGHTS.bold,
-    color: COLORS.text,
-  },
-  qrWrap: {
-    alignSelf: "center",
+  qrTile: {
     padding: SPACING.sm,
     borderRadius: RADIUS.md,
     borderWidth: 2,
-    borderColor: COLORS.primary,
+    borderColor: COLORS.transparent,
     backgroundColor: COLORS.white,
-    marginBottom: SPACING.md,
     overflow: "hidden",
     position: "relative",
   },
   qrHidden: {
-    height: QR_SIZE + 16,
+    height: QR_SIZE + 16 + SPACING.sm * 2,
+    alignSelf: "stretch",
     alignItems: "center",
     justifyContent: "center",
-    gap: 8,
-    marginBottom: SPACING.md,
   },
   checkedOverlay: {
     ...StyleSheet.absoluteFillObject,
@@ -478,49 +315,61 @@ const sheetS = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  qrHiddenText: {
+
+  cardTitle: {
+    fontSize: FONT_SIZES.xl,
+    fontFamily: FONTS.semibold,
+    color: COLORS.text,
+    marginTop: SPACING.lg,
+    textAlign: "center",
+  },
+  cardCaption: {
     fontSize: FONT_SIZES.sm,
-    color: COLORS.textMuted,
-    fontWeight: FONT_WEIGHTS.medium,
+    fontFamily: FONTS.regular,
+    color: COLORS.textSecondary,
+    textAlign: "center",
+    lineHeight: 21,
+    marginTop: SPACING.sm,
   },
 
-  countdown: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    backgroundColor: "rgba(159,153,199,0.13)",
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: 12,
+  // Bottom pills: filled gradient primary over an outlined secondary.
+  btnCol: {
+    paddingHorizontal: SPACING.lg,
+    paddingBottom: SPACING.md,
+    gap: SPACING.sm + 4,
   },
-  countdownBubble: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: COLORS.primary,
+  primaryBtn: {
+    height: 56,
+    borderRadius: RADIUS.full,
     alignItems: "center",
     justifyContent: "center",
+    overflow: "hidden",
   },
-  countdownBubbleText: {
-    color: COLORS.white,
-    fontSize: 11,
-    fontWeight: FONT_WEIGHTS.black,
+  primaryBtnText: {
+    fontSize: FONT_SIZES.base,
+    fontFamily: FONTS.semibold,
+    color: COLORS.textOnPrimary,
   },
-  countdownTitle: {
-    fontSize: FONT_SIZES.sm,
-    fontWeight: FONT_WEIGHTS.bold,
-    color: COLORS.text,
+  secondaryBtn: {
+    height: 56,
+    borderRadius: RADIUS.full,
+    borderWidth: 1.5,
+    borderColor: COLORS.primary,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: SPACING.sm,
   },
-  countdownBody: {
-    fontSize: 11,
-    color: COLORS.textSecondary,
-    marginTop: 1,
+  secondaryBtnText: {
+    fontSize: FONT_SIZES.base,
+    fontFamily: FONTS.semibold,
+    color: COLORS.primaryLight,
   },
 });
 
 // ── Exported trigger ───────────────────────────────────────────────────────
 interface AccessAnyGymProps {
-  variant?: "pill" | "full" | "icon";
+  variant?: "pill" | "full" | "icon" | "fab";
   /** Override the circular icon button styles (icon variant only). */
   iconStyle?: object;
   iconColor?: string;
@@ -549,6 +398,26 @@ export default function AccessAnyGym({
       <CheckedInSheet userId={userId!} onClose={() => setOpen(false)} />
     </Modal>
   ) : null;
+
+  if (variant === "fab") {
+    // CaFit-style floating tab-bar action: a raised gradient circle that
+    // breaks out of the bar. Opens the same QR check-in sheet.
+    return (
+      <>
+        <TouchableOpacity
+          style={[triggerS.fabBtn, !isReady && triggerS.disabled]}
+          onPress={() => isReady && setOpen(true)}
+          activeOpacity={0.85}
+          accessibilityRole="button"
+          accessibilityLabel="Scan QR to access a gym"
+        >
+          <GradientFill colors={GRADIENTS.primary} />
+          <Ionicons name="qr-code" size={26} color={COLORS.textOnPrimary} />
+        </TouchableOpacity>
+        {modal}
+      </>
+    );
+  }
 
   if (variant === "icon") {
     return (
@@ -585,7 +454,7 @@ export default function AccessAnyGym({
           activeOpacity={0.85}
         >
           <Ionicons name="qr-code" size={20} color={COLORS.white} />
-          <Text style={triggerS.fullLabel}>Access Any Gym</Text>
+          <Text style={triggerS.fullLabel}>Scanner mon pass</Text>
         </TouchableOpacity>
         {modal}
       </>
@@ -602,7 +471,9 @@ export default function AccessAnyGym({
         <GradientSurface radius={RADIUS.md} style={pillS.surface}>
           <View style={pillS.content}>
             <Ionicons name="qr-code" size={20} color={COLORS.white} />
-            <Text style={pillS.label}>{isReady ? "Access Gym" : "Loading…"}</Text>
+            <Text style={pillS.label}>
+              {isReady ? "Scanner" : "Chargement…"}
+            </Text>
           </View>
         </GradientSurface>
       </TouchableOpacity>
@@ -625,7 +496,7 @@ const triggerS = StyleSheet.create({
   },
   fullLabel: {
     fontSize: FONT_SIZES.base,
-    fontWeight: FONT_WEIGHTS.bold,
+    fontFamily: FONTS.bold,
     color: COLORS.white,
   },
   iconBtn: {
@@ -636,6 +507,19 @@ const triggerS = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     ...SHADOWS.card,
+  },
+  fabBtn: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.45,
+    shadowRadius: 16,
+    elevation: 10,
   },
   disabled: { opacity: 0.45 },
 });
@@ -651,7 +535,7 @@ const pillS = StyleSheet.create({
   },
   label: {
     fontSize: FONT_SIZES.xs,
-    fontWeight: FONT_WEIGHTS.bold,
+    fontFamily: FONTS.bold,
     color: COLORS.white,
     textAlign: "center",
   },

@@ -12,11 +12,12 @@
 //   5. On success, the webhook (server-side) writes the CREDIT row + bumps
 //      balance. The screen just navigates back to the credit dashboard.
 
+import AuroraBackground from "@/components/ui/AuroraBackground";
 import GradientSurface from "@/components/ui/GradientSurface";
 import {
     COLORS,
+    FONTS,
     FONT_SIZES,
-    FONT_WEIGHTS,
     RADIUS,
     SHADOWS,
     SPACING,
@@ -188,6 +189,7 @@ export default function TopUpScreen() {
       ]}
     >
       {/* Header */}
+      <AuroraBackground />
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backBtn}
@@ -213,8 +215,8 @@ export default function TopUpScreen() {
             <View style={styles.expoGoBanner}>
               <Ionicons name="warning" size={18} color={COLORS.warning} />
               <Text style={styles.expoGoText}>
-                You're in Expo Go — Stripe Payment Sheet needs a Dev Build to
-                run. The rest of the app works fine here.
+                You&apos;re in Expo Go — Stripe Payment Sheet needs a Dev Build
+                to run. The rest of the app works fine here.
               </Text>
             </View>
           )}
@@ -296,8 +298,8 @@ export default function TopUpScreen() {
             <View style={{ flex: 1 }}>
               <Text style={styles.securityTitle}>Secured by Stripe</Text>
               <Text style={styles.securityBody}>
-                Card number, expiry date and CVC are entered inside Stripe's
-                PCI-DSS compliant sheet. UnityFitness never sees your card.
+                Card number, expiry date and CVC are entered inside Stripe&apos;s
+                PCI-DSS compliant sheet. Unity Fitness never sees your card.
               </Text>
             </View>
           </View>
@@ -320,10 +322,14 @@ export default function TopUpScreen() {
             activeOpacity={0.9}
           >
             {busy ? (
-              <ActivityIndicator color={COLORS.white} />
+              <ActivityIndicator color={COLORS.textOnPrimary} />
             ) : (
               <>
-                <Ionicons name="lock-closed" size={16} color={COLORS.white} />
+                <Ionicons
+                  name="lock-closed"
+                  size={16}
+                  color={COLORS.textOnPrimary}
+                />
                 <Text style={styles.payBtnText}>
                   Pay {finalAmount} MAD securely
                 </Text>
@@ -339,27 +345,26 @@ export default function TopUpScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
 
+  // CaFit header: bare background, outlined circle back button, centered title.
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
-    backgroundColor: COLORS.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
   },
   backBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: COLORS.surfaceElevated,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: COLORS.border,
     alignItems: "center",
     justifyContent: "center",
   },
   headerTitle: {
     fontSize: FONT_SIZES.md,
-    fontWeight: FONT_WEIGHTS.black,
+    fontFamily: FONTS.semibold,
     color: COLORS.text,
   },
 
@@ -387,20 +392,20 @@ const styles = StyleSheet.create({
   heroBody: { padding: SPACING.xl },
   heroLabel: {
     fontSize: FONT_SIZES.xs,
-    fontWeight: FONT_WEIGHTS.bold,
+    fontFamily: FONTS.bold,
     color: "rgba(255,255,255,0.65)",
     letterSpacing: 1.6,
     marginBottom: SPACING.sm,
   },
   heroValue: {
     fontSize: FONT_SIZES.hero,
-    fontWeight: FONT_WEIGHTS.black,
+    fontFamily: FONTS.black,
     color: COLORS.white,
     letterSpacing: -1,
   },
   heroValueUnit: {
     fontSize: FONT_SIZES.md,
-    fontWeight: FONT_WEIGHTS.medium,
+    fontFamily: FONTS.medium,
     color: "rgba(255,255,255,0.7)",
   },
   heroSub: {
@@ -411,7 +416,7 @@ const styles = StyleSheet.create({
 
   sectionLabel: {
     fontSize: FONT_SIZES.xs,
-    fontWeight: FONT_WEIGHTS.bold,
+    fontFamily: FONTS.bold,
     color: COLORS.textMuted,
     textTransform: "uppercase",
     letterSpacing: 0.8,
@@ -437,23 +442,24 @@ const styles = StyleSheet.create({
     alignItems: "center",
     ...SHADOWS.soft,
   },
+  // Active preset = brand-filled pill card, per the kit's segmented pricing.
   presetActive: {
-    backgroundColor: COLORS.accent,
-    borderColor: COLORS.accent,
+    backgroundColor: COLORS.primary,
+    borderColor: COLORS.primary,
   },
   presetMad: {
     fontSize: FONT_SIZES.lg,
-    fontWeight: FONT_WEIGHTS.black,
+    fontFamily: FONTS.black,
     color: COLORS.text,
   },
   presetLabel: {
     fontSize: FONT_SIZES.xs,
-    fontWeight: FONT_WEIGHTS.semibold,
+    fontFamily: FONTS.semibold,
     color: COLORS.textMuted,
     marginTop: 2,
     letterSpacing: 0.5,
   },
-  presetTextActive: { color: COLORS.white },
+  presetTextActive: { color: COLORS.textOnPrimary },
 
   customRow: {
     flexDirection: "row",
@@ -469,13 +475,13 @@ const styles = StyleSheet.create({
   customInput: {
     flex: 1,
     fontSize: FONT_SIZES.xl,
-    fontWeight: FONT_WEIGHTS.black,
+    fontFamily: FONTS.black,
     color: COLORS.text,
     paddingVertical: SPACING.md,
   },
   customSuffix: {
     fontSize: FONT_SIZES.base,
-    fontWeight: FONT_WEIGHTS.bold,
+    fontFamily: FONTS.bold,
     color: COLORS.textMuted,
     letterSpacing: 1,
   },
@@ -492,7 +498,7 @@ const styles = StyleSheet.create({
   },
   securityTitle: {
     fontSize: FONT_SIZES.sm,
-    fontWeight: FONT_WEIGHTS.bold,
+    fontFamily: FONTS.bold,
     color: COLORS.text,
   },
   securityBody: {
@@ -515,14 +521,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: SPACING.sm,
-    backgroundColor: COLORS.accent,
+    backgroundColor: COLORS.primary,
     paddingVertical: SPACING.md,
     borderRadius: RADIUS.full,
   },
   payBtnDisabled: { opacity: 0.55 },
   payBtnText: {
-    color: COLORS.white,
-    fontWeight: FONT_WEIGHTS.bold,
+    color: COLORS.textOnPrimary,
+    fontFamily: FONTS.semibold,
     fontSize: FONT_SIZES.base,
   },
 });

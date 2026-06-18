@@ -16,11 +16,12 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
+import AuroraBackground from "@/components/ui/AuroraBackground";
 import GradientSurface from "@/components/ui/GradientSurface";
 import {
     COLORS,
+    FONTS,
     FONT_SIZES,
-    FONT_WEIGHTS,
     RADIUS,
     SHADOWS,
     SPACING,
@@ -45,14 +46,14 @@ const paymentSheetModule: {
 
 type IoniconsName = React.ComponentProps<typeof Ionicons>["name"];
 
-// ── Plan data (mirrors plans.tsx) ──────────────────────────────────────────
+// ── Credit packs (mirrors the Explorer packs in plans.tsx) ──────────────────
 const PLANS: Record<
   string,
   { name: string; price: number; points: number; perPoint: number }
 > = {
-  starter: { name: "Starter", price: 99, points: 10, perPoint: 9.9 },
-  mobility: { name: "Mobility", price: 199, points: 25, perPoint: 7.96 },
-  elite: { name: "Elite", price: 349, points: 50, perPoint: 6.98 },
+  pack5: { name: "5 crédits", price: 60, points: 5, perPoint: 12 },
+  pack15: { name: "15 crédits", price: 150, points: 15, perPoint: 10 },
+  pack30: { name: "30 crédits", price: 270, points: 30, perPoint: 9 },
 };
 
 // ── Payment methods ────────────────────────────────────────────────────────
@@ -66,20 +67,20 @@ interface PayMethod {
 const PAY_METHODS: PayMethod[] = [
   {
     id: "card",
-    label: "Credit / Debit Card",
+    label: "Carte bancaire",
     sub: "Visa, Mastercard",
     icon: "card-outline",
   },
   {
     id: "cmi",
-    label: "CMI Online",
-    sub: "Interbank payment",
+    label: "CMI en ligne",
+    sub: "Paiement interbancaire",
     icon: "globe-outline",
   },
   {
     id: "cash",
-    label: "Cash on site",
-    sub: "Pay at the front desk",
+    label: "Espèces sur place",
+    sub: "Payer à l'accueil",
     icon: "cash-outline",
   },
 ];
@@ -94,7 +95,7 @@ export default function CheckoutScreen() {
   const initPaymentSheet = sheet?.initPaymentSheet;
   const presentPaymentSheet = sheet?.presentPaymentSheet;
 
-  const plan = PLANS[planId ?? ""] ?? PLANS.mobility;
+  const plan = PLANS[planId ?? ""] ?? PLANS.pack15;
   const [payMethod, setPayMethod] = useState("card");
   const [loading, setLoading] = useState(false);
 
@@ -105,16 +106,16 @@ export default function CheckoutScreen() {
     // Cash + CMI are not implemented server-side yet.
     if (payMethod !== "card") {
       Alert.alert(
-        "Coming soon",
-        `${payMethod === "cash" ? "Cash on site" : "CMI Online"} payment is not enabled in this build.`,
+        "Bientôt disponible",
+        `Le paiement ${payMethod === "cash" ? "en espèces sur place" : "CMI en ligne"} n'est pas activé dans cette version.`,
       );
       return;
     }
     if (!initPaymentSheet || !presentPaymentSheet) {
       Alert.alert(
-        "Payments unavailable in Expo Go",
-        "Stripe Payment Sheet uses a native module that Expo Go can't load. " +
-          "Use a Dev Build:\n\n  npx expo run:android",
+        "Paiements indisponibles dans Expo Go",
+        "Le Payment Sheet Stripe utilise un module natif qu'Expo Go ne peut pas charger. " +
+          "Utilisez un Dev Build :\n\n  npx expo run:android",
       );
       return;
     }
@@ -125,7 +126,7 @@ export default function CheckoutScreen() {
       // the new `points` + `label` overrides on /api/payments/create-intent.
       const intent: CreateIntentResponse = await createPaymentIntent(total, {
         points: plan.points,
-        label:  `${plan.name} plan`,
+        label:  plan.name,
       });
 
       const initRes = await initPaymentSheet({
@@ -171,15 +172,15 @@ export default function CheckoutScreen() {
 
       Toast.show({
         type: "success",
-        text1: `${plan.name} plan unlocked`,
-        text2: `${plan.points} credits added to your wallet.`,
+        text1: "Paiement confirmé",
+        text2: `${plan.points} crédits ajoutés à votre portefeuille.`,
       });
       // Refresh once immediately, again after the webhook has had time to land.
       await refreshUser();
       setTimeout(() => { refreshUser(); }, 1500);
       router.replace("/(tabs)");
     } catch (err: any) {
-      Alert.alert("Payment failed", err?.message || "Please try again.");
+      Alert.alert("Échec du paiement", err?.message || "Veuillez réessayer.");
     } finally {
       setLoading(false);
     }
@@ -187,6 +188,7 @@ export default function CheckoutScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
+      <AuroraBackground />
       {/* ── Header ── */}
       <View style={styles.header}>
         <TouchableOpacity
@@ -196,7 +198,7 @@ export default function CheckoutScreen() {
         >
           <Ionicons name="arrow-back" size={22} color={COLORS.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Checkout</Text>
+        <Text style={styles.headerTitle}>Paiement</Text>
         <View style={{ width: 40 }} />
       </View>
 
@@ -211,28 +213,28 @@ export default function CheckoutScreen() {
           dimmer={0.08}
         >
           <View style={styles.planBody}>
-            <Text style={styles.planLabel}>YOUR PLAN</Text>
+            <Text style={styles.planLabel}>VOTRE FORMULE</Text>
             <Text style={styles.planName}>{plan.name}</Text>
 
             <View style={styles.planRow}>
               <View style={styles.planStat}>
                 <Ionicons name="flash" size={16} color="rgba(255,255,255,0.85)" />
-                <Text style={styles.planStatText}>{plan.points} points</Text>
+                <Text style={styles.planStatText}>{plan.points} crédits</Text>
               </View>
               <View style={styles.planStat}>
                 <Ionicons name="pricetag-outline" size={16} color="rgba(255,255,255,0.85)" />
                 <Text style={styles.planStatText}>
-                  {plan.perPoint.toFixed(2)} MAD/pt
+                  {plan.perPoint.toFixed(2)} DH/crédit
                 </Text>
               </View>
             </View>
 
-            <Text style={styles.planPrice}>{plan.price} MAD</Text>
+            <Text style={styles.planPrice}>{plan.price} DH</Text>
           </View>
         </GradientSurface>
 
         {/* ── Payment method ── */}
-        <Text style={styles.sectionLabel}>PAYMENT METHOD</Text>
+        <Text style={styles.sectionLabel}>MOYEN DE PAIEMENT</Text>
         <View style={styles.methodList}>
           {PAY_METHODS.map((m) => (
             <TouchableOpacity
@@ -275,19 +277,19 @@ export default function CheckoutScreen() {
         </View>
 
         {/* ── Price summary ── */}
-        <Text style={styles.sectionLabel}>ORDER SUMMARY</Text>
+        <Text style={styles.sectionLabel}>RÉCAPITULATIF</Text>
         <View style={styles.summaryCard}>
           <View style={styles.summaryRow}>
-            <Text style={styles.summaryKey}>{plan.name} plan</Text>
-            <Text style={styles.summaryVal}>{plan.price} MAD</Text>
+            <Text style={styles.summaryKey}>{plan.name}</Text>
+            <Text style={styles.summaryVal}>{plan.price} DH</Text>
           </View>
           <View style={styles.summaryRow}>
-            <Text style={styles.summaryKey}>Processing fee (2.5%)</Text>
-            <Text style={styles.summaryVal}>{fees} MAD</Text>
+            <Text style={styles.summaryKey}>Frais de traitement (2,5 %)</Text>
+            <Text style={styles.summaryVal}>{fees} DH</Text>
           </View>
           <View style={[styles.summaryRow, styles.summaryTotal]}>
             <Text style={styles.totalKey}>Total</Text>
-            <Text style={styles.totalVal}>{total} MAD</Text>
+            <Text style={styles.totalVal}>{total} DH</Text>
           </View>
         </View>
       </ScrollView>
@@ -306,14 +308,18 @@ export default function CheckoutScreen() {
           disabled={loading}
         >
           <Text style={styles.payBtnText}>
-            {loading ? "Processing…" : `Pay ${total} MAD`}
+            {loading ? "Traitement…" : `Payer ${total} DH`}
           </Text>
           {!loading && (
-            <Ionicons name="lock-closed" size={16} color={COLORS.white} />
+            <Ionicons
+              name="lock-closed"
+              size={16}
+              color={COLORS.textOnPrimary}
+            />
           )}
         </TouchableOpacity>
         <Text style={styles.secureNote}>
-          🔒 Payments are 256-bit encrypted
+          🔒 Paiements chiffrés en 256 bits
         </Text>
       </View>
     </View>
@@ -323,27 +329,26 @@ export default function CheckoutScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
 
+  // CaFit header: bare background, outlined circle back button, centered title.
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
-    backgroundColor: COLORS.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
   },
   backBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: COLORS.surfaceElevated,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: COLORS.border,
     alignItems: "center",
     justifyContent: "center",
   },
   headerTitle: {
     fontSize: FONT_SIZES.md,
-    fontWeight: FONT_WEIGHTS.black,
+    fontFamily: FONTS.semibold,
     color: COLORS.text,
   },
 
@@ -358,14 +363,14 @@ const styles = StyleSheet.create({
   },
   planLabel: {
     fontSize: FONT_SIZES.xs,
-    fontWeight: FONT_WEIGHTS.bold,
+    fontFamily: FONTS.bold,
     color: "rgba(255,255,255,0.6)",
     letterSpacing: 1.5,
     marginBottom: SPACING.xs,
   },
   planName: {
     fontSize: FONT_SIZES.xxl,
-    fontWeight: FONT_WEIGHTS.black,
+    fontFamily: FONTS.black,
     color: COLORS.white,
     marginBottom: SPACING.md,
     letterSpacing: -0.5,
@@ -389,18 +394,18 @@ const styles = StyleSheet.create({
   planStatText: {
     color: "rgba(255,255,255,0.85)",
     fontSize: FONT_SIZES.sm,
-    fontWeight: FONT_WEIGHTS.semibold,
+    fontFamily: FONTS.semibold,
   },
   planPrice: {
     fontSize: FONT_SIZES.xxl + 4,
-    fontWeight: FONT_WEIGHTS.black,
+    fontFamily: FONTS.black,
     color: COLORS.white,
     letterSpacing: -1,
   },
 
   sectionLabel: {
     fontSize: FONT_SIZES.xs,
-    fontWeight: FONT_WEIGHTS.bold,
+    fontFamily: FONTS.bold,
     color: COLORS.textMuted,
     textTransform: "uppercase",
     letterSpacing: 0.8,
@@ -442,7 +447,7 @@ const styles = StyleSheet.create({
   methodText: { flex: 1 },
   methodLabel: {
     fontSize: FONT_SIZES.base,
-    fontWeight: FONT_WEIGHTS.semibold,
+    fontFamily: FONTS.semibold,
     color: COLORS.text,
   },
   methodSub: { fontSize: FONT_SIZES.xs, color: COLORS.textMuted, marginTop: 1 },
@@ -479,7 +484,7 @@ const styles = StyleSheet.create({
   summaryKey: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary },
   summaryVal: {
     fontSize: FONT_SIZES.sm,
-    fontWeight: FONT_WEIGHTS.medium,
+    fontFamily: FONTS.medium,
     color: COLORS.text,
   },
   summaryTotal: {
@@ -490,12 +495,12 @@ const styles = StyleSheet.create({
   },
   totalKey: {
     fontSize: FONT_SIZES.base,
-    fontWeight: FONT_WEIGHTS.bold,
+    fontFamily: FONTS.bold,
     color: COLORS.text,
   },
   totalVal: {
     fontSize: FONT_SIZES.base,
-    fontWeight: FONT_WEIGHTS.black,
+    fontFamily: FONTS.black,
     color: COLORS.accent,
   },
 
@@ -512,15 +517,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: SPACING.xs,
-    backgroundColor: COLORS.accent,
+    backgroundColor: COLORS.primary,
     paddingVertical: SPACING.md,
     borderRadius: RADIUS.full,
     marginBottom: SPACING.sm,
   },
   payBtnLoading: { opacity: 0.7 },
   payBtnText: {
-    color: COLORS.white,
-    fontWeight: FONT_WEIGHTS.bold,
+    color: COLORS.textOnPrimary,
+    fontFamily: FONTS.semibold,
     fontSize: FONT_SIZES.base,
   },
   secureNote: {

@@ -1,12 +1,15 @@
 // app/onboarding.tsx
-// 3-slide intro carousel shown before login.
+// 3-slide intro carousel in the landing "SaaS Futuristic" aesthetic: aurora
+// canvas, brand illustration framed in a violet-glow ring, eyebrow + gradient
+// title, violet pager dashes, full-width gradient Next/Get Started pill.
 // Navigate here by calling router.replace("/onboarding") on first launch.
 
-import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
 import {
     Dimensions,
+    Image,
+    ImageSourcePropType,
     Pressable,
     ScrollView,
     StyleSheet,
@@ -14,47 +17,46 @@ import {
     View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Svg, {
-    Defs,
-    LinearGradient as SvgLinearGradient,
-    Rect,
-    Stop,
-} from "react-native-svg";
 
+import AuroraBackground from "@/components/ui/AuroraBackground";
+import Eyebrow from "@/components/ui/Eyebrow";
+import GradientFill from "@/components/ui/GradientFill";
 import {
     COLORS,
+    FONTS,
     FONT_SIZES,
-    FONT_WEIGHTS,
+    GRADIENTS,
     RADIUS,
-    SHADOWS,
     SPACING,
 } from "@/constants/theme";
 
 const { width: W } = Dimensions.get("window");
 
-type IoniconsName = React.ComponentProps<typeof Ionicons>["name"];
-
 interface Slide {
-  icon: IoniconsName;
+  image: ImageSourcePropType;
+  eyebrow: string;
   title: string;
   body: string;
 }
 
 const SLIDES: Slide[] = [
   {
-    icon: "barbell-outline",
-    title: "Train Anywhere",
-    body: "Access 50+ partner gyms across Morocco with a single pass.",
+    image: require("@/assets/images/onboarding-2.png"),
+    eyebrow: "Un seul réseau",
+    title: "Entraînez-vous partout",
+    body: "Accédez à plus de 50 salles partenaires au Maroc avec un seul pass flexible.",
   },
   {
-    icon: "flash-outline",
-    title: "Pay As You Go",
-    body: "Buy points once. Use them across all partner locations. No monthly fees.",
+    image: require("@/assets/images/onboarding-3.png"),
+    eyebrow: "Sans engagement",
+    title: "Payez à la séance",
+    body: "Achetez des crédits une fois et utilisez-les chez tous les partenaires. Aucun frais mensuel.",
   },
   {
-    icon: "phone-portrait-outline",
-    title: "Scan & Check In",
-    body: "Show your mobile pass at any partner gym. No cards, no hassle.",
+    image: require("@/assets/images/onboarding-1.png"),
+    eyebrow: "Accès instantané",
+    title: "Scannez & entrez",
+    body: "Présentez votre QR code dans n'importe quelle salle partenaire. Sans carte, sans attente.",
   },
 ];
 
@@ -80,110 +82,76 @@ export default function OnboardingScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
-      {/* Full-screen silk gradient */}
-      <Svg style={StyleSheet.absoluteFill} preserveAspectRatio="none">
-        <Defs>
-          <SvgLinearGradient id="onbGrad" x1="0" y1="0" x2="1" y2="1">
-            <Stop offset="0%" stopColor={COLORS.primary} stopOpacity="1" />
-            <Stop offset="50%" stopColor={COLORS.primaryDark} stopOpacity="1" />
-            <Stop offset="100%" stopColor={COLORS.accent} stopOpacity="1" />
-          </SvgLinearGradient>
-        </Defs>
-        <Rect x="0" y="0" width="100%" height="100%" fill="url(#onbGrad)" />
-      </Svg>
+    <View style={styles.root}>
+      <AuroraBackground />
+      <SafeAreaView style={styles.safe}>
+        {!isLast && (
+          <Pressable
+            style={styles.skipBtn}
+            onPress={() => router.replace("/(auth)/login")}
+          >
+            <Text style={styles.skipText}>Passer</Text>
+          </Pressable>
+        )}
 
-      {/* Decorative blobs */}
-      <View style={styles.blobTopRight} />
-      <View style={styles.blobBottomLeft} />
-
-      {/* Skip button */}
-      {!isLast && (
-        <Pressable
-          style={styles.skipBtn}
-          onPress={() => router.replace("/(auth)/login")}
+        <ScrollView
+          ref={scrollRef}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onMomentumScrollEnd={onScroll}
+          style={styles.pager}
         >
-          <Text style={styles.skipText}>Skip</Text>
-        </Pressable>
-      )}
+          {SLIDES.map((slide, i) => (
+            <View key={i} style={styles.slide}>
+              <View style={styles.heroRing}>
+                <View style={styles.heroDisc}>
+                  <Image
+                    source={slide.image}
+                    style={styles.heroImg}
+                    resizeMode="cover"
+                  />
+                </View>
+              </View>
 
-      {/* Slide pager */}
-      <ScrollView
-        ref={scrollRef}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onMomentumScrollEnd={onScroll}
-        style={styles.pager}
-      >
-        {SLIDES.map((slide, i) => (
-          <View key={i} style={styles.slide}>
-            <View style={styles.iconCircle}>
-              <Ionicons name={slide.icon} size={52} color={COLORS.white} />
+              <View style={styles.dots}>
+                {SLIDES.map((_, d) => (
+                  <View key={d} style={[styles.dot, d === i && styles.dotActive]} />
+                ))}
+              </View>
+
+              <Eyebrow style={styles.eyebrow}>{slide.eyebrow}</Eyebrow>
+              <Text style={styles.slideTitle}>{slide.title}</Text>
+              <Text style={styles.slideBody}>{slide.body}</Text>
             </View>
-            <Text style={styles.slideTitle}>{slide.title}</Text>
-            <Text style={styles.slideBody}>{slide.body}</Text>
-          </View>
-        ))}
-      </ScrollView>
+          ))}
+        </ScrollView>
 
-      {/* Dot indicators */}
-      <View style={styles.dots}>
-        {SLIDES.map((_, i) => (
-          <View
-            key={i}
-            style={[styles.dot, i === current && styles.dotActive]}
-          />
-        ))}
-      </View>
-
-      {/* Next / Get Started */}
-      <Pressable style={styles.nextBtn} onPress={advance}>
-        <Text style={styles.nextText}>
-          {isLast ? "Get Started" : "Next"}
-        </Text>
-        <Ionicons name="arrow-forward" size={18} color={COLORS.accent} />
-      </Pressable>
-    </SafeAreaView>
+        <Pressable style={styles.nextBtn} onPress={advance}>
+          <GradientFill colors={GRADIENTS.primary} />
+          <Text style={styles.nextText}>{isLast ? "Commencer" : "Suivant"}</Text>
+        </Pressable>
+      </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: COLORS.accent },
-
-  blobTopRight: {
-    position: "absolute",
-    top: -60,
-    right: -60,
-    width: 220,
-    height: 220,
-    borderRadius: 110,
-    backgroundColor: COLORS.primaryLight,
-    opacity: 0.35,
-  },
-  blobBottomLeft: {
-    position: "absolute",
-    bottom: -60,
-    left: -60,
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    backgroundColor: COLORS.accentLight,
-    opacity: 0.45,
-  },
+  root: { flex: 1, backgroundColor: COLORS.background },
+  safe: { flex: 1 },
 
   skipBtn: {
     position: "absolute",
-    top: SPACING.lg,
+    top: SPACING.md,
     right: SPACING.lg,
     zIndex: 10,
     paddingVertical: SPACING.xs,
     paddingHorizontal: SPACING.sm,
   },
   skipText: {
-    color: "rgba(255,255,255,0.65)",
+    color: COLORS.textMuted,
     fontSize: FONT_SIZES.sm,
-    fontWeight: FONT_WEIGHTS.medium,
+    fontFamily: FONTS.medium,
   },
 
   pager: { flex: 1 },
@@ -192,68 +160,81 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: SPACING.xl,
-    paddingBottom: SPACING.xxl,
+    paddingBottom: SPACING.xl,
   },
-  iconCircle: {
-    width: 128,
-    height: 128,
-    borderRadius: 64,
-    backgroundColor: "rgba(255,255,255,0.15)",
+  // Violet-glow ring around a translucent disc holding the illustration.
+  heroRing: {
+    width: 268,
+    height: 268,
+    borderRadius: 134,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.25)",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: SPACING.xl + SPACING.sm,
+    borderColor: COLORS.border,
+    padding: 10,
+    backgroundColor: COLORS.glass,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 18 },
+    shadowOpacity: 0.5,
+    shadowRadius: 40,
+    elevation: 10,
   },
-  slideTitle: {
-    fontSize: FONT_SIZES.xxl,
-    fontWeight: FONT_WEIGHTS.black,
-    color: COLORS.white,
-    textAlign: "center",
-    letterSpacing: -0.5,
-    marginBottom: SPACING.md,
+  heroDisc: {
+    flex: 1,
+    borderRadius: 124,
+    overflow: "hidden",
+    backgroundColor: COLORS.surfaceSolid,
   },
-  slideBody: {
-    fontSize: FONT_SIZES.base,
-    color: "rgba(255,255,255,0.78)",
-    textAlign: "center",
-    lineHeight: 24,
-    maxWidth: 280,
-  },
+  heroImg: { width: "100%", height: "100%" },
 
   dots: {
     flexDirection: "row",
     justifyContent: "center",
     gap: 8,
+    marginTop: SPACING.xl + SPACING.sm,
     marginBottom: SPACING.lg,
   },
   dot: {
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: "rgba(255,255,255,0.35)",
+    backgroundColor: COLORS.borderStrong,
   },
-  dotActive: {
-    width: 22,
-    backgroundColor: COLORS.white,
-    borderRadius: 3,
+  dotActive: { width: 22, backgroundColor: COLORS.primaryLight, borderRadius: 3 },
+
+  eyebrow: { marginBottom: SPACING.sm },
+  slideTitle: {
+    fontSize: FONT_SIZES.xxl,
+    fontFamily: FONTS.display,
+    color: COLORS.text,
+    textAlign: "center",
+    letterSpacing: -0.6,
+    marginBottom: SPACING.sm,
+  },
+  slideBody: {
+    fontSize: FONT_SIZES.base,
+    fontFamily: FONTS.regular,
+    color: COLORS.textSecondary,
+    textAlign: "center",
+    lineHeight: 24,
+    maxWidth: 320,
   },
 
   nextBtn: {
-    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: SPACING.xs,
-    backgroundColor: COLORS.white,
+    height: 56,
     marginHorizontal: SPACING.xl,
     marginBottom: SPACING.xl,
-    paddingVertical: SPACING.md,
     borderRadius: RADIUS.full,
-    ...SHADOWS.soft,
+    overflow: "hidden",
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.55,
+    shadowRadius: 22,
+    elevation: 10,
   },
   nextText: {
-    color: COLORS.accent,
-    fontWeight: FONT_WEIGHTS.bold,
+    color: COLORS.textOnPrimary,
+    fontFamily: FONTS.semibold,
     fontSize: FONT_SIZES.base,
   },
 });

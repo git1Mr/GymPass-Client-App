@@ -41,10 +41,10 @@ export default function GradientSurface({
             x2="1"
             y2="1"
           >
-            <Stop offset="0"    stopColor="#3C0008" />
-            <Stop offset="0.32" stopColor="#2A0820" />
-            <Stop offset="0.72" stopColor="#5A4D85" />
-            <Stop offset="1"    stopColor="#9f99c7" />
+            <Stop offset="0"    stopColor="#7C3AED" />
+            <Stop offset="0.38" stopColor="#6D28D9" />
+            <Stop offset="0.74" stopColor="#9525C9" />
+            <Stop offset="1"    stopColor="#C925AB" />
           </SvgLinearGradient>
           <Pattern
             id="gs-hatch"
@@ -103,8 +103,8 @@ const styles = StyleSheet.create({
   shell: {
     overflow: "hidden",
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.06)",
-    shadowColor: "#3C0008",
+    borderColor: "rgba(255,255,255,0.10)",
+    shadowColor: "#7C3AED",
     shadowOffset: { width: 0, height: 14 },
     shadowOpacity: 0.22,
     shadowRadius: 28,

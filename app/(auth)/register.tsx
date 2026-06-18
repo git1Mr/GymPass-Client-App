@@ -3,10 +3,8 @@ import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import React, { JSX, useState } from "react";
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -15,14 +13,19 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import AuroraBackground from "@/components/ui/AuroraBackground";
+import Eyebrow from "@/components/ui/Eyebrow";
 import FormInput from "@/components/ui/FormInput";
-import DarkVeil from "@/components/ui/DarkVeil";
-import UFLogo from "@/components/ui/UFLogo";
+import GlassCard from "@/components/ui/GlassCard";
+import GradientText from "@/components/ui/GradientText";
+import PrimaryButton from "@/components/ui/PrimaryButton";
+import UnityLogo from "@/components/ui/UnityLogo";
 import toast from "@/components/ui/Toast";
 import {
   COLORS,
+  FONTS,
   FONT_SIZES,
-  FONT_WEIGHTS,
+  GRADIENTS,
   RADIUS,
   SPACING,
 } from "@/constants/theme";
@@ -52,7 +55,7 @@ function parseRegisterError(
       message:
         err instanceof Error
           ? err.message
-          : "Could not connect to the server. Check your network.",
+          : "Impossible de joindre le serveur. Vérifiez votre connexion.",
     };
   }
 
@@ -97,7 +100,7 @@ export default function RegisterScreen(): JSX.Element {
     try {
       const deviceId = Device.modelId ?? Device.osInternalBuildId ?? "unknown-device";
       await signUp({ ...form, deviceId });
-      toast.success("Welcome to UnityFitness!");
+      toast.success("Bienvenue sur Unity Fitness !");
     } catch (err: unknown) {
       const { field, message } = parseRegisterError(err);
       if (field) setErrors((e) => ({ ...e, [field]: message }));
@@ -109,6 +112,7 @@ export default function RegisterScreen(): JSX.Element {
 
   return (
     <View style={styles.root}>
+      <AuroraBackground />
       <KeyboardAvoidingView
         style={styles.kav}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -121,33 +125,46 @@ export default function RegisterScreen(): JSX.Element {
         >
           <SafeAreaView edges={["top"]} style={styles.heroSafe}>
             <View style={styles.hero}>
-              <View style={styles.pillarLayer} pointerEvents="none">
-                <DarkVeil />
-              </View>
-
-              <TouchableOpacity
-                onPress={(): void => router.back()}
-                style={styles.backBtn}
-                activeOpacity={0.7}
-                hitSlop={10}
-              >
-                <Ionicons name="chevron-back" size={22} color={COLORS.white} />
-              </TouchableOpacity>
-
-              <View style={styles.logoWrap}>
-                <UFLogo size={80} variant="light" />
-              </View>
-              <Text style={styles.heroTitle}>Create account</Text>
-              <Text style={styles.heroSubtitle}>
-                Join the Unity Fitness network
-              </Text>
+              <UnityLogo size={46} />
             </View>
           </SafeAreaView>
 
-          <View style={styles.panel}>
+          <GlassCard style={styles.panel} radius={RADIUS.xl}>
+            {/* Back arrow at the card's top-left, centered title below. */}
+            <TouchableOpacity
+              onPress={(): void => router.back()}
+              style={styles.backBtn}
+              activeOpacity={0.7}
+              hitSlop={10}
+            >
+              <Ionicons name="arrow-back" size={22} color={COLORS.text} />
+            </TouchableOpacity>
+
+            <View style={styles.cardTitleWrap}>
+              <Eyebrow style={styles.eyebrow}>Rejoindre le réseau</Eyebrow>
+              <View style={styles.titleRow}>
+                <Text style={styles.cardTitle}>Créer un </Text>
+                <GradientText colors={[...GRADIENTS.text]} style={styles.cardTitle}>
+                  compte
+                </GradientText>
+              </View>
+              <Text style={styles.cardSubtitle}>
+                Un seul pass pour toutes les salles partenaires
+              </Text>
+              <View style={styles.switchRow}>
+                <Text style={styles.footerText}>Vous avez déjà un compte ? </Text>
+                <TouchableOpacity
+                  onPress={(): void => router.push("/(auth)/login")}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.footerLink}>Se connecter</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
             <FormInput
-              label="Full Name"
-              placeholder="Full Name"
+              label="Nom complet"
+              placeholder="Nom complet"
               autoCapitalize="words"
               autoComplete="name"
               value={form.name}
@@ -156,8 +173,8 @@ export default function RegisterScreen(): JSX.Element {
             />
 
             <FormInput
-              label="Email"
-              placeholder="you@example.com"
+              label="E-mail"
+              placeholder="vous@exemple.com"
               keyboardType="email-address"
               autoComplete="email"
               value={form.email}
@@ -166,8 +183,8 @@ export default function RegisterScreen(): JSX.Element {
             />
 
             <FormInput
-              label="Password"
-              placeholder="Min. 8 characters"
+              label="Mot de passe"
+              placeholder="Min. 8 caractères"
               secureTextEntry={!showPass}
               autoComplete="new-password"
               value={form.password}
@@ -178,8 +195,8 @@ export default function RegisterScreen(): JSX.Element {
             />
 
             <FormInput
-              label="Confirm Password"
-              placeholder="Repeat your password"
+              label="Confirmer le mot de passe"
+              placeholder="Répétez votre mot de passe"
               secureTextEntry={!showConf}
               autoComplete="new-password"
               value={form.confirmPassword}
@@ -189,35 +206,13 @@ export default function RegisterScreen(): JSX.Element {
               onRightIconPress={(): void => setShowConf((v) => !v)}
             />
 
-            <Pressable
+            <PrimaryButton
+              title="Créer un compte"
               onPress={handleRegister}
-              disabled={loading}
-              style={({ pressed }) => [
-                styles.cta,
-                loading && styles.ctaDisabled,
-                pressed && { opacity: 0.9 },
-              ]}
-            >
-              {loading ? (
-                <ActivityIndicator color={COLORS.white} />
-              ) : (
-                <>
-                  <Text style={styles.ctaLabel}>Create Account</Text>
-                  <Ionicons name="arrow-forward" size={18} color={COLORS.white} />
-                </>
-              )}
-            </Pressable>
-
-            <View style={styles.footer}>
-              <Text style={styles.footerText}>Already have an account? </Text>
-              <TouchableOpacity
-                onPress={(): void => router.push("/(auth)/login")}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.footerLink}>Sign in</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+              loading={loading}
+              style={styles.cta}
+            />
+          </GlassCard>
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
@@ -225,98 +220,63 @@ export default function RegisterScreen(): JSX.Element {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: "#0E0A1F" },
+  root: { flex: 1, backgroundColor: COLORS.background },
   kav: { flex: 1 },
-  scroll: { flexGrow: 1 },
+  scroll: { flexGrow: 1, paddingBottom: SPACING.lg },
 
-  heroSafe: { backgroundColor: "#0E0A1F" },
+  heroSafe: { backgroundColor: COLORS.transparent },
   hero: {
-    backgroundColor: "#0E0A1F",
-    paddingTop: SPACING.lg,
-    paddingBottom: SPACING.xxxl + SPACING.lg,
+    paddingTop: SPACING.xl,
+    paddingBottom: SPACING.lg,
     paddingHorizontal: SPACING.lg,
     alignItems: "center",
-    position: "relative",
-    overflow: "hidden",
-  },
-  pillarLayer: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  backBtn: {
-    alignSelf: "flex-start",
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "rgba(255,255,255,0.18)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.25)",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: SPACING.md,
-    zIndex: 2,
-  },
-  logoWrap: { marginTop: SPACING.xs, zIndex: 1 },
-  heroTitle: {
-    fontSize: FONT_SIZES.xxl,
-    fontWeight: FONT_WEIGHTS.black,
-    color: COLORS.white,
-    marginTop: SPACING.md,
-    letterSpacing: -0.5,
-    textAlign: "center",
-  },
-  heroSubtitle: {
-    fontSize: FONT_SIZES.base,
-    color: "rgba(255,255,255,0.78)",
-    fontWeight: FONT_WEIGHTS.medium,
-    marginTop: SPACING.xs,
-    textAlign: "center",
   },
 
   panel: {
-    backgroundColor: COLORS.surface,
-    borderTopLeftRadius: RADIUS.xl,
-    borderTopRightRadius: RADIUS.xl,
-    marginTop: -SPACING.xl,
-    paddingTop: SPACING.xl,
+    marginHorizontal: SPACING.md,
+    paddingTop: SPACING.lg,
     paddingHorizontal: SPACING.lg,
     paddingBottom: SPACING.xl,
-    flex: 1,
-    minHeight: 420,
   },
 
-  cta: {
-    backgroundColor: COLORS.primary,
-    borderRadius: RADIUS.md,
-    height: 54,
+  backBtn: {
+    alignSelf: "flex-start",
+    marginBottom: SPACING.sm,
+  },
+  cardTitleWrap: {
+    alignItems: "center",
+    marginBottom: SPACING.lg,
+  },
+  eyebrow: { marginBottom: SPACING.sm },
+  titleRow: { flexDirection: "row", alignItems: "baseline" },
+  cardTitle: {
+    fontSize: FONT_SIZES.xxl,
+    fontFamily: FONTS.display,
+    color: COLORS.text,
+    letterSpacing: -0.5,
+  },
+  cardSubtitle: {
+    fontSize: FONT_SIZES.sm,
+    fontFamily: FONTS.regular,
+    color: COLORS.textSecondary,
+    marginTop: SPACING.xs,
+  },
+  switchRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    gap: SPACING.sm,
     marginTop: SPACING.sm,
-    shadowColor: COLORS.primary,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.4,
-    shadowRadius: 16,
-    elevation: 6,
-  },
-  ctaDisabled: { opacity: 0.7 },
-  ctaLabel: {
-    color: COLORS.white,
-    fontSize: FONT_SIZES.md,
-    fontWeight: FONT_WEIGHTS.bold,
-    letterSpacing: 0.3,
   },
 
-  footer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: SPACING.xl,
+  cta: { marginTop: SPACING.sm },
+
+  footerText: {
+    fontSize: FONT_SIZES.sm,
+    fontFamily: FONTS.regular,
+    color: COLORS.textSecondary,
   },
-  footerText: { fontSize: FONT_SIZES.sm, color: COLORS.text },
   footerLink: {
     fontSize: FONT_SIZES.sm,
-    color: COLORS.primaryDark,
-    fontWeight: FONT_WEIGHTS.bold,
+    color: COLORS.primaryLight,
+    fontFamily: FONTS.semibold,
   },
 });

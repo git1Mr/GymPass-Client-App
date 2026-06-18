@@ -1,7 +1,8 @@
+import Eyebrow from "@/components/ui/Eyebrow";
 import {
     COLORS,
+    FONTS,
     FONT_SIZES,
-    FONT_WEIGHTS,
     RADIUS,
     SHADOWS,
     SPACING,
@@ -82,9 +83,9 @@ const MOCK_GYMS: GymWithCoord[] = [
 ];
 
 const TIER_COLORS: Record<number, string> = {
-  1: COLORS.primary,
-  2: "#F59E0B",
-  3: COLORS.accent,
+  1: COLORS.success,
+  2: COLORS.primaryLight,
+  3: COLORS.magenta,
 };
 
 const BOUNDS = {
@@ -210,10 +211,11 @@ export default function ExploreScreen() {
     <SafeAreaView style={styles.safe} edges={["top"]}>
       {/* ── Page header ── */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Explore</Text>
+        <Eyebrow>Carte du réseau</Eyebrow>
+        <Text style={styles.headerTitle}>Explorer les salles</Text>
         <Text style={styles.headerSub}>
-          {filtered.length} partner club{filtered.length === 1 ? "" : "s"} ·
-          mock map (no API key)
+          {filtered.length} salle{filtered.length === 1 ? "" : "s"} partenaire
+          {filtered.length === 1 ? "" : "s"} près de vous
         </Text>
       </View>
 
@@ -238,8 +240,8 @@ export default function ExploreScreen() {
           <Svg width={mapSize.width} height={mapSize.height}>
             <Defs>
               <LinearGradient id="mapBg" x1="0" y1="0" x2="0" y2="1">
-                <Stop offset="0%" stopColor="#0E0A1F" />
-                <Stop offset="100%" stopColor="#13121C" />
+                <Stop offset="0%" stopColor={COLORS.background} />
+                <Stop offset="100%" stopColor={COLORS.surfaceElevated} />
               </LinearGradient>
             </Defs>
             <Rect
@@ -314,7 +316,7 @@ export default function ExploreScreen() {
                   filterTier === t && styles.chipTextActive,
                 ]}
               >
-                {t === null ? "All" : `Tier ${t}`}
+                {t === null ? "Toutes" : `Palier ${t}`}
               </Text>
             </TouchableOpacity>
           ))}
@@ -328,7 +330,7 @@ export default function ExploreScreen() {
             activeOpacity={0.85}
           >
             <Ionicons name="compass" size={20} color={COLORS.white} />
-            <Text style={styles.overlayText}>Discover our partners</Text>
+            <Text style={styles.overlayText}>Découvrir nos partenaires</Text>
           </TouchableOpacity>
         </View>
 
@@ -366,13 +368,13 @@ export default function ExploreScreen() {
                   { backgroundColor: TIER_COLORS[selected.tier] },
                 ]}
               >
-                <Text style={styles.tierText}>Tier {selected.tier}</Text>
+                <Text style={styles.tierText}>Palier {selected.tier}</Text>
               </View>
             </View>
             <View style={styles.sheetRow}>
               <Ionicons name="flash" size={16} color={COLORS.accent} />
               <Text style={styles.sheetPoints}>
-                {selected.pointsPerSession} pts / session
+                {selected.pointsPerSession} crédits / séance
               </Text>
             </View>
             <View style={styles.sheetActions}>
@@ -380,13 +382,13 @@ export default function ExploreScreen() {
                 style={styles.sheetBtn}
                 onPress={() => setSelected(null)}
               >
-                <Text style={styles.sheetBtnText}>Close</Text>
+                <Text style={styles.sheetBtnText}>Fermer</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.sheetBtn, styles.sheetBtnPrimary]}
               >
-                <Text style={[styles.sheetBtnText, { color: COLORS.white }]}>
-                  Check in here
+                <Text style={[styles.sheetBtnText, { color: COLORS.textOnPrimary }]}>
+                  Entrer ici
                 </Text>
               </TouchableOpacity>
             </View>
@@ -403,21 +405,25 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
-    backgroundColor: COLORS.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
   },
   headerTitle: {
     fontSize: FONT_SIZES.xl,
-    fontWeight: FONT_WEIGHTS.black,
+    fontFamily: FONTS.display,
     color: COLORS.text,
+    letterSpacing: -0.4,
+    marginTop: 2,
   },
-  headerSub: { fontSize: FONT_SIZES.sm, color: COLORS.textMuted, marginTop: 2 },
+  headerSub: {
+    fontSize: FONT_SIZES.sm,
+    fontFamily: FONTS.regular,
+    color: COLORS.textMuted,
+    marginTop: 2,
+  },
 
   mapWrap: {
     flex: 1,
     position: "relative",
-    backgroundColor: "#0E0A1F",
+    backgroundColor: COLORS.background,
     overflow: "hidden",
   },
   svgWrap: { ...StyleSheet.absoluteFillObject },
@@ -453,13 +459,14 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
     ...SHADOWS.soft,
   },
-  chipActive: { backgroundColor: COLORS.accent, borderColor: COLORS.accent },
+  // CaFit segmented pills: brand-filled active pill, dark inactive pills.
+  chipActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
   chipText: {
     fontSize: FONT_SIZES.sm,
     color: COLORS.text,
-    fontWeight: FONT_WEIGHTS.medium,
+    fontFamily: FONTS.medium,
   },
-  chipTextActive: { color: COLORS.white },
+  chipTextActive: { color: COLORS.textOnPrimary, fontFamily: FONTS.semibold },
 
   overlayWrap: {
     position: "absolute",
@@ -472,16 +479,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: SPACING.sm,
-    backgroundColor: COLORS.accent,
+    backgroundColor: COLORS.primary,
     paddingVertical: SPACING.md,
     paddingHorizontal: SPACING.xl,
     borderRadius: RADIUS.full,
     ...SHADOWS.card,
   },
   overlayText: {
-    color: COLORS.white,
+    color: COLORS.textOnPrimary,
     fontSize: FONT_SIZES.base,
-    fontWeight: FONT_WEIGHTS.bold,
+    fontFamily: FONTS.semibold,
   },
 
   zoomCol: {
@@ -511,8 +518,10 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.surface,
     borderTopLeftRadius: RADIUS.xl,
     borderTopRightRadius: RADIUS.xl,
+    borderWidth: 1,
+    borderBottomWidth: 0,
+    borderColor: COLORS.border,
     padding: SPACING.lg,
-    ...SHADOWS.card,
   },
   sheetHandle: {
     width: 40,
@@ -530,7 +539,7 @@ const styles = StyleSheet.create({
   },
   sheetName: {
     fontSize: FONT_SIZES.lg,
-    fontWeight: FONT_WEIGHTS.bold,
+    fontFamily: FONTS.bold,
     color: COLORS.text,
   },
   sheetCity: { fontSize: FONT_SIZES.sm, color: COLORS.textMuted, marginTop: 2 },
@@ -542,7 +551,7 @@ const styles = StyleSheet.create({
   tierText: {
     color: COLORS.white,
     fontSize: FONT_SIZES.xs,
-    fontWeight: FONT_WEIGHTS.bold,
+    fontFamily: FONTS.bold,
   },
   sheetRow: {
     flexDirection: "row",
@@ -561,12 +570,12 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
   },
   sheetBtnPrimary: {
-    backgroundColor: COLORS.accent,
-    borderColor: COLORS.accent,
+    backgroundColor: COLORS.primary,
+    borderColor: COLORS.primary,
   },
   sheetBtnText: {
     fontSize: FONT_SIZES.base,
-    fontWeight: FONT_WEIGHTS.semibold,
+    fontFamily: FONTS.semibold,
     color: COLORS.text,
   },
 });

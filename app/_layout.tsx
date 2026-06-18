@@ -1,3 +1,12 @@
+import { DMMono_400Regular, DMMono_500Medium } from "@expo-google-fonts/dm-mono";
+import {
+  Montserrat_400Regular,
+  Montserrat_500Medium,
+  Montserrat_600SemiBold,
+  Montserrat_700Bold,
+  Montserrat_800ExtraBold,
+  useFonts,
+} from "@expo-google-fonts/montserrat";
 import { Slot, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { JSX, useEffect, useState } from "react";
@@ -6,7 +15,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import Toast, { BaseToast, ErrorToast, ToastConfig } from "react-native-toast-message";
 
 import LoadingScreen from "@/components/ui/LoadingScreen";
-import { COLORS, FONT_SIZES, FONT_WEIGHTS } from "@/constants/theme";
+import { COLORS, FONTS, FONT_SIZES, RADIUS } from "@/constants/theme";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { isStripeAvailable } from "@/services/stripeEnv";
 import { ThemeProvider } from "@/theme/ThemeContext";
@@ -14,13 +23,21 @@ import SplashScreen from "./splash";
 
 // Dark-surface toasts — the library defaults are white cards with dark text.
 const toastBase = {
-  style: { backgroundColor: COLORS.surfaceElevated, borderLeftWidth: 4 },
+  style: {
+    backgroundColor: COLORS.surfaceElevated,
+    borderLeftWidth: 4,
+    borderRadius: RADIUS.md,
+  },
   text1Style: {
     color: COLORS.text,
     fontSize: FONT_SIZES.sm,
-    fontWeight: FONT_WEIGHTS.bold,
+    fontFamily: FONTS.semibold,
   },
-  text2Style: { color: COLORS.textSecondary, fontSize: FONT_SIZES.sm },
+  text2Style: {
+    color: COLORS.textSecondary,
+    fontSize: FONT_SIZES.sm,
+    fontFamily: FONTS.regular,
+  },
   text2NumberOfLines: 2,
 };
 const toastConfig: ToastConfig = {
@@ -92,6 +109,28 @@ function AuthGate(): JSX.Element {
 
 export default function RootLayout(): JSX.Element {
   const [splashDone, setSplashDone] = useState<boolean>(false);
+  // Montserrat carries the whole type ramp; DM Mono is the eyebrow-label face.
+  // Rendering any screen before they resolve would flash system-font fallbacks.
+  const [fontsLoaded] = useFonts({
+    Montserrat_400Regular,
+    Montserrat_500Medium,
+    Montserrat_600SemiBold,
+    Montserrat_700Bold,
+    Montserrat_800ExtraBold,
+    DMMono_400Regular,
+    DMMono_500Medium,
+  });
+
+  if (!fontsLoaded) {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <StatusBar style="light" />
+          <LoadingScreen />
+        </ThemeProvider>
+      </SafeAreaProvider>
+    );
+  }
 
   if (!splashDone) {
     return (
