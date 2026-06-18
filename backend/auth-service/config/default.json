@@ -5,5 +5,12 @@
   "db": {
     "uri": "mongodb://localhost/unityfitness"
   },
-  "port": 3001
+  "port": 3001,
+  "smtp": {
+    "host": "",
+    "port": 587,
+    "user": "",
+    "pass": "",
+    "from": "Unity Fitness <no-reply@unityfitness.ma>"
+  }
 }

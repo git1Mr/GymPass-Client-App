@@ -454,7 +454,7 @@ export default function AccessAnyGym({
           activeOpacity={0.85}
         >
           <Ionicons name="qr-code" size={20} color={COLORS.white} />
-          <Text style={triggerS.fullLabel}>Scanner mon pass</Text>
+          <Text style={triggerS.fullLabel}>Générer mon pass</Text>
         </TouchableOpacity>
         {modal}
       </>

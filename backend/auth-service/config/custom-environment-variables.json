@@ -4,5 +4,12 @@
   "db": {
     "uri": "MONGO_URI"
   },
-  "port": "PORT"
+  "port": "PORT",
+  "smtp": {
+    "host": "SMTP_HOST",
+    "port": "SMTP_PORT",
+    "user": "SMTP_USER",
+    "pass": "SMTP_PASS",
+    "from": "SMTP_FROM"
+  }
 }

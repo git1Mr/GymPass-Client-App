@@ -2,10 +2,12 @@ const express = require('express');
 const bcrypt  = require('bcrypt');
 const crypto  = require('crypto');
 const Joi     = require('joi');
+const winston = require('winston');
 const router  = express.Router();
 
 const { User } = require('../models/user');
 const { setSessionCookies, clearSessionCookies } = require('../utils/sessionCookies');
+const { sendPasswordResetEmail } = require('../utils/mailer');
 
 const RESET_TOKEN_TTL_MS = 30 * 60 * 1000; // 30 minutes
 
@@ -57,8 +59,11 @@ router.post('/logout', (_req, res) => {
 });
 
 // POST /api/auth/forgot-password
-// Issues a short-lived reset token. In production the token would be emailed;
-// here we return it directly so the demo flow works without SMTP infra.
+// Issues a short-lived reset token and emails it (SMTP). Always responds with
+// the same generic message so the endpoint never leaks which emails are
+// registered. The raw token is never returned in the HTTP response.
+const GENERIC_RESET_MESSAGE = 'Si cet e-mail existe, un code de réinitialisation a été envoyé.';
+
 router.post('/forgot-password', async (req, res) => {
   const { error, value } = Joi.object({
     email: Joi.string().email().required()
@@ -67,20 +72,22 @@ router.post('/forgot-password', async (req, res) => {
 
   const user = await User.findOne({ email: value.email });
   // Always respond 200 — never leak whether the email is registered.
-  if (!user) return res.send({ message: 'If that email exists, a reset link was sent.' });
+  if (!user) return res.send({ message: GENERIC_RESET_MESSAGE });
 
   const token = crypto.randomBytes(32).toString('hex');
   user.resetTokenHash    = hashToken(token);
   user.resetTokenExpires = new Date(Date.now() + RESET_TOKEN_TTL_MS);
   await user.save();
 
-  // DEMO ONLY: returning the raw token. In prod, email it and respond with the
-  // generic message above.
-  res.send({
-    message:    'Reset token issued.',
-    resetToken: token,
-    expiresAt:  user.resetTokenExpires
-  });
+  try {
+    await sendPasswordResetEmail(user.email, token, RESET_TOKEN_TTL_MS / 60000);
+  } catch (e) {
+    // Don't surface SMTP failures to the caller (would leak account existence
+    // and expose infra detail). Log it; the user can simply retry.
+    winston.error('Failed to send password-reset email', { message: e.message });
+  }
+
+  res.send({ message: GENERIC_RESET_MESSAGE });
 });
 
 // POST /api/auth/reset-password

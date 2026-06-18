@@ -2,15 +2,22 @@
 // Unity Fitness mark with a violet glow, an eyebrow label, a gradient headline,
 // and a glowing CTA. Auto-advances after the intro animation; the button skips.
 
-import { COLORS, FONTS, FONT_SIZES, GRADIENTS, RADIUS, SPACING } from "@/constants/theme";
+import {
+    COLORS,
+    FONTS,
+    FONT_SIZES,
+    GRADIENTS,
+    RADIUS,
+    SPACING,
+} from "@/constants/theme";
 import React, { JSX, useEffect, useRef } from "react";
 import {
-  Animated,
-  Easing,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
+    Animated,
+    Easing,
+    Pressable,
+    StyleSheet,
+    Text,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -96,11 +103,14 @@ export default function SplashScreen({
           <Animated.View
             style={[
               styles.copy,
-              { opacity: copyOpacity, transform: [{ translateY: copyTranslate }] },
+              {
+                opacity: copyOpacity,
+                transform: [{ translateY: copyTranslate }],
+              },
             ]}
           >
-            <Eyebrow style={styles.eyebrow}>Passeport Réseau Mondial</Eyebrow>
-            <Text style={styles.title}>La Clé Mondiale</Text>
+            <Eyebrow style={styles.eyebrow}>Passeport Réseau Marocaine</Eyebrow>
+            <Text style={styles.title}>La Clé Marocaine</Text>
             <GradientText
               colors={[...GRADIENTS.text]}
               style={styles.titleAccent}
@@ -108,8 +118,8 @@ export default function SplashScreen({
               du Fitness.
             </GradientText>
             <Text style={styles.tagline}>
-              Un seul pass flexible pour toutes les salles,{"\n"}studios et centres
-              de fitness de votre ville. Sans engagement.
+              Un seul pass flexible pour toutes les salles,{"\n"}studios et
+              centres de fitness de votre ville. Sans engagement.
             </Text>
           </Animated.View>
         </View>
@@ -126,7 +136,11 @@ export default function SplashScreen({
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.background, overflow: "hidden" },
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+    overflow: "hidden",
+  },
   safe: { flex: 1, paddingHorizontal: SPACING.lg },
 
   center: { flex: 1, alignItems: "center", justifyContent: "center" },
