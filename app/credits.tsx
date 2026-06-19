@@ -37,7 +37,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 function formatDate(iso: string): string {
   try {
     const d = new Date(iso);
-    return d.toLocaleString(undefined, {
+    return d.toLocaleString("fr-FR", {
       day: "2-digit",
       month: "short",
       hour: "2-digit",
@@ -67,8 +67,8 @@ function TxRow({ tx }: { tx: CreditTransaction }) {
       <View style={{ flex: 1 }}>
         <Text style={txStyles.title}>
           {isCredit
-            ? tx.packLabel || `Top-up · ${tx.pointsAmount} credits`
-            : `Gym session · ${tx.pointsAmount} credits`}
+            ? tx.packLabel || `Recharge · ${tx.pointsAmount} crédits`
+            : `Séance · ${tx.pointsAmount} crédits`}
         </Text>
         <Text style={txStyles.meta}>
           {formatDate(tx.createdAt)}
@@ -175,7 +175,7 @@ export default function CreditsScreen() {
         >
           <Ionicons name="arrow-back" size={22} color={COLORS.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>My Credits</Text>
+        <Text style={styles.headerTitle}>Mes crédits</Text>
         <View style={{ width: 40 }} />
       </View>
 
@@ -198,13 +198,13 @@ export default function CreditsScreen() {
           dimmer={0.08}
         >
           <View style={styles.heroBody}>
-            <Text style={styles.heroLabel}>UNITYFITNESS CREDITS</Text>
+            <Text style={styles.heroLabel}>CRÉDITS UNITY FITNESS</Text>
             <Text style={styles.heroValue}>
               {balance}
-              <Text style={styles.heroUnit}> credits</Text>
+              <Text style={styles.heroUnit}> crédits</Text>
             </Text>
             <Text style={styles.heroSub}>
-              Use credits at any partner gym in the network.
+              Utilisez vos crédits dans tous les clubs du réseau.
             </Text>
 
             <TouchableOpacity
@@ -213,13 +213,13 @@ export default function CreditsScreen() {
               activeOpacity={0.9}
             >
               <Ionicons name="add-circle" size={18} color={COLORS.accent} />
-              <Text style={styles.topUpText}>Top Up Credits</Text>
+              <Text style={styles.topUpText}>Recharger des crédits</Text>
             </TouchableOpacity>
           </View>
         </GradientSurface>
 
         {/* Activity */}
-        <Text style={styles.sectionLabel}>RECENT ACTIVITY</Text>
+        <Text style={styles.sectionLabel}>ACTIVITÉ RÉCENTE</Text>
         <View style={styles.list}>
           {loading ? (
             <View style={styles.empty}>
@@ -228,9 +228,9 @@ export default function CreditsScreen() {
           ) : txs.length === 0 ? (
             <View style={styles.empty}>
               <Ionicons name="wallet-outline" size={36} color={COLORS.textMuted} />
-              <Text style={styles.emptyTitle}>No transactions yet</Text>
+              <Text style={styles.emptyTitle}>Aucune transaction</Text>
               <Text style={styles.emptyBody}>
-                Top up your credits to get started.
+                Rechargez vos crédits pour commencer.
               </Text>
             </View>
           ) : (

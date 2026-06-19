@@ -40,7 +40,7 @@ export default function EditProfileScreen() {
 
   function handleSave(): void {
     // No PUT /users/me on the backend yet — keep the UI honest.
-    toast.info("Profile editing will be available soon.", "Coming soon");
+    toast.info("La modification du profil sera bientôt disponible.", "Bientôt disponible");
   }
 
   return (
@@ -49,7 +49,7 @@ export default function EditProfileScreen() {
       {/* Header */}
       <View style={styles.header}>
         <CircleIconButton icon="chevron-back" onPress={() => router.back()} />
-        <Text style={styles.headerTitle}>Edit profile</Text>
+        <Text style={styles.headerTitle}>Modifier le profil</Text>
         <CircleIconButton icon="ellipsis-vertical" iconSize={18} />
       </View>
 
@@ -74,7 +74,7 @@ export default function EditProfileScreen() {
               </View>
             </View>
             <Text style={styles.name} numberOfLines={1}>
-              {user?.name ?? "Member"}
+              {user?.name ?? "Membre"}
             </Text>
           </View>
 
@@ -83,15 +83,15 @@ export default function EditProfileScreen() {
           {/* Fields */}
           <View style={styles.form}>
             <FormInput
-              label="Full name"
-              placeholder="Full name"
+              label="Nom complet"
+              placeholder="Nom complet"
               autoCapitalize="words"
               value={name}
               onChangeText={setName}
             />
             <FormInput
-              label="Email"
-              placeholder="you@example.com"
+              label="E-mail"
+              placeholder="vous@exemple.com"
               value={user?.email ?? ""}
               editable={false}
               rightIcon="mail-outline"
@@ -106,7 +106,7 @@ export default function EditProfileScreen() {
             { paddingBottom: Math.max(insets.bottom, SPACING.md) },
           ]}
         >
-          <PrimaryButton title="Save" onPress={handleSave} />
+          <PrimaryButton title="Enregistrer" onPress={handleSave} />
         </View>
       </KeyboardAvoidingView>
     </View>

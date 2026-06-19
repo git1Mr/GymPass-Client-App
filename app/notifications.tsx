@@ -36,16 +36,16 @@ const TODAY: Notice[] = [
   {
     id: "1",
     icon: "qr-code",
-    title: "UnityFitness",
-    body: "Check-in confirmed at FitClub Casablanca. Enjoy your session! 💪",
-    time: "07:32 AM",
+    title: "Unity Fitness",
+    body: "Entrée confirmée à FitClub Casablanca. Bonne séance ! 💪",
+    time: "07:32",
   },
   {
     id: "2",
     icon: "wallet",
-    title: "UnityFitness",
-    body: "25 UnityFitnessCredits were added to your balance.",
-    time: "09:15 AM",
+    title: "Unity Fitness",
+    body: "25 crédits ont été ajoutés à votre solde.",
+    time: "09:15",
   },
 ];
 
@@ -54,15 +54,15 @@ const YESTERDAY: Notice[] = [
     id: "3",
     icon: "flash",
     title: "EliteGym Rabat",
-    body: "New class schedule is available for next week.",
-    time: "06:40 PM",
+    body: "Le nouveau planning des cours est disponible pour la semaine prochaine.",
+    time: "18:40",
   },
   {
     id: "4",
     icon: "trophy",
-    title: "UnityFitness",
-    body: "Weekly summary: 3 check-ins across 2 clubs. Keep it up!",
-    time: "10:00 AM",
+    title: "Unity Fitness",
+    body: "Résumé de la semaine : 3 entrées dans 2 clubs. Continuez comme ça !",
+    time: "10:00",
   },
 ];
 
@@ -105,14 +105,14 @@ export default function NotificationsScreen() {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        <Eyebrow style={styles.groupLabel}>Today</Eyebrow>
+        <Eyebrow style={styles.groupLabel}>Aujourd&apos;hui</Eyebrow>
         <GlassCard style={styles.group}>
           {TODAY.map((n, i) => (
             <NoticeRow key={n.id} notice={n} last={i === TODAY.length - 1} />
           ))}
         </GlassCard>
 
-        <Eyebrow style={styles.groupLabel}>Yesterday</Eyebrow>
+        <Eyebrow style={styles.groupLabel}>Hier</Eyebrow>
         <GlassCard style={styles.group}>
           {YESTERDAY.map((n, i) => (
             <NoticeRow key={n.id} notice={n} last={i === YESTERDAY.length - 1} />

@@ -7,14 +7,14 @@ interface ToastHelper {
 }
 
 const toast: ToastHelper = {
-  success: (message: string, title = "Success"): void =>
+  success: (message: string, title = "Succès"): void =>
     Toast.show({
       type: "success",
       text1: title,
       text2: message,
       visibilityTime: 3000,
     }),
-  error: (message: string, title = "Error"): void =>
+  error: (message: string, title = "Erreur"): void =>
     Toast.show({
       type: "error",
       text1: title,

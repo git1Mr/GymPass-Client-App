@@ -47,10 +47,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 
 const PRESETS: { mad: number; label: string }[] = [
-  { mad: 50, label: "Quick" },
-  { mad: 100, label: "Popular" },
-  { mad: 200, label: "Best Value" },
-  { mad: 500, label: "Power" },
+  { mad: 50, label: "Rapide" },
+  { mad: 100, label: "Populaire" },
+  { mad: 200, label: "Meilleur prix" },
+  { mad: 500, label: "Max" },
 ];
 
 // Resolved at module load. In Expo Go this stays null and the screen renders
@@ -89,16 +89,16 @@ export default function TopUpScreen() {
   const handleTopUp = useCallback(async () => {
     if (!initPaymentSheet || !presentPaymentSheet) {
       Alert.alert(
-        "Payments unavailable in Expo Go",
-        "Stripe Payment Sheet uses a native module that Expo Go can't load. " +
-          "Run a Dev Build:\n\n" +
+        "Paiements indisponibles dans Expo Go",
+        "Le Payment Sheet Stripe utilise un module natif qu'Expo Go ne peut pas charger. " +
+          "Lancez un Dev Build :\n\n" +
           "  npx expo prebuild\n" +
-          "  npx expo run:android   (or run:ios)",
+          "  npx expo run:android   (ou run:ios)",
       );
       return;
     }
     if (finalAmount < 1) {
-      Alert.alert("Invalid amount", "Please enter at least 1 MAD.");
+      Alert.alert("Montant invalide", "Saisissez au moins 1 DH.");
       return;
     }
 
@@ -165,8 +165,8 @@ export default function TopUpScreen() {
 
       Toast.show({
         type: "success",
-        text1: "Payment confirmed",
-        text2: `${intent.points} UnityFitnessCredits added.`,
+        text1: "Paiement confirmé",
+        text2: `${intent.points} crédits ajoutés.`,
       });
       // Webhook usually lands within ~1s; poll twice in case Stripe is slow.
       await refreshUser();
@@ -175,7 +175,7 @@ export default function TopUpScreen() {
       }, 1500);
       router.replace("/credits");
     } catch (err: any) {
-      Alert.alert("Payment failed", err?.message || "Please try again.");
+      Alert.alert("Échec du paiement", err?.message || "Veuillez réessayer.");
     } finally {
       setBusy(false);
     }
@@ -198,7 +198,7 @@ export default function TopUpScreen() {
         >
           <Ionicons name="arrow-back" size={22} color={COLORS.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Top Up Credits</Text>
+        <Text style={styles.headerTitle}>Recharger des crédits</Text>
         <View style={{ width: 40 }} />
       </View>
 
@@ -215,8 +215,8 @@ export default function TopUpScreen() {
             <View style={styles.expoGoBanner}>
               <Ionicons name="warning" size={18} color={COLORS.warning} />
               <Text style={styles.expoGoText}>
-                You&apos;re in Expo Go — Stripe Payment Sheet needs a Dev Build
-                to run. The rest of the app works fine here.
+                Vous êtes dans Expo Go — le Payment Sheet Stripe nécessite un
+                Dev Build. Le reste de l&apos;app fonctionne ici.
               </Text>
             </View>
           )}
@@ -224,21 +224,21 @@ export default function TopUpScreen() {
           {/* Hero */}
           <GradientSurface radius={RADIUS.xl} style={styles.hero} dimmer={0.08}>
             <View style={styles.heroBody}>
-              <Text style={styles.heroLabel}>UNITYFITNESS CREDITS</Text>
+              <Text style={styles.heroLabel}>CRÉDITS UNITY FITNESS</Text>
               <Text style={styles.heroValue}>
                 {creditsPreview}
-                <Text style={styles.heroValueUnit}> credits</Text>
+                <Text style={styles.heroValueUnit}> crédits</Text>
               </Text>
               <Text style={styles.heroSub}>
                 {finalAmount > 0
-                  ? `You'll pay ${finalAmount} MAD`
-                  : "Pick an amount below"}
+                  ? `Vous paierez ${finalAmount} DH`
+                  : "Choisissez un montant ci-dessous"}
               </Text>
             </View>
           </GradientSurface>
 
           {/* Presets */}
-          <Text style={styles.sectionLabel}>QUICK AMOUNTS</Text>
+          <Text style={styles.sectionLabel}>MONTANTS RAPIDES</Text>
           <View style={styles.presetGrid}>
             {PRESETS.map((p) => {
               const active = customMad.length === 0 && selectedMad === p.mad;
